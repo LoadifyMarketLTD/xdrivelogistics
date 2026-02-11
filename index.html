@@ -13,13 +13,28 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://xdrivelogistics.co.uk/" />
   <meta property="og:image" content="https://xdrivelogistics.co.uk/logo.png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="408" />
+  <meta property="og:image:alt" content="XDrive Logistics Logo" />
+  <meta property="og:site_name" content="XDrive Logistics" />
+  <meta property="og:locale" content="en_GB" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="XDrive Logistics | UK & EU Dedicated Transport" />
   <meta name="twitter:description" content="Dedicated van & commercial transport across the UK and Europe. Fast. Direct. Reliable." />
   <meta name="twitter:image" content="https://xdrivelogistics.co.uk/logo.png" />
+  <meta name="twitter:image:alt" content="XDrive Logistics Logo" />
 
-  <link rel="icon" href="logo.png" />
+  <!-- Additional Meta Tags -->
+  <meta name="theme-color" content="#071825" />
+  <meta name="keywords" content="logistics, transport, courier, UK, EU, van hire, dedicated transport, delivery service, Blackburn, Manchester" />
+  <meta name="author" content="XDrive Logistics" />
+  <meta name="robots" content="index, follow" />
+
+  <link rel="icon" type="image/png" href="logo.png" />
+  
+  <!-- Preload critical assets -->
+  <link rel="preload" href="logo.png" as="image" type="image/png" />
 
   <style>
     :root{
@@ -57,12 +72,18 @@
       position:fixed; inset:0;
       background:
         linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.72)),
-        url("https://images.unsplash.com/photo-1501700493788-fa1a4fc9fe36?auto=format&fit=crop&w=2400&q=80");
+        url("https://images.unsplash.com/photo-1501700493788-fa1a4fc9fe36?auto=format&fit=crop&w=1200&q=60");
       background-size:cover;
       background-position:center;
       filter: blur(10px) saturate(1.1);
       transform: scale(1.06);
       z-index:-3;
+    }
+    /* Lazy load background */
+    @media (prefers-reduced-data: reduce) {
+      .bg {
+        background-image: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.72));
+      }
     }
     .grain{
       position:fixed; inset:0;
@@ -321,6 +342,7 @@
 
     label{
       font-size: 12px;
+      font-weight: 600;
       color: rgba(255,255,255,.76);
       letter-spacing:.2px;
     }
@@ -495,19 +517,64 @@
       color: rgba(255,255,255,.62);
       margin-top: 8px;
     }
+    
+    /* Field validation feedback */
+    .field-error {
+      font-size: 12px;
+      color: var(--danger);
+      margin-top: 4px;
+      display: none;
+    }
+    .field.invalid .field-error {
+      display: block;
+    }
+    .field.invalid input,
+    .field.invalid select,
+    .field.invalid textarea {
+      border-color: rgba(255,90,106,.55);
+    }
+    
+    /* Accessibility helper */
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
   </style>
 
   <!-- LocalBusiness schema -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
-    "@type":"LogisticsBusiness",
+    "@type":"LogisticsService",
     "name":"XDrive Logistics",
     "url":"https://xdrivelogistics.co.uk/",
     "logo":"https://xdrivelogistics.co.uk/logo.png",
+    "image":"https://xdrivelogistics.co.uk/logo.png",
     "telephone":"+447423272138",
     "email":"xdrivelogisticsltd@gmail.com",
-    "areaServed":["GB","EU"],
+    "areaServed":[
+      {
+        "@type":"Country",
+        "name":"United Kingdom"
+      },
+      {
+        "@type":"Place",
+        "name":"European Union"
+      }
+    ],
+    "serviceType":["Courier Service","Transport Service","Dedicated Transport"],
+    "provider":{
+      "@type":"LocalBusiness",
+      "name":"XDrive Logistics",
+      "priceRange":"£"
+    },
     "sameAs":[]
   }
   </script>
@@ -577,52 +644,53 @@
           <form id="quoteForm" autocomplete="on">
             <div class="grid">
               <div class="field">
-                <label for="name">Name / Company</label>
-                <input id="name" name="name" placeholder="Your name or company" required />
+                <label for="name">Name / Company <span aria-label="required">*</span></label>
+                <input id="name" name="name" placeholder="Your name or company" required aria-required="true" autocomplete="name" />
               </div>
 
               <div class="field">
-                <label for="phone">Phone (WhatsApp)</label>
-                <input id="phone" name="phone" placeholder="+44..." required />
+                <label for="phone">Phone (WhatsApp) <span aria-label="required">*</span></label>
+                <input id="phone" name="phone" type="tel" placeholder="+44..." required aria-required="true" aria-describedby="phone-error" autocomplete="tel" />
+                <div id="phone-error" class="field-error" role="alert"></div>
               </div>
 
               <div class="field">
-                <label for="pickup">Pickup location</label>
-                <input id="pickup" name="pickup" placeholder="e.g., Blackburn BB1" required />
+                <label for="pickup">Pickup location <span aria-label="required">*</span></label>
+                <input id="pickup" name="pickup" placeholder="e.g., Blackburn BB1" required aria-required="true" autocomplete="address-line1" />
               </div>
 
               <div class="field">
-                <label for="dropoff">Drop-off location</label>
-                <input id="dropoff" name="dropoff" placeholder="e.g., Manchester" required />
+                <label for="dropoff">Drop-off location <span aria-label="required">*</span></label>
+                <input id="dropoff" name="dropoff" placeholder="e.g., Manchester" required aria-required="true" autocomplete="off" />
               </div>
             </div>
 
             <div class="row" style="margin-top:12px;">
               <div class="field">
-                <label for="collection_date">Collection date</label>
-                <input id="collection_date" name="collection_date" type="date" required />
+                <label for="collection_date">Collection date <span aria-label="required">*</span></label>
+                <input id="collection_date" name="collection_date" type="date" required aria-required="true" />
               </div>
               <div class="field">
-                <label for="collection_time">Collection time</label>
-                <input id="collection_time" name="collection_time" type="time" required />
+                <label for="collection_time">Collection time <span aria-label="required">*</span></label>
+                <input id="collection_time" name="collection_time" type="time" required aria-required="true" />
               </div>
             </div>
 
             <div class="row" style="margin-top:12px;">
               <div class="field">
-                <label for="delivery_date">Delivery date</label>
-                <input id="delivery_date" name="delivery_date" type="date" required />
+                <label for="delivery_date">Delivery date <span aria-label="required">*</span></label>
+                <input id="delivery_date" name="delivery_date" type="date" required aria-required="true" />
               </div>
               <div class="field">
-                <label for="delivery_time">Delivery time</label>
-                <input id="delivery_time" name="delivery_time" type="time" required />
+                <label for="delivery_time">Delivery time <span aria-label="required">*</span></label>
+                <input id="delivery_time" name="delivery_time" type="time" required aria-required="true" />
               </div>
             </div>
 
             <div class="grid" style="margin-top:12px;">
               <div class="field">
-                <label for="vehicle">Vehicle preference</label>
-                <select id="vehicle" name="vehicle" required>
+                <label for="vehicle">Vehicle preference <span aria-label="required">*</span></label>
+                <select id="vehicle" name="vehicle" required aria-required="true">
                   <option value="" selected disabled>Select vehicle</option>
                   <option value="Small van">Small van</option>
                   <option value="Medium van">Medium van</option>
@@ -632,8 +700,8 @@
               </div>
 
               <div class="field">
-                <label for="source">Source</label>
-                <select id="source" name="source" required>
+                <label for="source">How did you find us? <span aria-label="required">*</span></label>
+                <select id="source" name="source" required aria-required="true">
                   <option value="xdrivelogistics.co.uk" selected>xdrivelogistics.co.uk</option>
                   <option value="facebook">Facebook</option>
                   <option value="whatsapp">WhatsApp</option>
@@ -645,15 +713,18 @@
             </div>
 
             <div class="field" style="margin-top:12px;">
-              <label for="load_details">Load details</label>
-              <textarea id="load_details" name="load_details" placeholder="Weight, pallets, dimensions, collection time window, special notes…" required></textarea>
+              <label for="load_details">Load details <span aria-label="required">*</span></label>
+              <textarea id="load_details" name="load_details" placeholder="Weight, pallets, dimensions, collection time window, special notes…" required aria-required="true"></textarea>
               <div class="tiny">Tip: WhatsApp gives the fastest response. Include pickup, drop, dates/times and load details.</div>
             </div>
 
             <div class="actions">
-              <button class="btn btn-primary" type="submit" id="sendBtn">Send Request</button>
-              <a class="btn btn-ghost" id="waBtn" href="#" target="_blank" rel="noopener">WhatsApp</a>
-              <a class="btn btn-ghost" id="emailBtn" href="#" target="_blank" rel="noopener">Email</a>
+              <button class="btn btn-primary" type="submit" id="sendBtn">
+                <span id="btnText">Send Request</span>
+                <span id="btnLoader" style="display:none;">⏳ Sending...</span>
+              </button>
+              <a class="btn btn-ghost" id="waBtn" href="#" target="_blank" rel="noopener">📱 WhatsApp</a>
+              <a class="btn btn-ghost" id="emailBtn" href="#" target="_blank" rel="noopener">✉️ Email</a>
             </div>
 
             <div id="status" class="status"></div>
@@ -713,8 +784,12 @@
   </footer>
 
   <script>
-    // Make Webhook URL
+    // Configuration - IMPORTANT: In production, move webhook URL to server-side
+    // This is exposed in client code which is a security concern
     const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/ys8ddlbqd8xknxh5ruqsa4q9hwr5e783";
+    
+    // WARNING: Consider implementing a backend proxy to hide this webhook URL
+    // Example: POST to /api/quote on your server, which then forwards to Make.com
 
     // Contact info
     const WHATSAPP_PHONE_E164 = "447423272138"; // UK number without +, with country code
@@ -769,13 +844,15 @@
     }
 
     function isPhoneValid(phone){
-      // Accept: +44..., 07..., 0044..., or digits 10-15
+      // Accept: +44..., 07..., 0044..., or international with + prefix
       const p = phone.replace(/\s+/g,'');
       if (!p) return false;
+      // UK formats
       if (/^\+44\d{9,12}$/.test(p)) return true;
       if (/^0044\d{9,12}$/.test(p)) return true;
       if (/^07\d{9}$/.test(p)) return true;
-      if (/^\d{10,15}$/.test(p)) return true;
+      // International format with + (10-15 digits total)
+      if (/^\+\d{10,15}$/.test(p)) return true;
       return false;
     }
 
@@ -873,6 +950,32 @@
     ["input","change","keyup"].forEach(evt => {
       form.addEventListener(evt, () => saveDraft());
     });
+    
+    // Real-time phone validation
+    const phoneInput = document.getElementById("phone");
+    const phoneField = phoneInput.closest(".field");
+    const phoneError = document.getElementById("phone-error");
+    
+    phoneInput.addEventListener("blur", () => {
+      const phone = normalizePhone(phoneInput.value);
+      if (phone && !isPhoneValid(phone)) {
+        phoneField.classList.add("invalid");
+        phoneError.textContent = "Please enter a valid phone number (e.g., +44... or 07...)";
+      } else {
+        phoneField.classList.remove("invalid");
+        phoneError.textContent = "";
+      }
+    });
+    
+    phoneInput.addEventListener("input", () => {
+      if (phoneField.classList.contains("invalid")) {
+        const phone = normalizePhone(phoneInput.value);
+        if (phone && isPhoneValid(phone)) {
+          phoneField.classList.remove("invalid");
+          phoneError.textContent = "";
+        }
+      }
+    });
 
     // Init buttons
     setQuickButtons(getFormData());
@@ -916,8 +1019,10 @@
 
       // Send
       sendBtn.disabled = true;
-      const oldText = sendBtn.textContent;
-      sendBtn.textContent = "Sending...";
+      const btnText = document.getElementById("btnText");
+      const btnLoader = document.getElementById("btnLoader");
+      btnText.style.display = "none";
+      btnLoader.style.display = "inline";
 
       try{
         await postToMake(data);
@@ -925,10 +1030,12 @@
         // Keep draft but you can clear after success:
         localStorage.removeItem(DRAFT_KEY);
       }catch(err){
+        console.error("Submission error:", err);
         showStatus("err", "❌ Not sent. Please try again or use WhatsApp. (" + (err?.message || "error") + ")");
       }finally{
         sendBtn.disabled = false;
-        sendBtn.textContent = oldText;
+        btnText.style.display = 'inline';
+        btnLoader.style.display = 'none';
       }
     });
   </script>
