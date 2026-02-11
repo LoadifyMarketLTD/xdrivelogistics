@@ -280,7 +280,7 @@
 
           <div class="card">
             <h3>EU Transport</h3>
-            <p>Cross-border dedicated runs with basic documentation guidance and tracking updates.</p>
+            <p>Cross-border dedicated runs with basic documentation guidance and provide updates.</p>
           </div>
         </div>
       </section>
@@ -432,5 +432,31 @@
       </div>
     </main>
   </div>
+
+  <!-- ✅ Added: Send Netlify quote form data to Make webhook in background (no visual changes) -->
+  <script>
+  (function () {
+    const MAKE_WEBHOOK = "https://hook.eu1.make.com/ys8ddlbqd8xknxh5ruqsa4q9hwr5e783";
+    const form = document.querySelector('form[name="quote"]');
+    if (!form) return;
+
+    form.addEventListener("submit", function () {
+      try {
+        const fd = new FormData(form);
+        const data = {};
+        fd.forEach((v, k) => (data[k] = v));
+        data.source = window.location.href;
+        data.timestamp = new Date().toISOString();
+
+        fetch(MAKE_WEBHOOK, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+          keepalive: true
+        }).catch(function(){});
+      } catch (e) {}
+    }, { capture: true });
+  })();
+  </script>
 </body>
 </html>
