@@ -3,7 +3,7 @@
 ## Critical Security Issue: Exposed Webhook URL
 
 ### Current Issue
-The Make.com webhook URL is currently hardcoded in the client-side JavaScript code (`index.html` line 717). This means:
+The Make.com webhook URL is currently hardcoded in the client-side JavaScript code (`index.html` line 789). This means:
 - ✗ Anyone can view the webhook URL in browser developer tools
 - ✗ Malicious actors could spam your webhook with fake submissions
 - ✗ You have no control over rate limiting or validation

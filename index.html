@@ -650,19 +650,18 @@
 
               <div class="field">
                 <label for="phone">Phone (WhatsApp) <span aria-label="required">*</span></label>
-                <input id="phone" name="phone" type="tel" placeholder="+44..." required aria-required="true" aria-describedby="phone-hint phone-error" autocomplete="tel" />
-                <span id="phone-hint" class="visually-hidden">Enter your phone number in UK format, e.g., +44 or 07</span>
+                <input id="phone" name="phone" type="tel" placeholder="+44..." required aria-required="true" aria-describedby="phone-error" autocomplete="tel" />
                 <div id="phone-error" class="field-error" role="alert"></div>
               </div>
 
               <div class="field">
                 <label for="pickup">Pickup location <span aria-label="required">*</span></label>
-                <input id="pickup" name="pickup" placeholder="e.g., Blackburn BB1" required aria-required="true" autocomplete="shipping address-line1" />
+                <input id="pickup" name="pickup" placeholder="e.g., Blackburn BB1" required aria-required="true" autocomplete="address-line1" />
               </div>
 
               <div class="field">
                 <label for="dropoff">Drop-off location <span aria-label="required">*</span></label>
-                <input id="dropoff" name="dropoff" placeholder="e.g., Manchester" required aria-required="true" autocomplete="shipping address-line2" />
+                <input id="dropoff" name="dropoff" placeholder="e.g., Manchester" required aria-required="true" autocomplete="off" />
               </div>
             </div>
 
@@ -845,15 +844,15 @@
     }
 
     function isPhoneValid(phone){
-      // Accept: +44..., 07..., 0044..., or digits 10-15
+      // Accept: +44..., 07..., 0044..., or international with + prefix
       const p = phone.replace(/\s+/g,'');
       if (!p) return false;
       // UK formats
       if (/^\+44\d{9,12}$/.test(p)) return true;
       if (/^0044\d{9,12}$/.test(p)) return true;
       if (/^07\d{9}$/.test(p)) return true;
-      // International format (10-15 digits)
-      if (/^\+?\d{10,15}$/.test(p)) return true;
+      // International format with + (10-15 digits total)
+      if (/^\+\d{10,15}$/.test(p)) return true;
       return false;
     }
 
