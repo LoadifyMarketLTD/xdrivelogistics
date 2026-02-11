@@ -1,202 +1,500 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>XDrive Logistics | UK & EU Dedicated Transport</title>
-  <meta name="description" content="UK & EU dedicated courier and commercial transport. Same-day collections, pallet freight, multi-drop routes, and high-value loads. Fast response via WhatsApp or phone." />
+  <meta name="description" content="Dedicated courier & transport services across the UK and EU. Fast quotes, reliable collection & delivery." />
   <link rel="canonical" href="https://xdrivelogistics.co.uk/" />
 
   <!-- Open Graph -->
   <meta property="og:title" content="XDrive Logistics | UK & EU Dedicated Transport" />
-  <meta property="og:description" content="Dedicated van, pallet & commercial transport across the UK and Europe. Fast. Direct. Reliable." />
+  <meta property="og:description" content="Dedicated van & commercial transport across the UK and Europe. Fast. Direct. Reliable." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://xdrivelogistics.co.uk/" />
   <meta property="og:image" content="https://xdrivelogistics.co.uk/logo.png" />
 
-  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="XDrive Logistics | UK & EU Dedicated Transport" />
-  <meta name="twitter:description" content="Dedicated van, pallet & commercial transport across the UK and Europe. Fast. Direct. Reliable." />
+  <meta name="twitter:description" content="Dedicated van & commercial transport across the UK and Europe. Fast. Direct. Reliable." />
   <meta name="twitter:image" content="https://xdrivelogistics.co.uk/logo.png" />
 
   <link rel="icon" href="logo.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
-    html{scroll-behavior:smooth;}
-    body{
-      background:linear-gradient(135deg,#0d2f4f 0%,#0f3d63 50%,#167bbd 100%);
-      color:#fff;
-      min-height:100vh;
+    :root{
+      --bg1:#071825;
+      --bg2:#0b2a3b;
+      --card: rgba(12, 34, 50, .58);
+      --card2: rgba(10, 28, 42, .72);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.14);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --gold: #D4AF37;
+      --gold2:#b9931f;
+      --ok:#2bd576;
+      --danger:#ff5a6a;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --radius: 22px;
     }
-    .container{width:92%;max-width:1200px;margin:auto;padding:22px 0 44px;}
 
-    nav{
-      display:flex;justify-content:space-between;align-items:center;
-      gap:14px;padding:12px 0;
-      position:sticky;top:0;z-index:50;
-      backdrop-filter: blur(10px);
-      background: rgba(10,34,57,0.25);
-      border-bottom:1px solid rgba(255,255,255,0.10);
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 15% 10%, rgba(212,175,55,.18), transparent 55%),
+        radial-gradient(900px 600px at 90% 25%, rgba(0,190,255,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
     }
-    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;}
-    .brand img{width:34px;height:34px;border-radius:8px;}
-    .logoText{font-weight:900;font-size:17px;letter-spacing:.2px}
-    .navlinks{display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:center;}
-    .navlinks a{color:rgba(255,255,255,0.86);text-decoration:none;font-weight:800;font-size:13px}
-    .navlinks a:hover{color:#fff}
-    .cta-btn{
-      background:#f4c430;color:#0a2239;
-      padding:10px 14px;border-radius:10px;font-weight:900;
-      text-decoration:none;display:inline-flex;align-items:center;gap:8px;
-      box-shadow:0 10px 20px rgba(0,0,0,0.22);
+
+    /* Blurred background image layer */
+    .bg{
+      position:fixed; inset:0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.72)),
+        url("https://images.unsplash.com/photo-1501700493788-fa1a4fc9fe36?auto=format&fit=crop&w=2400&q=80");
+      background-size:cover;
+      background-position:center;
+      filter: blur(10px) saturate(1.1);
+      transform: scale(1.06);
+      z-index:-3;
+    }
+    .grain{
+      position:fixed; inset:0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+      opacity:.22;
+      z-index:-2;
+      pointer-events:none;
+    }
+
+    /* Top nav */
+    .navWrap{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: rgba(0,0,0,.22);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .nav{
+      width:min(1180px, 100%);
+      margin: 0 auto;
+      padding: 14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      text-decoration:none; color:var(--text);
+      min-width: 220px;
+    }
+    .logo{
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.08);
+      object-fit: cover;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    .brandText{display:flex; flex-direction:column; gap:2px;}
+    .brandText b{font-size: 15px; letter-spacing:.2px;}
+    .brandText span{font-size: 12px; color: rgba(255,255,255,.70);}
+
+    .navLinks{
+      display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+    }
+    .navLinks a{
+      color: rgba(255,255,255,.78);
+      text-decoration:none;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+    }
+    .navLinks a:hover{
+      color: var(--text);
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.10);
+    }
+
+    .navCta{
+      display:flex; gap:10px; align-items:center;
+    }
+    .ctaBtn{
+      border:0;
+      border-radius: 14px;
+      padding: 10px 12px;
+      cursor:pointer;
+      font-weight:900;
+      letter-spacing:.2px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      user-select:none;
+      text-decoration:none;
+      background: linear-gradient(180deg, var(--gold), var(--gold2));
+      color:#1a1406;
+      box-shadow: 0 16px 40px rgba(212,175,55,.22);
+      white-space:nowrap;
+    }
+    .ghostBtn{
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.12);
+      padding: 10px 12px;
+      border-radius: 14px;
+      text-decoration:none;
+      font-weight: 900;
       white-space:nowrap;
     }
 
-    .hero{padding:40px 0 12px;text-align:center;}
-    .badge{
-      display:inline-flex;align-items:center;gap:10px;
-      background:rgba(255,255,255,0.12);
-      border:1px solid rgba(255,255,255,0.16);
-      padding:10px 14px;border-radius:999px;
-      font-weight:900;font-size:13px;
+    /* Hamburger */
+    .hamburger{
+      display:none;
+      width: 42px; height: 42px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      cursor:pointer;
+      align-items:center;
+      justify-content:center;
+      gap:5px;
+      flex-direction:column;
     }
-    .dot{width:8px;height:8px;border-radius:999px;background:#34d399;display:inline-block}
-    .hero h1{font-size:44px;line-height:1.08;font-weight:900;margin:16px 0 12px;}
-    .hero h1 span{color:#f4c430;}
-    .hero p{max-width:860px;margin:0 auto;opacity:.92;font-size:17px;line-height:1.55;}
-    .heroActions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px;}
-    .btn-primary{
-      background:#f4c430;color:#0a2239;
-      padding:13px 20px;border-radius:12px;font-weight:900;text-decoration:none;
-    }
-    .btn-secondary{
-      background:rgba(255,255,255,0.14);
-      border:1px solid rgba(255,255,255,0.18);
-      padding:13px 20px;border-radius:12px;font-weight:900;text-decoration:none;color:#fff;
-    }
-    .trustRow{
-      margin:16px auto 0;
-      display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
-      opacity:.95;
-    }
-    .pill{
-      background:rgba(255,255,255,0.10);
-      border:1px solid rgba(255,255,255,0.14);
-      padding:9px 11px;border-radius:999px;
-      font-weight:800;font-size:13px;
+    .hamburger span{
+      width: 18px;
+      height: 2px;
+      background: rgba(255,255,255,.86);
+      border-radius: 10px;
     }
 
-    .section{padding:34px 0 0;}
-    .section-title{text-align:center;font-size:28px;font-weight:900;margin-bottom:12px;}
-    .section-sub{text-align:center;opacity:.88;max-width:850px;margin:0 auto 16px;line-height:1.6;font-size:14.8px;}
+    .mobileMenu{
+      display:none;
+      width:min(1180px, 100%);
+      margin: 0 auto;
+      padding: 0 18px 14px;
+    }
+    .mobileMenuInner{
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 10px;
+      display:grid;
+      gap:8px;
+    }
+    .mobileMenuInner a{
+      padding: 12px 12px;
+      border-radius: 14px;
+      text-decoration:none;
+      color: rgba(255,255,255,.86);
+      font-weight: 900;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+    }
+
+    @media (max-width: 860px){
+      .navLinks{display:none;}
+      .hamburger{display:flex;}
+      .navCta{display:none;}
+      .mobileMenu{display:block;}
+      .mobileMenu[hidden]{display:none;}
+    }
+
+    .wrap{
+      min-height:100%;
+      padding: 18px 18px 46px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+    }
+
+    .container{
+      width:min(1180px, 100%);
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:22px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 980px){
+      .container{grid-template-columns:1fr; gap:16px;}
+      .wrap{padding: 14px 14px 34px;}
+    }
+
+    .card{
+      background: linear-gradient(180deg, var(--card), rgba(10, 28, 42, .52));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(600px 220px at 20% 0%, rgba(212,175,55,.20), transparent 60%),
+                  radial-gradient(500px 220px at 85% 10%, rgba(0,200,255,.14), transparent 60%);
+      pointer-events:none;
+      opacity:.9;
+    }
+
+    .inner{position:relative; padding:22px;}
+    @media (max-width: 980px){ .inner{padding:18px;} }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:14px;
+    }
+
+    .heroTitle{
+      display:flex; flex-direction:column; gap:6px;
+    }
+    .heroTitle h1{
+      margin:0;
+      font-size: 22px;
+      letter-spacing:.2px;
+      line-height:1.1;
+    }
+    .heroTitle p{
+      margin:0;
+      color:var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .pill{
+      padding:10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,.18);
+      display:flex;
+      gap:10px;
+      align-items:center;
+      color:var(--muted);
+      font-size: 12px;
+      white-space:nowrap;
+    }
+    .pill b{color:var(--text); font-weight:700}
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--ok);
+      box-shadow: 0 0 0 6px rgba(43,213,118,.12);
+    }
 
     .grid{
-      display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-      gap:14px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top: 12px;
     }
-    .card{
-      background:rgba(255,255,255,0.09);
-      border:1px solid rgba(255,255,255,0.16);
-      border-radius:16px;
-      padding:16px 16px 14px;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 14px 28px rgba(0,0,0,0.18);
+    @media (max-width: 560px){
+      .grid{grid-template-columns:1fr;}
+      .topbar{flex-direction:column; align-items:flex-start;}
+      .pill{width:100%; justify-content:flex-start;}
     }
-    .card h3{color:#f4c430;font-size:15px;margin-bottom:8px;font-weight:900;}
-    .card p{opacity:.90;line-height:1.55;font-size:13.8px}
 
-    .split{
-      display:grid;grid-template-columns:1.15fr 0.85fr;gap:14px;align-items:start;
-      margin-top:14px;
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
     }
-    @media (max-width: 920px){ .split{grid-template-columns:1fr;} .hero h1{font-size:36px;} }
 
-    .formCard{
-      background:rgba(255,255,255,0.09);
-      border:1px solid rgba(255,255,255,0.16);
-      border-radius:18px;
-      padding:16px;
-      backdrop-filter: blur(10px);
+    label{
+      font-size: 12px;
+      color: rgba(255,255,255,.76);
+      letter-spacing:.2px;
     }
-    label{font-size:12.8px;font-weight:900;opacity:.95;display:block;margin:10px 0 6px}
+
     input, select, textarea{
       width:100%;
-      background:rgba(255,255,255,0.10);
-      border:1px solid rgba(255,255,255,0.18);
-      color:#fff;
-      padding:12px 12px;border-radius:12px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke2);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 12px 12px;
       outline:none;
-      font-weight:700;
+      transition: .18s ease;
+      font-size: 14px;
     }
-    textarea{min-height:92px;resize:vertical}
-    input::placeholder, textarea::placeholder{color:rgba(255,255,255,0.70)}
-    .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media (max-width: 640px){ .two{grid-template-columns:1fr;} }
+    textarea{min-height: 120px; resize: vertical; padding-top:12px;}
+    input::placeholder, textarea::placeholder{color: rgba(255,255,255,.46);}
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(212,175,55,.55);
+      box-shadow: 0 0 0 6px rgba(212,175,55,.10);
+    }
+    select option{background:#0a2333; color:#fff;}
 
-    .formActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
-    .submit{
-      background:#f4c430;color:#0a2239;border:none;
-      padding:13px 18px;border-radius:12px;
-      font-weight:900;cursor:pointer;
+    .row{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:12px;
     }
-    .ghost{
-      background:rgba(255,255,255,0.14);
-      border:1px solid rgba(255,255,255,0.18);
-      padding:13px 18px;border-radius:12px;
-      font-weight:900;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+    @media (max-width: 560px){ .row{grid-template-columns:1fr;} }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-top:14px;
+      flex-wrap:wrap;
     }
+
+    .btn{
+      border:0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      cursor:pointer;
+      font-weight:800;
+      letter-spacing:.2px;
+      transition:.18s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      user-select:none;
+      text-decoration:none;
+    }
+    .btn-primary{
+      background: linear-gradient(180deg, var(--gold), var(--gold2));
+      color:#1a1406;
+      box-shadow: 0 16px 40px rgba(212,175,55,.22);
+    }
+    .btn-primary:hover{transform: translateY(-1px); filter: brightness(1.02);}
+    .btn-primary:disabled{
+      opacity:.72;
+      cursor:not-allowed;
+      transform:none;
+    }
+    .btn-ghost{
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border: 1px solid var(--stroke2);
+    }
+    .btn-ghost:hover{transform: translateY(-1px); background: rgba(255,255,255,.10);}
 
     .status{
+      margin-top: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,.18);
+      color: var(--muted);
       display:none;
+    }
+    .status.ok{display:block; border-color: rgba(43,213,118,.35); background: rgba(43,213,118,.10); color: rgba(235,255,244,.94);}
+    .status.err{display:block; border-color: rgba(255,90,106,.35); background: rgba(255,90,106,.10); color: rgba(255,242,244,.94);}
+
+    .right{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    .sideCard{
+      background: linear-gradient(180deg, var(--card2), rgba(10,28,42,.60));
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .sideCard::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(520px 180px at 12% 0%, rgba(212,175,55,.18), transparent 60%);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .sideInner{position:relative;}
+    .sideTitle{margin:0 0 8px; font-size: 16px;}
+    .sideText{margin:0; color:var(--muted); font-size: 13px; line-height:1.55;}
+
+    .contactList{
       margin-top:10px;
-      background:rgba(34,197,94,0.18);
-      border:1px solid rgba(34,197,94,0.35);
-      border-radius:12px;
-      padding:10px 12px;
-      font-weight:900;
-      font-size:13px;
-      line-height:1.4;
+      display:grid;
+      gap:10px;
     }
-    .status.err{
-      background:rgba(239,68,68,0.16);
-      border:1px solid rgba(239,68,68,0.35);
+    .contactItem{
+      padding: 10px 12px;
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+      background: rgba(255,255,255,.06);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      color: var(--muted);
+      font-size: 13px;
     }
+    .contactItem b{color:var(--text);}
+    .link{
+      color: var(--gold);
+      text-decoration:none;
+      font-weight:800;
+    }
+    .link:hover{text-decoration:underline;}
 
+    .faq{
+      margin-top:10px;
+      display:grid;
+      gap:10px;
+    }
     details{
-      background:rgba(255,255,255,0.08);
-      border:1px solid rgba(255,255,255,0.14);
-      border-radius:14px;
-      padding:12px 12px;
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+      background: rgba(255,255,255,.06);
+      padding: 10px 12px;
     }
-    summary{cursor:pointer;font-weight:900;font-size:14px}
-    details p{margin-top:8px;opacity:.90;line-height:1.6;font-size:13.5px}
+    summary{
+      cursor:pointer;
+      font-weight:800;
+      color: rgba(255,255,255,.90);
+      outline:none;
+    }
+    details p{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size: 13px;
+      line-height:1.55;
+    }
 
-    .contactBox{
-      background:rgba(255,255,255,0.09);
-      border:1px solid rgba(255,255,255,0.16);
-      border-radius:18px;
-      padding:16px;
+    footer{
+      width:min(1180px, 100%);
+      margin: 10px auto 0;
+      color: rgba(255,255,255,.60);
+      font-size: 12px;
+      text-align:center;
+      padding: 10px 18px 20px;
     }
-    .contactBox a{color:#fff;text-decoration:none;font-weight:900}
-    .contactBox small{display:block;opacity:.80;margin-top:6px;line-height:1.45;font-size:13px}
 
-    /* Floating WhatsApp */
-    .wa-float{
-      position:fixed;right:16px;bottom:16px;z-index:60;
-      background:#22c55e;color:#071a2a;
-      padding:12px 14px;border-radius:999px;
-      font-weight:900;text-decoration:none;
-      box-shadow:0 16px 30px rgba(0,0,0,0.25);
-      display:inline-flex;gap:10px;align-items:center;
+    .tiny{
+      font-size:12px;
+      color: rgba(255,255,255,.62);
+      margin-top: 8px;
     }
-    .wa-float span{color:#052e14}
-    .footer{margin-top:34px;text-align:center;opacity:.65;font-size:12.5px;padding-bottom:18px}
   </style>
 
   <!-- LocalBusiness schema -->
@@ -216,247 +514,423 @@
 </head>
 
 <body>
-  <!-- WhatsApp floating -->
-  <a class="wa-float" href="https://wa.me/447423272138?text=Hi%20XDrive%20Logistics%2C%20I%20need%20a%20quote.%20Pickup%3A%20____%20Drop%3A%20____%20Date%3A%20____%20Load%3A%20____" target="_blank" rel="noopener">
-    WhatsApp <span>Fast quote</span>
-  </a>
+  <div class="bg"></div>
+  <div class="grain"></div>
 
-  <div class="container">
-    <nav>
-      <a class="brand" href="#top">
-        <img src="logo.png" alt="XDrive Logistics logo" />
-        <div class="logoText">XDrive Logistics</div>
+  <!-- NAV -->
+  <div class="navWrap">
+    <div class="nav">
+      <a class="brand" href="#top" aria-label="XDrive Logistics Home">
+        <img class="logo" src="logo.png" alt="XDrive Logistics logo" onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex';" />
+        <div class="brandText" id="logoFallback" style="display:none;flex-direction:column;">
+          <b>XDrive Logistics</b>
+          <span>UK & EU Dedicated Transport</span>
+        </div>
+        <div class="brandText" id="brandTextDefault">
+          <b>XDrive Logistics</b>
+          <span>UK & EU Dedicated Transport</span>
+        </div>
       </a>
 
-      <div class="navlinks" aria-label="Primary">
-        <a href="#services">Services</a>
-        <a href="#coverage">Coverage</a>
-        <a href="#quote">Quote</a>
-        <a href="#faq">FAQ</a>
+      <div class="navLinks" aria-label="Primary">
+        <a href="#quote">Get a Quote</a>
         <a href="#contact">Contact</a>
+        <a href="#faq">FAQ</a>
       </div>
 
-      <a class="cta-btn" href="#quote">Get a Quote</a>
-    </nav>
-
-    <main id="top">
-      <section class="hero">
-        <div class="badge"><span class="dot"></span> Trusted by UK logistics professionals</div>
-
-        <h1>UK & EU <span>Dedicated Transport</span><br>Fast. Direct. Reliable.</h1>
-
-        <p>
-          Commercial courier, pallet and dedicated van transport across the UK and Europe.
-          Built for businesses that need speed, reliability and professional handling.
-        </p>
-
-        <div class="heroActions">
-          <a class="btn-primary" href="#quote">Request Instant Quote</a>
-          <a class="btn-secondary" href="tel:+447423272138">Call Now</a>
-          <a class="btn-secondary" href="mailto:xdrivelogisticsltd@gmail.com?subject=Quote%20request%20-%20XDrive%20Logistics">Email</a>
-        </div>
-
-        <div class="trustRow" aria-label="Key trust points">
-          <div class="pill">✔ Fully insured transport</div>
-          <div class="pill">✔ Direct driver communication</div>
-          <div class="pill">✔ Transparent pricing</div>
-          <div class="pill">✔ Fast response & collection</div>
-        </div>
-      </section>
-
-      <section id="services" class="section">
-        <h2 class="section-title">Services</h2>
-        <p class="section-sub">
-          Dedicated courier solutions for urgent, scheduled and commercial loads — across the UK and Europe.
-        </p>
-
-        <div class="grid">
-          <div class="card"><h3>Same-Day Courier</h3><p>Urgent collections & direct delivery — fastest option for time-critical shipments.</p></div>
-          <div class="card"><h3>Next-Day Delivery</h3><p>Planned transport for regular routes and scheduled shipments with clear updates.</p></div>
-          <div class="card"><h3>Pallet & Commercial Loads</h3><p>Business freight, pallet transport and secure handling for commercial customers.</p></div>
-          <div class="card"><h3>Multi-Drop Routes</h3><p>Optimised routes for multiple stops — reduce cost per drop and improve efficiency.</p></div>
-          <div class="card"><h3>Dedicated Van</h3><p>Exclusive vehicle for your load — ideal for high-value freight and sensitive goods.</p></div>
-          <div class="card"><h3>EU Transport</h3><p>Cross-border dedicated runs with basic documentation guidance and tracking updates.</p></div>
-        </div>
-      </section>
-
-      <section id="coverage" class="section">
-        <h2 class="section-title">Coverage</h2>
-        <p class="section-sub">UK nationwide coverage, with EU routes available on request.</p>
-
-        <div class="grid">
-          <div class="card"><h3>UK Nationwide</h3><p>England • Scotland • Wales • Midlands • London & South East</p></div>
-          <div class="card"><h3>EU Routes</h3><p>Dedicated EU transport available on request (paperwork guidance + tracking updates).</p></div>
-          <div class="card"><h3>Fast Response</h3><p>Best results via WhatsApp — send pickup, drop, date and load details for a quick quote.</p></div>
-        </div>
-      </section>
-
-      <section id="quote" class="section">
-        <h2 class="section-title">Request a Quote</h2>
-        <p class="section-sub">
-          Fill the details below and we’ll reply fast with price & availability.
-          (Sends to Make → Google Sheets + Email)
-        </p>
-
-        <div class="split">
-          <div class="formCard">
-            <form id="quoteForm" action="https://hook.eu1.make.com/ys8ddlbqd8xknxh5ruqsa4q9hwr5e783" method="POST">
-              <!-- hidden (for Make + Sheets) -->
-              <input type="hidden" name="submitted_at" id="submitted_at" value="" />
-              <input type="hidden" name="source" value="xdrivelogistics.co.uk" />
-
-              <div class="two">
-                <div>
-                  <label for="name">Name / Company</label>
-                  <input id="name" name="name" placeholder="Your name or company" required />
-                </div>
-                <div>
-                  <label for="phone">Phone (WhatsApp)</label>
-                  <input id="phone" name="phone" placeholder="+44..." required />
-                </div>
-              </div>
-
-              <div class="two">
-                <div>
-                  <label for="pickup">Pickup location</label>
-                  <input id="pickup" name="pickup" placeholder="e.g., Blackburn BB1" required />
-                </div>
-                <div>
-                  <label for="dropoff">Drop-off location</label>
-                  <input id="dropoff" name="dropoff" placeholder="e.g., Manchester" required />
-                </div>
-              </div>
-
-              <div class="two">
-                <div>
-                  <label for="datetime">Collection date & time</label>
-                  <!-- FIX #1: REAL calendar -->
-                  <input id="datetime" name="datetime" type="datetime-local" required />
-                </div>
-                <div>
-                  <label for="vehicle">Vehicle preference</label>
-                  <!-- FIX #2: FULL options -->
-                  <select id="vehicle" name="vehicle" required>
-                    <option value="" selected disabled>Select vehicle</option>
-                    <option value="Small van">Small van</option>
-                    <option value="Medium van">Medium van</option>
-                    <option value="Long wheelbase">Long wheelbase</option>
-                    <option value="Luton van">Luton van</option>
-                    <option value="Any">Any</option>
-                  </select>
-                </div>
-              </div>
-
-              <label for="load_details">Load details</label>
-              <textarea id="load_details" name="load_details" placeholder="Weight, pallets, collection time window, special notes..."></textarea>
-
-              <div class="formActions">
-                <button class="submit" type="submit">Send Request</button>
-                <a class="ghost" href="https://wa.me/447423272138?text=Hi%20XDrive%20Logistics%2C%20quote%20request%3A%20Pickup%3A%20____%20Drop%3A%20____%20Date%3A%20____%20Load%3A%20____" target="_blank" rel="noopener">WhatsApp</a>
-                <a class="ghost" href="mailto:xdrivelogisticsltd@gmail.com?subject=Quote%20request%20-%20XDrive%20Logistics&body=Pickup%3A%20____%0ADrop%3A%20____%0ADate%3A%20____%0ALoad%3A%20____%0APhone%3A%20____">Email</a>
-              </div>
-
-              <div id="okMsg" class="status">✅ Thank you! Request received. We’ll reply shortly.</div>
-              <div id="errMsg" class="status err">❌ Not sent. Please try again or use WhatsApp.</div>
-
-              <p style="margin-top:10px;opacity:.82;font-size:12px;line-height:1.45">
-                Tip: WhatsApp gives the fastest response. Include pickup, drop, date/time and load details.
-              </p>
-            </form>
-          </div>
-
-          <div class="contactBox" id="contact">
-            <h3 style="font-weight:900;margin-bottom:10px;color:#f4c430">Contact</h3>
-            <div style="display:grid;gap:10px">
-              <div>
-                <a href="https://wa.me/447423272138" target="_blank" rel="noopener">WhatsApp: 07423 272138</a>
-                <small>Fastest way to get a quote.</small>
-              </div>
-              <div>
-                <a href="tel:+447423272138">Phone: 07423 272138</a>
-                <small>Best for immediate dispatch.</small>
-              </div>
-              <div>
-                <a href="mailto:xdrivelogisticsltd@gmail.com">Email: xdrivelogisticsltd@gmail.com</a>
-                <small>Quotes & paperwork support.</small>
-              </div>
-            </div>
-
-            <div style="margin-top:14px;opacity:.88;font-size:13px;line-height:1.6">
-              <strong>What to send:</strong><br>
-              Pickup • Drop • Date/Time • Load details • Vehicle preference
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="faq" class="section">
-        <h2 class="section-title">FAQ</h2>
-        <p class="section-sub">Quick answers for clients and dispatchers.</p>
-
-        <div class="grid">
-          <details>
-            <summary>How fast can you collect?</summary>
-            <p>Same-day collections are available depending on distance and vehicle availability. WhatsApp details for the fastest confirmation.</p>
-          </details>
-          <details>
-            <summary>Do you do pallet and commercial loads?</summary>
-            <p>Yes. We handle commercial loads and palletised freight. Please include weight/quantity and any handling notes.</p>
-          </details>
-          <details>
-            <summary>Do you cover Europe?</summary>
-            <p>EU dedicated runs are available on request. We can guide on basic documentation requirements and provide updates.</p>
-          </details>
-          <details>
-            <summary>How do I get the quickest quote?</summary>
-            <p>Send pickup, drop, date/time and load details on WhatsApp. You can also use the quote form on this page.</p>
-          </details>
-        </div>
-      </section>
-
-      <div class="footer">
-        © 2026 XDrive Logistics — Courier & Transport (UK & EU). All rights reserved.
+      <div class="navCta">
+        <a class="ghostBtn" href="tel:+447423272138">Call</a>
+        <a class="ctaBtn" href="#quote">Quote</a>
       </div>
-    </main>
+
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="mobileMenu" id="mobileMenu" hidden>
+      <div class="mobileMenuInner">
+        <a href="#quote">Get a Quote</a>
+        <a href="tel:+447423272138">Call</a>
+        <a href="#contact">Contact</a>
+        <a href="#faq">FAQ</a>
+      </div>
+    </div>
   </div>
 
+  <main class="wrap" id="top">
+    <div class="container">
+      <!-- LEFT: FORM -->
+      <section class="card" aria-label="Request a quote form" id="quote">
+        <div class="inner">
+          <div class="topbar">
+            <div class="heroTitle">
+              <h1>Fast Quote • Dedicated Transport</h1>
+              <p>Send pickup & delivery details. We’ll reply quickly with price & availability.</p>
+            </div>
+            <div class="pill" title="We reply quickly">
+              <span class="dot"></span>
+              <span><b>Quick reply</b> via WhatsApp / Email</span>
+            </div>
+          </div>
+
+          <form id="quoteForm" autocomplete="on">
+            <div class="grid">
+              <div class="field">
+                <label for="name">Name / Company</label>
+                <input id="name" name="name" placeholder="Your name or company" required />
+              </div>
+
+              <div class="field">
+                <label for="phone">Phone (WhatsApp)</label>
+                <input id="phone" name="phone" placeholder="+44..." required />
+              </div>
+
+              <div class="field">
+                <label for="pickup">Pickup location</label>
+                <input id="pickup" name="pickup" placeholder="e.g., Blackburn BB1" required />
+              </div>
+
+              <div class="field">
+                <label for="dropoff">Drop-off location</label>
+                <input id="dropoff" name="dropoff" placeholder="e.g., Manchester" required />
+              </div>
+            </div>
+
+            <div class="row" style="margin-top:12px;">
+              <div class="field">
+                <label for="collection_date">Collection date</label>
+                <input id="collection_date" name="collection_date" type="date" required />
+              </div>
+              <div class="field">
+                <label for="collection_time">Collection time</label>
+                <input id="collection_time" name="collection_time" type="time" required />
+              </div>
+            </div>
+
+            <div class="row" style="margin-top:12px;">
+              <div class="field">
+                <label for="delivery_date">Delivery date</label>
+                <input id="delivery_date" name="delivery_date" type="date" required />
+              </div>
+              <div class="field">
+                <label for="delivery_time">Delivery time</label>
+                <input id="delivery_time" name="delivery_time" type="time" required />
+              </div>
+            </div>
+
+            <div class="grid" style="margin-top:12px;">
+              <div class="field">
+                <label for="vehicle">Vehicle preference</label>
+                <select id="vehicle" name="vehicle" required>
+                  <option value="" selected disabled>Select vehicle</option>
+                  <option value="Small van">Small van</option>
+                  <option value="Medium van">Medium van</option>
+                  <option value="Long wheelbase">Long wheelbase</option>
+                  <option value="Luton van">Luton van</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="source">Source</label>
+                <select id="source" name="source" required>
+                  <option value="xdrivelogistics.co.uk" selected>xdrivelogistics.co.uk</option>
+                  <option value="facebook">Facebook</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="google">Google</option>
+                  <option value="referral">Referral</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field" style="margin-top:12px;">
+              <label for="load_details">Load details</label>
+              <textarea id="load_details" name="load_details" placeholder="Weight, pallets, dimensions, collection time window, special notes…" required></textarea>
+              <div class="tiny">Tip: WhatsApp gives the fastest response. Include pickup, drop, dates/times and load details.</div>
+            </div>
+
+            <div class="actions">
+              <button class="btn btn-primary" type="submit" id="sendBtn">Send Request</button>
+              <a class="btn btn-ghost" id="waBtn" href="#" target="_blank" rel="noopener">WhatsApp</a>
+              <a class="btn btn-ghost" id="emailBtn" href="#" target="_blank" rel="noopener">Email</a>
+            </div>
+
+            <div id="status" class="status"></div>
+          </form>
+        </div>
+      </section>
+
+      <!-- RIGHT: CONTACT + FAQ -->
+      <aside class="right" aria-label="Contact and FAQ">
+        <div class="sideCard" id="contact">
+          <div class="sideInner">
+            <h2 class="sideTitle">Contact</h2>
+            <p class="sideText">Best for immediate dispatch and quotes.</p>
+
+            <div class="contactList">
+              <div class="contactItem">
+                <span>WhatsApp:</span>
+                <b>07423 272138</b>
+              </div>
+              <div class="contactItem">
+                <span>Email:</span>
+                <a class="link" href="mailto:xdrivelogisticsltd@gmail.com">xdrivelogisticsltd@gmail.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sideCard" id="faq">
+          <div class="sideInner">
+            <h2 class="sideTitle">FAQ</h2>
+            <p class="sideText">Quick answers for clients and dispatchers.</p>
+
+            <div class="faq">
+              <details>
+                <summary>How fast can you collect?</summary>
+                <p>Often same-day, depending on location, vehicle and load. Send the request form and we’ll confirm availability.</p>
+              </details>
+
+              <details>
+                <summary>Do you do pallets and commercial loads?</summary>
+                <p>Yes. Include weight, pallet count, dimensions and any forklift / tail-lift requirements.</p>
+              </details>
+
+              <details>
+                <summary>Do you cover Europe?</summary>
+                <p>Yes, UK ↔ EU dedicated transport. Provide pickup & drop, dates/times, and load details for a quick quote.</p>
+              </details>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    © <span id="year"></span> XDrive Logistics • Dedicated courier & transport services
+  </footer>
+
   <script>
-    // Submit to Make webhook without leaving the page
-    (function () {
-      const form = document.getElementById('quoteForm');
-      const ok = document.getElementById('okMsg');
-      const err = document.getElementById('errMsg');
-      const submittedAt = document.getElementById('submitted_at');
+    // Make Webhook URL
+    const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/ys8ddlbqd8xknxh5ruqsa4q9hwr5e783";
 
-      if (!form) return;
+    // Contact info
+    const WHATSAPP_PHONE_E164 = "447423272138"; // UK number without +, with country code
+    const EMAIL_TO = "xdrivelogisticsltd@gmail.com";
 
-      form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        ok.style.display = 'none';
-        err.style.display = 'none';
+    // Draft autosave key
+    const DRAFT_KEY = "xdrive_quote_draft_v2";
 
-        // ISO timestamp for Sheets (submitted_at)
-        submittedAt.value = new Date().toISOString();
+    const form = document.getElementById("quoteForm");
+    const statusEl = document.getElementById("status");
+    const sendBtn = document.getElementById("sendBtn");
+    const waBtn = document.getElementById("waBtn");
+    const emailBtn = document.getElementById("emailBtn");
 
-        try {
-          const data = new FormData(form);
-          const res = await fetch(form.action, { method: 'POST', body: data });
+    const hamburger = document.getElementById("hamburger");
+    const mobileMenu = document.getElementById("mobileMenu");
 
-          if (res.ok) {
-            ok.style.display = 'block';
-            form.reset();
+    document.getElementById("year").textContent = new Date().getFullYear();
 
-            // Keep defaults after reset
-            submittedAt.value = new Date().toISOString();
-            form.querySelector('input[name="source"]').value = "xdrivelogistics.co.uk";
-          } else {
-            err.style.display = 'block';
-          }
-        } catch (e2) {
-          err.style.display = 'block';
-        }
+    // Hamburger toggle
+    hamburger?.addEventListener("click", () => {
+      const isOpen = hamburger.getAttribute("aria-expanded") === "true";
+      hamburger.setAttribute("aria-expanded", String(!isOpen));
+      if (mobileMenu.hasAttribute("hidden")) mobileMenu.removeAttribute("hidden");
+      else mobileMenu.setAttribute("hidden", "");
+    });
+
+    // Close menu after click
+    document.querySelectorAll(".mobileMenuInner a").forEach(a => {
+      a.addEventListener("click", () => {
+        mobileMenu.setAttribute("hidden", "");
+        hamburger.setAttribute("aria-expanded", "false");
       });
-    })();
+    });
+
+    // Defaults for dates (today)
+    const todayISO = new Date().toISOString().slice(0,10);
+    const collectionDate = document.getElementById("collection_date");
+    const deliveryDate = document.getElementById("delivery_date");
+    if (collectionDate && !collectionDate.value) collectionDate.value = todayISO;
+    if (deliveryDate && !deliveryDate.value) deliveryDate.value = todayISO;
+
+    function showStatus(type, msg){
+      statusEl.className = "status " + (type === "ok" ? "ok" : "err");
+      statusEl.textContent = msg;
+      statusEl.style.display = "block";
+      statusEl.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function normalizePhone(raw){
+      return (raw || "").trim().replace(/\s+/g, " ");
+    }
+
+    function isPhoneValid(phone){
+      // Accept: +44..., 07..., 0044..., or digits 10-15
+      const p = phone.replace(/\s+/g,'');
+      if (!p) return false;
+      if (/^\+44\d{9,12}$/.test(p)) return true;
+      if (/^0044\d{9,12}$/.test(p)) return true;
+      if (/^07\d{9}$/.test(p)) return true;
+      if (/^\d{10,15}$/.test(p)) return true;
+      return false;
+    }
+
+    function toDateTime(dateStr, timeStr){
+      // dateStr: YYYY-MM-DD, timeStr: HH:MM
+      if (!dateStr || !timeStr) return null;
+      const iso = `${dateStr}T${timeStr}:00`;
+      const d = new Date(iso);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    function buildMessage(data){
+      return [
+        "XDrive Logistics Request",
+        "------------------------",
+        `Name/Company: ${data.name}`,
+        `Phone (WhatsApp): ${data.phone}`,
+        `Pickup: ${data.pickup}`,
+        `Drop-off: ${data.dropoff}`,
+        `Collection: ${data.collection_date} ${data.collection_time}`,
+        `Delivery: ${data.delivery_date} ${data.delivery_time}`,
+        `Vehicle: ${data.vehicle}`,
+        `Load details: ${data.load_details}`,
+        `Source: ${data.source}`,
+        `Submitted at: ${data.submitted_at}`
+      ].join("\n");
+    }
+
+    function setQuickButtons(data){
+      const msg = encodeURIComponent(buildMessage(data));
+      waBtn.href = `https://wa.me/${WHATSAPP_PHONE_E164}?text=${msg}`;
+      emailBtn.href = `mailto:${EMAIL_TO}?subject=${encodeURIComponent("XDrive Logistics Request")}&body=${msg}`;
+    }
+
+    async function postToMake(payload){
+      const res = await fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if(!res.ok){
+        const text = await res.text().catch(()=> "");
+        throw new Error(`Webhook failed (${res.status}). ${text}`);
+      }
+      return true;
+    }
+
+    function getFormData(){
+      return {
+        name: form.name.value.trim(),
+        phone: normalizePhone(form.phone.value),
+        pickup: form.pickup.value.trim(),
+        dropoff: form.dropoff.value.trim(),
+        collection_date: form.collection_date.value,
+        collection_time: form.collection_time.value,
+        delivery_date: form.delivery_date.value,
+        delivery_time: form.delivery_time.value,
+        vehicle: form.vehicle.value,
+        load_details: form.load_details.value.trim(),
+        source: form.source.value,
+        submitted_at: new Date().toISOString()
+      };
+    }
+
+    // Autosave draft
+    function saveDraft(){
+      try{
+        const d = getFormData();
+        // don't store submitted_at
+        delete d.submitted_at;
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+      }catch(e){}
+    }
+    function loadDraft(){
+      try{
+        const raw = localStorage.getItem(DRAFT_KEY);
+        if (!raw) return;
+        const d = JSON.parse(raw);
+        if (d.name) form.name.value = d.name;
+        if (d.phone) form.phone.value = d.phone;
+        if (d.pickup) form.pickup.value = d.pickup;
+        if (d.dropoff) form.dropoff.value = d.dropoff;
+        if (d.collection_date) form.collection_date.value = d.collection_date;
+        if (d.collection_time) form.collection_time.value = d.collection_time;
+        if (d.delivery_date) form.delivery_date.value = d.delivery_date;
+        if (d.delivery_time) form.delivery_time.value = d.delivery_time;
+        if (d.vehicle) form.vehicle.value = d.vehicle;
+        if (d.load_details) form.load_details.value = d.load_details;
+        if (d.source) form.source.value = d.source;
+      }catch(e){}
+    }
+    loadDraft();
+
+    // Save on input changes
+    ["input","change","keyup"].forEach(evt => {
+      form.addEventListener(evt, () => saveDraft());
+    });
+
+    // Init buttons
+    setQuickButtons(getFormData());
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      statusEl.style.display = "none";
+
+      const data = getFormData();
+      setQuickButtons(data);
+
+      // Required checks
+      const requiredOk =
+        data.name && data.phone && data.pickup && data.dropoff &&
+        data.collection_date && data.collection_time &&
+        data.delivery_date && data.delivery_time &&
+        data.vehicle && data.load_details;
+
+      if(!requiredOk){
+        showStatus("err", "Please complete all fields.");
+        return;
+      }
+
+      if(!isPhoneValid(data.phone)){
+        showStatus("err", "Phone number looks invalid. Please enter a valid UK number (e.g., 074.. or +44..).");
+        return;
+      }
+
+      const cdt = toDateTime(data.collection_date, data.collection_time);
+      const ddt = toDateTime(data.delivery_date, data.delivery_time);
+
+      if(!cdt || !ddt){
+        showStatus("err", "Please select valid dates and times.");
+        return;
+      }
+
+      if(ddt.getTime() < cdt.getTime()){
+        showStatus("err", "Delivery must be AFTER collection. Please adjust delivery date/time.");
+        return;
+      }
+
+      // Send
+      sendBtn.disabled = true;
+      const oldText = sendBtn.textContent;
+      sendBtn.textContent = "Sending...";
+
+      try{
+        await postToMake(data);
+        showStatus("ok", "✅ Thank you! Request received. We’ll reply shortly.");
+        // Keep draft but you can clear after success:
+        localStorage.removeItem(DRAFT_KEY);
+      }catch(err){
+        showStatus("err", "❌ Not sent. Please try again or use WhatsApp. (" + (err?.message || "error") + ")");
+      }finally{
+        sendBtn.disabled = false;
+        sendBtn.textContent = oldText;
+      }
+    });
   </script>
 </body>
 </html>
