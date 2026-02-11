@@ -13,11 +13,23 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://xdrivelogistics.co.uk/" />
   <meta property="og:image" content="https://xdrivelogistics.co.uk/logo.png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="408" />
+  <meta property="og:image:alt" content="XDrive Logistics Logo" />
+  <meta property="og:site_name" content="XDrive Logistics" />
+  <meta property="og:locale" content="en_GB" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="XDrive Logistics | UK & EU Dedicated Transport" />
   <meta name="twitter:description" content="Dedicated van & commercial transport across the UK and Europe. Fast. Direct. Reliable." />
   <meta name="twitter:image" content="https://xdrivelogistics.co.uk/logo.png" />
+  <meta name="twitter:image:alt" content="XDrive Logistics Logo" />
+
+  <!-- Additional Meta Tags -->
+  <meta name="theme-color" content="#071825" />
+  <meta name="keywords" content="logistics, transport, courier, UK, EU, van hire, dedicated transport, delivery service, Blackburn, Manchester" />
+  <meta name="author" content="XDrive Logistics" />
+  <meta name="robots" content="index, follow" />
 
   <link rel="icon" type="image/png" href="logo.png" />
   
@@ -633,24 +645,24 @@
             <div class="grid">
               <div class="field">
                 <label for="name">Name / Company <span aria-label="required">*</span></label>
-                <input id="name" name="name" placeholder="Your name or company" required aria-required="true" />
+                <input id="name" name="name" placeholder="Your name or company" required aria-required="true" autocomplete="name" />
               </div>
 
               <div class="field">
                 <label for="phone">Phone (WhatsApp) <span aria-label="required">*</span></label>
-                <input id="phone" name="phone" type="tel" placeholder="+44..." required aria-required="true" aria-describedby="phone-hint phone-error" />
+                <input id="phone" name="phone" type="tel" placeholder="+44..." required aria-required="true" aria-describedby="phone-hint phone-error" autocomplete="tel" />
                 <span id="phone-hint" class="visually-hidden">Enter your phone number in UK format, e.g., +44 or 07</span>
                 <div id="phone-error" class="field-error" role="alert"></div>
               </div>
 
               <div class="field">
                 <label for="pickup">Pickup location <span aria-label="required">*</span></label>
-                <input id="pickup" name="pickup" placeholder="e.g., Blackburn BB1" required aria-required="true" />
+                <input id="pickup" name="pickup" placeholder="e.g., Blackburn BB1" required aria-required="true" autocomplete="shipping address-line1" />
               </div>
 
               <div class="field">
                 <label for="dropoff">Drop-off location <span aria-label="required">*</span></label>
-                <input id="dropoff" name="dropoff" placeholder="e.g., Manchester" required aria-required="true" />
+                <input id="dropoff" name="dropoff" placeholder="e.g., Manchester" required aria-required="true" autocomplete="shipping address-line2" />
               </div>
             </div>
 
@@ -708,9 +720,12 @@
             </div>
 
             <div class="actions">
-              <button class="btn btn-primary" type="submit" id="sendBtn">Send Request</button>
-              <a class="btn btn-ghost" id="waBtn" href="#" target="_blank" rel="noopener">WhatsApp</a>
-              <a class="btn btn-ghost" id="emailBtn" href="#" target="_blank" rel="noopener">Email</a>
+              <button class="btn btn-primary" type="submit" id="sendBtn">
+                <span id="btnText">Send Request</span>
+                <span id="btnLoader" style="display:none;">⏳ Sending...</span>
+              </button>
+              <a class="btn btn-ghost" id="waBtn" href="#" target="_blank" rel="noopener">📱 WhatsApp</a>
+              <a class="btn btn-ghost" id="emailBtn" href="#" target="_blank" rel="noopener">✉️ Email</a>
             </div>
 
             <div id="status" class="status"></div>
@@ -1005,8 +1020,10 @@
 
       // Send
       sendBtn.disabled = true;
-      const oldText = sendBtn.textContent;
-      sendBtn.textContent = "Sending...";
+      const btnText = document.getElementById("btnText");
+      const btnLoader = document.getElementById("btnLoader");
+      btnText.style.display = "none";
+      btnLoader.style.display = "inline";
 
       try{
         await postToMake(data);
@@ -1014,10 +1031,12 @@
         // Keep draft but you can clear after success:
         localStorage.removeItem(DRAFT_KEY);
       }catch(err){
+        console.error("Submission error:", err);
         showStatus("err", "❌ Not sent. Please try again or use WhatsApp. (" + (err?.message || "error") + ")");
       }finally{
         sendBtn.disabled = false;
-        sendBtn.textContent = oldText;
+        btnText.style.display = 'inline';
+        btnLoader.style.display = 'none';
       }
     });
   </script>
