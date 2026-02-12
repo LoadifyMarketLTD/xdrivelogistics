@@ -362,6 +362,13 @@
       display: block;
     }
 
+    .messageBox.info{
+      background: rgba(0, 190, 255, 0.15);
+      border: 1px solid rgba(0, 190, 255, 0.3);
+      color: rgba(0, 190, 255, 0.95);
+      display: block;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .loginContainer{
@@ -625,13 +632,13 @@
     // Handle forgot password link
     document.querySelector('.forgotLink').addEventListener('click', (e) => {
       e.preventDefault();
-      showMessage('Password reset functionality coming soon. Please contact support.', 'error');
+      showMessage('Password reset functionality coming soon. Please contact support.', 'info');
     });
 
     // Handle register link
     document.querySelector('.registerLink a').addEventListener('click', (e) => {
       e.preventDefault();
-      showMessage('Registration functionality coming soon. Please contact support.', 'error');
+      showMessage('Registration functionality coming soon. Please contact support.', 'info');
     });
   </script>
 </body>
