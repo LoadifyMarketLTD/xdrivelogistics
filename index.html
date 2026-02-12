@@ -1,1063 +1,717 @@
 <!doctype html>
-<html lang="en-GB">
+<html lang="ro">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>XDrive Logistics | UK & EU Dedicated Transport</title>
-  <meta name="description" content="Dedicated courier & transport services across the UK and EU. Fast quotes, reliable collection & delivery." />
-  <link rel="canonical" href="https://xdrivelogistics.co.uk/" />
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="XDrive Logistics | UK & EU Dedicated Transport" />
-  <meta property="og:description" content="Dedicated van & commercial transport across the UK and Europe. Fast. Direct. Reliable." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://xdrivelogistics.co.uk/" />
-  <meta property="og:image" content="https://xdrivelogistics.co.uk/logo.png" />
-  <meta property="og:image:width" content="612" />
-  <meta property="og:image:height" content="408" />
-  <meta property="og:image:alt" content="XDrive Logistics Logo" />
-  <meta property="og:site_name" content="XDrive Logistics" />
-  <meta property="og:locale" content="en_GB" />
-
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="XDrive Logistics | UK & EU Dedicated Transport" />
-  <meta name="twitter:description" content="Dedicated van & commercial transport across the UK and Europe. Fast. Direct. Reliable." />
-  <meta name="twitter:image" content="https://xdrivelogistics.co.uk/logo.png" />
-  <meta name="twitter:image:alt" content="XDrive Logistics Logo" />
-
-  <!-- Additional Meta Tags -->
-  <meta name="theme-color" content="#071825" />
-  <meta name="keywords" content="logistics, transport, courier, UK, EU, van hire, dedicated transport, delivery service, Blackburn, Manchester" />
-  <meta name="author" content="XDrive Logistics" />
-  <meta name="robots" content="index, follow" />
-
-  <link rel="icon" type="image/png" href="logo.png" />
-  
-  <!-- Preload critical assets -->
-  <link rel="preload" href="logo.webp" as="image" type="image/webp" />
-
-  <!-- Preconnect to external domains -->
-  <link rel="preconnect" href="https://hook.eu2.make.com" crossorigin />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>XDrive Logistics LTD — Cere ofertă</title>
+  <meta name="description" content="Transport rapid UK & EU. Cere ofertă instant. WhatsApp, Email, Formular." />
 
   <style>
     :root{
-      --bg1:#071825;
-      --bg2:#0b2a3b;
-      --card: rgba(12, 34, 50, .58);
-      --card2: rgba(10, 28, 42, .72);
-      --stroke: rgba(255,255,255,.10);
-      --stroke2: rgba(255,255,255,.14);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.72);
-      --gold: #D4AF37;
-      --gold2:#b9931f;
-      --ok:#2bd576;
-      --danger:#ff5a6a;
-      --shadow: 0 20px 60px rgba(0,0,0,.45);
-      --radius: 22px;
+      --bg:#f6f9ff;
+      --ink:#0b1b33;
+      --muted:#5b6b85;
+      --brand:#1b63c6;
+      --brand2:#0f4fae;
+      --line:rgba(14,36,72,.12);
+
+      --glass: rgba(255,255,255,.78);
+      --glass2: rgba(255,255,255,.68);
+      --shadow: 0 30px 70px rgba(10,40,90,.20);
+      --shadow2: 0 14px 40px rgba(10,40,90,.18);
+
+      --r16: 16px;
+      --r20: 20px;
+      --r24: 24px;
+
+      --container: 1180px;
     }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--text);
-      background:
-        radial-gradient(1200px 800px at 15% 10%, rgba(212,175,55,.18), transparent 55%),
-        radial-gradient(900px 600px at 90% 25%, rgba(0,190,255,.12), transparent 55%),
-        linear-gradient(180deg, var(--bg1), var(--bg2));
+      color:var(--ink);
+      background: radial-gradient(1200px 600px at 30% -10%, rgba(40,120,255,.12), transparent 60%),
+                  radial-gradient(900px 500px at 80% 10%, rgba(60,200,255,.10), transparent 55%),
+                  var(--bg);
       overflow-x:hidden;
     }
 
-    /* Blurred background image layer */
-    .bg{
-      position:fixed; inset:0;
-      background:
-        linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.72)),
-        url("background.webp");
-      background-size:cover;
-      background-position:center;
-      filter: blur(10px) saturate(1.1);
-      transform: scale(1.06);
-      z-index:-3;
-    }
-    /* Lazy load background */
-    @media (prefers-reduced-data: reduce) {
-      .bg {
-        background-image: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.72));
-      }
-    }
-    .grain{
-      position:fixed; inset:0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
-      mix-blend-mode: overlay;
-      opacity:.22;
-      z-index:-2;
-      pointer-events:none;
-    }
+    a{ color:inherit; text-decoration:none; }
+    .container{ width:min(var(--container), calc(100% - 40px)); margin:0 auto; }
 
-    /* Top nav */
-    .navWrap{
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      background: rgba(0,0,0,.22);
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
+    /* NAVBAR */
     .nav{
-      width:min(1180px, 100%);
-      margin: 0 auto;
-      padding: 14px 18px;
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,.72);
+      border-bottom:1px solid rgba(14,36,72,.10);
+    }
+    .navInner{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:12px;
+      padding:14px 0;
+      gap:16px;
     }
-
-    .brand{
+    .brandWrap{
       display:flex; align-items:center; gap:10px;
-      text-decoration:none; color:var(--text);
       min-width: 220px;
     }
-    .logo{
-      width: 38px; height: 38px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.08);
-      object-fit: cover;
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+
+    /* ✅ LOGO REAL (PNG) */
+    .logoImg{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      object-fit:contain;
+      background: rgba(255,255,255,.55);
+      border: 1px solid rgba(255,255,255,.65);
+      box-shadow: 0 10px 22px rgba(10,40,90,.14);
+      padding:6px;
     }
-    .brandText{display:flex; flex-direction:column; gap:2px;}
-    .brandText b{font-size: 15px; letter-spacing:.2px;}
-    .brandText span{font-size: 12px; color: rgba(255,255,255,.70);}
+
+    .brandText{
+      display:flex; flex-direction:column; line-height:1.1;
+    }
+    .brandText b{ font-size:16px; letter-spacing:.2px; }
+    .brandText span{ font-size:12px; color:var(--muted); }
 
     .navLinks{
-      display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+      display:flex; align-items:center; gap:18px;
+      color:#27344f;
+      font-weight:600;
     }
     .navLinks a{
-      color: rgba(255,255,255,.78);
-      text-decoration:none;
-      font-weight: 800;
-      font-size: 13px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      border: 1px solid transparent;
+      opacity:.9;
+      padding:10px 10px;
+      border-radius:12px;
     }
-    .navLinks a:hover{
-      color: var(--text);
-      background: rgba(255,255,255,.06);
-      border-color: rgba(255,255,255,.10);
-    }
+    .navLinks a:hover{ background: rgba(20,70,150,.06); opacity:1; }
 
     .navCta{
-      display:flex; gap:10px; align-items:center;
-    }
-    .ctaBtn{
-      border:0;
-      border-radius: 14px;
-      padding: 10px 12px;
-      cursor:pointer;
-      font-weight:900;
-      letter-spacing:.2px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      user-select:none;
-      text-decoration:none;
-      background: linear-gradient(180deg, var(--gold), var(--gold2));
-      color:#1a1406;
-      box-shadow: 0 16px 40px rgba(212,175,55,.22);
-      white-space:nowrap;
-    }
-    .ghostBtn{
-      background: rgba(255,255,255,.08);
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,.12);
-      padding: 10px 12px;
-      border-radius: 14px;
-      text-decoration:none;
-      font-weight: 900;
-      white-space:nowrap;
-    }
-
-    /* Hamburger */
-    .hamburger{
-      display:none;
-      width: 42px; height: 42px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      cursor:pointer;
-      align-items:center;
-      justify-content:center;
-      gap:5px;
-      flex-direction:column;
-    }
-    .hamburger span{
-      width: 18px;
-      height: 2px;
-      background: rgba(255,255,255,.86);
-      border-radius: 10px;
-    }
-
-    .mobileMenu{
-      display:none;
-      width:min(1180px, 100%);
-      margin: 0 auto;
-      padding: 0 18px 14px;
-    }
-    .mobileMenuInner{
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      background: rgba(0,0,0,.22);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      padding: 10px;
-      display:grid;
-      gap:8px;
-    }
-    .mobileMenuInner a{
-      padding: 12px 12px;
-      border-radius: 14px;
-      text-decoration:none;
-      color: rgba(255,255,255,.86);
-      font-weight: 900;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.06);
-    }
-
-    @media (max-width: 860px){
-      .navLinks{display:none;}
-      .hamburger{display:flex;}
-      .navCta{display:none;}
-      .mobileMenu{display:block;}
-      .mobileMenu[hidden]{display:none;}
-    }
-
-    .wrap{
-      min-height:100%;
-      padding: 18px 18px 46px;
-      display:flex;
-      align-items:flex-start;
-      justify-content:center;
-    }
-
-    .container{
-      width:min(1180px, 100%);
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap:22px;
-      margin-top: 18px;
-    }
-
-    @media (max-width: 980px){
-      .container{grid-template-columns:1fr; gap:16px;}
-      .wrap{padding: 14px 14px 34px;}
-    }
-
-    .card{
-      background: linear-gradient(180deg, var(--card), rgba(10, 28, 42, .52));
-      border: 1px solid var(--stroke);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      overflow:hidden;
-      position:relative;
-    }
-
-    .card::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(600px 220px at 20% 0%, rgba(212,175,55,.20), transparent 60%),
-                  radial-gradient(500px 220px at 85% 10%, rgba(0,200,255,.14), transparent 60%);
-      pointer-events:none;
-      opacity:.9;
-    }
-
-    .inner{position:relative; padding:22px;}
-    @media (max-width: 980px){ .inner{padding:18px;} }
-
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:14px;
-    }
-
-    .heroTitle{
-      display:flex; flex-direction:column; gap:6px;
-    }
-    .heroTitle h1{
-      margin:0;
-      font-size: 22px;
-      letter-spacing:.2px;
-      line-height:1.1;
-    }
-    .heroTitle p{
-      margin:0;
-      color:var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .pill{
-      padding:10px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--stroke);
-      background: rgba(0,0,0,.18);
-      display:flex;
-      gap:10px;
-      align-items:center;
-      color:var(--muted);
-      font-size: 12px;
-      white-space:nowrap;
-    }
-    .pill b{color:var(--text); font-weight:700}
-    .dot{
-      width:8px; height:8px; border-radius:999px;
-      background: var(--ok);
-      box-shadow: 0 0 0 6px rgba(43,213,118,.12);
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-      margin-top: 12px;
-    }
-    @media (max-width: 560px){
-      .grid{grid-template-columns:1fr;}
-      .topbar{flex-direction:column; align-items:flex-start;}
-      .pill{width:100%; justify-content:flex-start;}
-    }
-
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:7px;
-    }
-
-    label{
-      font-size: 12px;
-      font-weight: 600;
-      color: rgba(255,255,255,.76);
-      letter-spacing:.2px;
-    }
-
-    input, select, textarea{
-      width:100%;
-      border-radius: 14px;
-      border: 1px solid var(--stroke2);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      padding: 12px 12px;
-      outline:none;
-      transition: .18s ease;
-      font-size: 14px;
-    }
-    textarea{min-height: 120px; resize: vertical; padding-top:12px;}
-    input::placeholder, textarea::placeholder{color: rgba(255,255,255,.46);}
-    input:focus, select:focus, textarea:focus{
-      border-color: rgba(212,175,55,.55);
-      box-shadow: 0 0 0 6px rgba(212,175,55,.10);
-    }
-    select option{background:#0a2333; color:#fff;}
-
-    .row{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap:12px;
-    }
-    @media (max-width: 560px){ .row{grid-template-columns:1fr;} }
-
-    .actions{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      margin-top:14px;
-      flex-wrap:wrap;
+      display:flex; align-items:center; gap:10px;
+      min-width: 220px;
+      justify-content:flex-end;
     }
 
     .btn{
       border:0;
       border-radius: 14px;
-      padding: 12px 14px;
-      cursor:pointer;
+      padding:12px 16px;
       font-weight:800;
+      cursor:pointer;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease, opacity .15s ease;
+      display:inline-flex; align-items:center; gap:10px;
+      white-space:nowrap;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btnPrimary{
+      color:#fff;
+      background: linear-gradient(180deg, #2a7cff, #0f4fae);
+      box-shadow: 0 14px 28px rgba(15,79,174,.28);
+    }
+    .btnPrimary:hover{ box-shadow: 0 18px 36px rgba(15,79,174,.32); }
+
+    .btnGhost{
+      background: rgba(255,255,255,.78);
+      border:1px solid rgba(14,36,72,.12);
+      box-shadow: 0 10px 22px rgba(10,40,90,.10);
+      color:#183052;
+    }
+    .btnGhost:hover{ background: rgba(255,255,255,.90); }
+
+    /* HERO */
+    .hero{
+      position:relative;
+      padding: 34px 0 160px;
+      overflow:hidden;
+    }
+
+    /* ✅ HERO SERIOS (local file) */
+    .heroBg{
+      position:absolute; inset:0;
+      background:
+        linear-gradient(90deg,
+          rgba(8,22,44,.62) 0%,
+          rgba(8,22,44,.34) 52%,
+          rgba(8,22,44,.18) 100%
+        ),
+        url("hero-logistics.jpg");
+      background-size:cover;
+      background-position:center right;
+      background-repeat:no-repeat;
+      filter:saturate(1.08) contrast(1.04) brightness(1.03);
+      transform: scale(1.03);
+    }
+
+    .hero:before{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(900px 500px at 20% 20%, rgba(60,160,255,.22), transparent 60%),
+                  radial-gradient(700px 420px at 90% 20%, rgba(255,255,255,.12), transparent 58%);
+      pointer-events:none;
+    }
+    .heroInner{
+      position:relative;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 34px;
+      align-items:center;
+      padding-top: 10px;
+    }
+
+    .heroCopy{
+      color:#fff;
+      max-width: 640px;
+    }
+    .heroCopy h1{
+      margin:0 0 10px;
+      font-size: clamp(34px, 4.2vw, 54px);
+      line-height:1.02;
+      letter-spacing:-.6px;
+      text-shadow: 0 12px 40px rgba(0,0,0,.30);
+    }
+    .heroCopy p{
+      margin: 0 0 18px;
+      color: rgba(255,255,255,.86);
+      font-size: 16px;
+      line-height:1.6;
+      text-shadow: 0 10px 30px rgba(0,0,0,.25);
+      max-width: 560px;
+    }
+    .heroCtas{ display:flex; gap:12px; flex-wrap:wrap; }
+    .heroNote{
+      margin-top: 14px;
+      display:flex; gap:10px; align-items:center;
+      color: rgba(255,255,255,.82);
+      font-weight:600;
+      font-size: 13px;
+      opacity:.95;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: rgba(255,255,255,.85);
+      box-shadow: 0 8px 18px rgba(0,0,0,.25);
+    }
+
+    /* 3 BLOCKS (like in image) */
+    .triCards{
+      position:relative;
+      margin-top: 28px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      padding: 16px 16px;
+      border-radius: var(--r24);
+      background: rgba(255,255,255,.30);
+      border: 1px solid rgba(255,255,255,.35);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 50px rgba(0,0,0,.16);
+    }
+    .triCard{
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(14,36,72,.10);
+      border-radius: 18px;
+      padding: 14px 14px;
+      display:flex; gap:12px;
+      align-items:flex-start;
+    }
+    .triIcon{
+      width:40px; height:40px; border-radius:14px;
+      display:grid; place-items:center;
+      background: linear-gradient(180deg, rgba(42,124,255,.16), rgba(15,79,174,.10));
+      border: 1px solid rgba(15,79,174,.16);
+      color:#0f4fae;
+      flex:0 0 auto;
+    }
+    .triCard b{ display:block; margin-bottom:3px; }
+    .triCard small{ color: var(--muted); line-height:1.35; }
+
+    /* FLOATING FORM */
+    .floatingForm{
+      position:relative;
+      margin-top: 26px;
+      transform: translateY(70px);
+      z-index:10;
+    }
+    .formShell{
+      background: var(--glass);
+      border: 1px solid rgba(255,255,255,.85);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      overflow:hidden;
+    }
+    .formTop{
+      padding: 18px 18px 10px;
+      border-bottom: 1px solid rgba(14,36,72,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.70));
+    }
+    .formTop h2{
+      margin:0;
+      font-size: 22px;
+      letter-spacing:-.2px;
+      text-align:center;
+      color:#12335d;
+    }
+    .formTop p{
+      margin:6px 0 0;
+      text-align:center;
+      color: rgba(18,51,93,.72);
+      font-weight:600;
+      font-size: 13px;
+    }
+
+    .formBody{ padding: 16px 18px 18px; background: rgba(255,255,255,.62); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .field{
+      display:flex; flex-direction:column;
+      gap:6px;
+    }
+    label{
+      font-size: 12px;
+      font-weight: 800;
+      color: rgba(18,51,93,.82);
       letter-spacing:.2px;
-      transition:.18s ease;
-      display:inline-flex;
+    }
+    input, select, textarea{
+      width:100%;
+      border-radius: 14px;
+      border: 1px solid rgba(14,36,72,.14);
+      background: rgba(255,255,255,.86);
+      padding: 12px 12px;
+      font-weight: 700;
+      color: #102a4b;
+      outline:none;
+      transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+    }
+    textarea{ min-height: 96px; resize: vertical; }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(27,99,198,.55);
+      box-shadow: 0 0 0 4px rgba(27,99,198,.12);
+      background: rgba(255,255,255,.95);
+    }
+
+    .span2{ grid-column: span 2; }
+    .span3{ grid-column: span 3; }
+
+    .actions{
+      display:flex;
       align-items:center;
       justify-content:center;
-      gap:10px;
-      user-select:none;
-      text-decoration:none;
+      gap: 10px;
+      flex-wrap:wrap;
+      margin-top: 14px;
     }
-    .btn-primary{
-      background: linear-gradient(180deg, var(--gold), var(--gold2));
-      color:#1a1406;
-      box-shadow: 0 16px 40px rgba(212,175,55,.22);
+
+    .btnWide{
+      padding: 13px 18px;
+      min-width: 220px;
+      justify-content:center;
+      border-radius: 16px;
     }
-    .btn-primary:hover{transform: translateY(-1px); filter: brightness(1.02);}
-    .btn-primary:disabled{
-      opacity:.72;
-      cursor:not-allowed;
-      transform:none;
+
+    .pillRow{
+      display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+      margin-top: 10px;
     }
-    .btn-ghost{
-      background: rgba(255,255,255,.08);
-      color: var(--text);
-      border: 1px solid var(--stroke2);
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(14,36,72,.12);
+      background: rgba(255,255,255,.82);
+      box-shadow: 0 10px 22px rgba(10,40,90,.10);
+      font-weight: 900;
+      color:#14345f;
+      cursor:pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
     }
-    .btn-ghost:hover{transform: translateY(-1px); background: rgba(255,255,255,.10);}
+    .pill:hover{ transform: translateY(-1px); box-shadow: 0 14px 28px rgba(10,40,90,.14); }
+    .pillGreen{
+      color:#0b4a2a;
+      border-color: rgba(0,170,90,.25);
+      background: rgba(225,255,240,.78);
+    }
 
     .status{
       margin-top: 10px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      border: 1px solid var(--stroke);
-      background: rgba(0,0,0,.18);
-      color: var(--muted);
+      text-align:center;
+      font-weight:900;
+      color:#0b5a2a;
       display:none;
     }
-    .status.ok{display:block; border-color: rgba(43,213,118,.35); background: rgba(43,213,118,.10); color: rgba(235,255,244,.94);}
-    .status.err{display:block; border-color: rgba(255,90,106,.35); background: rgba(255,90,106,.10); color: rgba(255,242,244,.94);}
-
-    .right{
-      display:flex;
-      flex-direction:column;
-      gap:16px;
+    .statusErr{
+      color:#8a1020;
     }
 
-    .sideCard{
-      background: linear-gradient(180deg, var(--card2), rgba(10,28,42,.60));
-      border:1px solid var(--stroke);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+    /* Sections below */
+    .below{
+      padding: 120px 0 60px;
+    }
+    .section{
+      margin-top: 26px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .panel{
+      background: rgba(255,255,255,.82);
+      border: 1px solid rgba(14,36,72,.10);
+      border-radius: 22px;
       padding: 18px;
-      position:relative;
-      overflow:hidden;
+      box-shadow: var(--shadow2);
     }
-    .sideCard::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(520px 180px at 12% 0%, rgba(212,175,55,.18), transparent 60%);
-      pointer-events:none;
-      opacity:.9;
-    }
-    .sideInner{position:relative;}
-    .sideTitle{margin:0 0 8px; font-size: 16px;}
-    .sideText{margin:0; color:var(--muted); font-size: 13px; line-height:1.55;}
+    .panel h3{ margin:0 0 8px; letter-spacing:-.2px; }
+    .panel p{ margin:0; color:var(--muted); line-height:1.6; font-weight:600; }
 
-    /* Backdrop-filter fallbacks for older browsers */
-    @supports not (backdrop-filter: blur(14px)) {
-      .navWrap {
-        background: rgba(0, 0, 0, 0.85);
-      }
-      .mobileMenuInner {
-        background: rgba(0, 0, 0, 0.85);
-      }
-      .card {
-        background: linear-gradient(180deg, rgba(12, 34, 50, .85), rgba(10, 28, 42, .80));
-      }
-      .sideCard {
-        background: linear-gradient(180deg, rgba(10, 28, 42, .85), rgba(10, 28, 42, .80));
-      }
-    }
-
-    .contactList{
-      margin-top:10px;
-      display:grid;
-      gap:10px;
-    }
-    .contactItem{
-      padding: 10px 12px;
-      border: 1px solid var(--stroke);
-      border-radius: 14px;
-      background: rgba(255,255,255,.06);
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:center;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .contactItem b{color:var(--text);}
-    .link{
-      color: var(--gold);
-      text-decoration:none;
-      font-weight:800;
-    }
-    .link:hover{text-decoration:underline;}
-
-    .faq{
-      margin-top:10px;
-      display:grid;
-      gap:10px;
-    }
-    details{
-      border: 1px solid var(--stroke);
-      border-radius: 14px;
-      background: rgba(255,255,255,.06);
-      padding: 10px 12px;
-    }
-    summary{
-      cursor:pointer;
-      font-weight:800;
-      color: rgba(255,255,255,.90);
-      outline:none;
-    }
-    details p{
-      margin:8px 0 0;
-      color:var(--muted);
-      font-size: 13px;
-      line-height:1.55;
-    }
-
-    footer{
-      width:min(1180px, 100%);
-      margin: 10px auto 0;
-      color: rgba(255,255,255,.60);
-      font-size: 12px;
+    .footer{
+      padding: 26px 0 34px;
+      color: rgba(15,40,75,.72);
       text-align:center;
-      padding: 10px 18px 20px;
+      font-weight:700;
+      border-top: 1px solid rgba(14,36,72,.10);
+      background: rgba(255,255,255,.55);
+      backdrop-filter: blur(10px);
     }
 
-    .tiny{
-      font-size:12px;
-      color: rgba(255,255,255,.62);
-      margin-top: 8px;
+    /* Responsive */
+    @media (max-width: 980px){
+      .navLinks{ display:none; }
+      .heroInner{ grid-template-columns: 1fr; }
+      .triCards{ grid-template-columns: 1fr; }
+      .grid{ grid-template-columns: 1fr; }
+      .span2,.span3{ grid-column: auto; }
+      .below{ padding-top: 140px; }
+      .section{ grid-template-columns: 1fr; }
+      .floatingForm{ transform: translateY(54px); }
+      .hero{ padding-bottom: 190px; }
     }
-    
-    /* Field validation feedback */
-    .field-error {
-      font-size: 12px;
-      color: var(--danger);
-      margin-top: 4px;
-      display: none;
-    }
-    .field.invalid .field-error {
-      display: block;
-    }
-    .field.invalid input,
-    .field.invalid select,
-    .field.invalid textarea {
-      border-color: rgba(255,90,106,.55);
-    }
-    
-    /* Accessibility helper */
-    .visually-hidden {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border-width: 0;
+    @media (max-width: 480px){
+      .container{ width: calc(100% - 24px); }
+      .btn{ padding: 12px 14px; border-radius: 14px; }
+      .brandWrap{ min-width:unset; }
+      .navCta{ min-width:unset; }
+      .heroCopy p{ font-size: 15px; }
     }
   </style>
-
-  <!-- LocalBusiness schema -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"LogisticsService",
-    "name":"XDrive Logistics",
-    "url":"https://xdrivelogistics.co.uk/",
-    "logo":"https://xdrivelogistics.co.uk/logo.png",
-    "image":"https://xdrivelogistics.co.uk/logo.png",
-    "telephone":"+447423272138",
-    "email":"xdrivelogisticsltd@gmail.com",
-    "areaServed":[
-      {
-        "@type":"Country",
-        "name":"United Kingdom"
-      },
-      {
-        "@type":"Place",
-        "name":"European Union"
-      }
-    ],
-    "serviceType":["Courier Service","Transport Service","Dedicated Transport"],
-    "provider":{
-      "@type":"LocalBusiness",
-      "name":"XDrive Logistics",
-      "priceRange":"£"
-    },
-    "sameAs":[]
-  }
-  </script>
 </head>
 
 <body>
-  <div class="bg"></div>
-  <div class="grain"></div>
 
   <!-- NAV -->
-  <div class="navWrap">
-    <div class="nav">
-      <a class="brand" href="#top" aria-label="XDrive Logistics Home">
-        <picture>
-          <source srcset="logo.webp" type="image/webp" />
-          <img class="logo" src="logo.png" alt="XDrive Logistics logo" onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex';" />
-        </picture>
-        <div class="brandText" id="logoFallback" style="display:none;flex-direction:column;">
-          <b>XDrive Logistics</b>
-          <span>UK & EU Dedicated Transport</span>
-        </div>
-        <div class="brandText" id="brandTextDefault">
-          <b>XDrive Logistics</b>
-          <span>UK & EU Dedicated Transport</span>
+  <header class="nav">
+    <div class="container navInner">
+      <a class="brandWrap" href="#top" aria-label="XDrive Logistics">
+        <!-- ✅ LOGO PNG -->
+        <img class="logoImg" src="logo.png" alt="XDrive Logistics logo" />
+        <div class="brandText">
+          <b>XDrive Logistics LTD</b>
+          <span>UK & EU Transport • Quotes Fast</span>
         </div>
       </a>
 
-      <div class="navLinks" aria-label="Primary">
-        <a href="#quote">Get a Quote</a>
+      <nav class="navLinks" aria-label="Meniu">
+        <a href="#services">Serviciile Noastre</a>
+        <a href="#about">Despre Noi</a>
         <a href="#contact">Contact</a>
-        <a href="#faq">FAQ</a>
-      </div>
+      </nav>
 
       <div class="navCta">
-        <a class="ghostBtn" href="tel:+447423272138">Call</a>
-        <a class="ctaBtn" href="#quote">Quote</a>
-      </div>
-
-      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-
-    <div class="mobileMenu" id="mobileMenu" hidden>
-      <div class="mobileMenuInner">
-        <a href="#quote">Get a Quote</a>
-        <a href="tel:+447423272138">Call</a>
-        <a href="#contact">Contact</a>
-        <a href="#faq">FAQ</a>
+        <button class="btn btnPrimary" onclick="scrollToQuote()">Cere Ofertă</button>
       </div>
     </div>
-  </div>
+  </header>
 
-  <main class="wrap" id="top">
-    <div class="container">
-      <!-- LEFT: FORM -->
-      <section class="card" aria-label="Request a quote form" id="quote">
-        <div class="inner">
-          <div class="topbar">
-            <div class="heroTitle">
-              <h1>Fast Quote • Dedicated Transport</h1>
-              <p>Send pickup & delivery details. We’ll reply quickly with price & availability.</p>
-            </div>
-            <div class="pill" title="We reply quickly">
-              <span class="dot"></span>
-              <span><b>Quick reply</b> via WhatsApp / Email</span>
+  <!-- HERO -->
+  <main id="top" class="hero">
+    <div class="heroBg" aria-hidden="true"></div>
+
+    <div class="container heroInner">
+      <div class="heroCopy">
+        <h1>Transport de încredere<br/>pentru afacerea ta</h1>
+        <p>Soluții profesioniste pentru transport rapid și sigur în UK și Europa. Trimite cererea, iar noi îți răspundem rapid cu preț și disponibilitate.</p>
+
+        <div class="heroCtas">
+          <button class="btn btnPrimary" onclick="scrollToQuote()">Cere Ofertă</button>
+          <button class="btn btnGhost" onclick="openWhatsApp()">Contactează-ne</button>
+        </div>
+
+        <div class="heroNote">
+          <span class="dot"></span>
+          <span>Răspuns rapid • WhatsApp + Email • Ofertă clară</span>
+        </div>
+
+        <!-- 3 BLOCKS -->
+        <div id="services" class="triCards" aria-label="Servicii / Despre / Ce oferim">
+          <div class="triCard">
+            <div class="triIcon" aria-hidden="true">🚚</div>
+            <div>
+              <b>Serviciile Noastre</b>
+              <small>Transport marfă, livrări expres, colectări rapide.</small>
             </div>
           </div>
-
-          <form id="quoteForm" autocomplete="on">
-            <div class="grid">
-              <div class="field">
-                <label for="name">Name / Company <span aria-label="required">*</span></label>
-                <input id="name" name="name" placeholder="Your name or company" required aria-required="true" autocomplete="name" />
-              </div>
-
-              <div class="field">
-                <label for="phone">Phone (WhatsApp) <span aria-label="required">*</span></label>
-                <input id="phone" name="phone" type="tel" placeholder="+44..." required aria-required="true" aria-describedby="phone-error" autocomplete="tel" />
-                <div id="phone-error" class="field-error" role="alert"></div>
-              </div>
-
-              <div class="field">
-                <label for="pickup">Pickup location <span aria-label="required">*</span></label>
-                <input id="pickup" name="pickup" placeholder="e.g., Blackburn BB1" required aria-required="true" autocomplete="address-line1" />
-              </div>
-
-              <div class="field">
-                <label for="dropoff">Drop-off location <span aria-label="required">*</span></label>
-                <input id="dropoff" name="dropoff" placeholder="e.g., Manchester" required aria-required="true" autocomplete="off" />
-              </div>
+          <div class="triCard">
+            <div class="triIcon" aria-hidden="true">📍</div>
+            <div>
+              <b>Cine Suntem Noi</b>
+              <small>Profesioniști cu experiență în logistică și transport.</small>
             </div>
-
-            <div class="row" style="margin-top:12px;">
-              <div class="field">
-                <label for="collection_date">Collection date <span aria-label="required">*</span></label>
-                <input id="collection_date" name="collection_date" type="date" required aria-required="true" />
-              </div>
-              <div class="field">
-                <label for="collection_time">Collection time <span aria-label="required">*</span></label>
-                <input id="collection_time" name="collection_time" type="time" required aria-required="true" />
-              </div>
-            </div>
-
-            <div class="row" style="margin-top:12px;">
-              <div class="field">
-                <label for="delivery_date">Delivery date <span aria-label="required">*</span></label>
-                <input id="delivery_date" name="delivery_date" type="date" required aria-required="true" />
-              </div>
-              <div class="field">
-                <label for="delivery_time">Delivery time <span aria-label="required">*</span></label>
-                <input id="delivery_time" name="delivery_time" type="time" required aria-required="true" />
-              </div>
-            </div>
-
-            <div class="grid" style="margin-top:12px;">
-              <div class="field">
-                <label for="vehicle">Vehicle preference <span aria-label="required">*</span></label>
-                <select id="vehicle" name="vehicle" required aria-required="true">
-                  <option value="" selected disabled>Select vehicle</option>
-                  <option value="Small van">Small van</option>
-                  <option value="Medium van">Medium van</option>
-                  <option value="Long wheelbase">Long wheelbase</option>
-                  <option value="Luton van">Luton van</option>
-                </select>
-              </div>
-
-              <div class="field">
-                <label for="source">How did you find us? <span aria-label="required">*</span></label>
-                <select id="source" name="source" required aria-required="true">
-                  <option value="xdrivelogistics.co.uk" selected>xdrivelogistics.co.uk</option>
-                  <option value="facebook">Facebook</option>
-                  <option value="whatsapp">WhatsApp</option>
-                  <option value="google">Google</option>
-                  <option value="referral">Referral</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field" style="margin-top:12px;">
-              <label for="load_details">Load details <span aria-label="required">*</span></label>
-              <textarea id="load_details" name="load_details" placeholder="Weight, pallets, dimensions, collection time window, special notes…" required aria-required="true"></textarea>
-              <div class="tiny">Tip: WhatsApp gives the fastest response. Include pickup, drop, dates/times and load details.</div>
-            </div>
-
-            <div class="actions">
-              <button class="btn btn-primary" type="submit" id="sendBtn">
-                <span id="btnText">Send Request</span>
-                <span id="btnLoader" style="display:none;">⏳ Sending...</span>
-              </button>
-              <a class="btn btn-ghost" id="waBtn" href="#" target="_blank" rel="noopener">📱 WhatsApp</a>
-              <a class="btn btn-ghost" id="emailBtn" href="#" target="_blank" rel="noopener">✉️ Email</a>
-            </div>
-
-            <div id="status" class="status"></div>
-          </form>
-        </div>
-      </section>
-
-      <!-- RIGHT: CONTACT + FAQ -->
-      <aside class="right" aria-label="Contact and FAQ">
-        <div class="sideCard" id="contact">
-          <div class="sideInner">
-            <h2 class="sideTitle">Contact</h2>
-            <p class="sideText">Best for immediate dispatch and quotes.</p>
-
-            <div class="contactList">
-              <div class="contactItem">
-                <span>WhatsApp:</span>
-                <b>07423 272138</b>
-              </div>
-              <div class="contactItem">
-                <span>Email:</span>
-                <a class="link" href="mailto:xdrivelogisticsltd@gmail.com">xdrivelogisticsltd@gmail.com</a>
-              </div>
+          </div>
+          <div class="triCard">
+            <div class="triIcon" aria-hidden="true">🧾</div>
+            <div>
+              <b>Ce Oferim</b>
+              <small>Soluții personalizate pentru nevoile tale, simplu și rapid.</small>
             </div>
           </div>
         </div>
 
-        <div class="sideCard" id="faq">
-          <div class="sideInner">
-            <h2 class="sideTitle">FAQ</h2>
-            <p class="sideText">Quick answers for clients and dispatchers.</p>
+        <!-- FORM OVER HERO -->
+        <div id="quote" class="floatingForm">
+          <div class="formShell">
+            <div class="formTop">
+              <h2>Cere o Ofertă de Transport</h2>
+              <p>Completează detaliile și trimitem preț + disponibilitate.</p>
+            </div>
 
-            <div class="faq">
-              <details>
-                <summary>How fast can you collect?</summary>
-                <p>Often same-day, depending on location, vehicle and load. Send the request form and we’ll confirm availability.</p>
-              </details>
+            <div class="formBody">
+              <form id="quoteForm">
+                <div class="grid">
+                  <div class="field">
+                    <label>Nume / Companie</label>
+                    <input name="name" placeholder="Numele tău sau compania" autocomplete="name" required />
+                  </div>
 
-              <details>
-                <summary>Do you do pallets and commercial loads?</summary>
-                <p>Yes. Include weight, pallet count, dimensions and any forklift / tail-lift requirements.</p>
-              </details>
+                  <div class="field">
+                    <label>Telefon (WhatsApp)</label>
+                    <input name="phone" placeholder="+44..." autocomplete="tel" required />
+                  </div>
 
-              <details>
-                <summary>Do you cover Europe?</summary>
-                <p>Yes, UK ↔ EU dedicated transport. Provide pickup & drop, dates/times, and load details for a quick quote.</p>
-              </details>
+                  <div class="field">
+                    <label>Email</label>
+                    <input name="email" placeholder="example@email.com" autocomplete="email" required />
+                  </div>
+
+                  <div class="field">
+                    <label>Loc de încărcare (Pickup)</label>
+                    <input name="pickup" placeholder="ex: Blackburn BB1" required />
+                  </div>
+
+                  <div class="field">
+                    <label>Loc de descărcare (Drop-off)</label>
+                    <input name="dropoff" placeholder="ex: Manchester" required />
+                  </div>
+
+                  <div class="field">
+                    <label>Tip vehicul</label>
+                    <select name="vehicle" required>
+                      <option value="" selected>Select vehicle</option>
+                      <option>Small van</option>
+                      <option>Medium van</option>
+                      <option>Long wheelbase</option>
+                      <option>Luton van</option>
+                    </select>
+                  </div>
+
+                  <div class="field">
+                    <label>Data & ora colectării</label>
+                    <input type="datetime-local" name="pickup_datetime" required />
+                  </div>
+
+                  <div class="field">
+                    <label>Data & ora livrării</label>
+                    <input type="datetime-local" name="delivery_datetime" required />
+                  </div>
+
+                  <div class="field">
+                    <label>Tip transport</label>
+                    <select name="transport_type" required>
+                      <option value="" selected>Alege</option>
+                      <option>Express</option>
+                      <option>Same-day</option>
+                      <option>Next-day</option>
+                      <option>Scheduled</option>
+                    </select>
+                  </div>
+
+                  <div class="field span3">
+                    <label>Detalii încărcătură</label>
+                    <textarea name="load_details" placeholder="Greutate, paleți/colete, dimensiuni, fereastră de colectare, note speciale..." required></textarea>
+                  </div>
+                </div>
+
+                <div class="actions">
+                  <button class="btn btnPrimary btnWide" type="submit">Trimite Cererea</button>
+                  <button class="btn btnGhost btnWide" type="button" onclick="clearDraft()">Șterge</button>
+                </div>
+
+                <div class="pillRow" id="contact">
+                  <div class="pill pillGreen" onclick="openWhatsApp()">✅ WhatsApp</div>
+                  <div class="pill" onclick="sendEmailClient()">✉️ Email</div>
+                </div>
+
+                <div id="statusOk" class="status">✅ Cererea a fost trimisă. Îți răspundem în curând.</div>
+                <div id="statusErr" class="status statusErr">❌ Eroare la trimitere. Încearcă din nou sau folosește WhatsApp.</div>
+              </form>
             </div>
           </div>
         </div>
-      </aside>
+
+      </div>
+
+      <div></div>
     </div>
   </main>
 
-  <footer>
-    © <span id="year"></span> XDrive Logistics • Dedicated courier & transport services
+  <section class="below">
+    <div class="container">
+      <div class="section">
+        <div class="panel" id="about">
+          <h3>Despre XDrive Logistics</h3>
+          <p>Transport pentru clienți business și dispeceri: rapid, organizat, comunicare clară, confirmări și statusuri rapide. Scopul nostru: să fie ușor să ceri ofertă și să primești răspunsul imediat.</p>
+        </div>
+
+        <div class="panel">
+          <h3>Acoperire UK & EU</h3>
+          <p>Disponibilitate în funcție de rută și timp. Pentru cel mai rapid răspuns, WhatsApp este cea mai bună opțiune — include pickup, drop-off, date/time și detalii încărcătură.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      © <span id="y"></span> XDrive Logistics LTD • UK & EU Transport • WhatsApp & Email
+    </div>
   </footer>
 
   <script>
-    // Configuration - IMPORTANT: In production, move webhook URL to server-side
-    // This is exposed in client code which is a security concern
     const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/ys8ddlbqd8xknxh5ruqsa4q9hwr5e783";
-    
-    // WARNING: Consider implementing a backend proxy to hide this webhook URL
-    // Example: POST to /api/quote on your server, which then forwards to Make.com
-
-    // Contact info
-    const WHATSAPP_PHONE_E164 = "447423272138"; // UK number without +, with country code
+    const DRAFT_KEY = "xdrive_quote_draft_v1";
+    const WHATSAPP_NUMBER = "447423272138";
     const EMAIL_TO = "xdrivelogisticsltd@gmail.com";
 
-    // Draft autosave key
-    const DRAFT_KEY = "xdrive_quote_draft_v2";
+    document.getElementById("y").textContent = new Date().getFullYear();
+
+    function scrollToQuote(){
+      document.getElementById("quote").scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    function openWhatsApp(){
+      const data = getFormData();
+      const msg =
+`XDrive Logistics - Quote Request
+Name/Company: ${data.name || "-"}
+Phone: ${data.phone || "-"}
+Email: ${data.email || "-"}
+Pickup: ${data.pickup || "-"}
+Drop-off: ${data.dropoff || "-"}
+Pickup date/time: ${data.pickup_datetime || "-"}
+Delivery date/time: ${data.delivery_datetime || "-"}
+Vehicle: ${data.vehicle || "-"}
+Transport type: ${data.transport_type || "-"}
+Load details: ${data.load_details || "-"}`;
+
+      const url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg);
+      window.open(url, "_blank");
+    }
+
+    function sendEmailClient(){
+      const data = getFormData();
+      const subject = "XDrive Quote Request";
+      const body =
+`Name/Company: ${data.name || "-"}
+Phone: ${data.phone || "-"}
+Email: ${data.email || "-"}
+Pickup: ${data.pickup || "-"}
+Drop-off: ${data.dropoff || "-"}
+Pickup date/time: ${data.pickup_datetime || "-"}
+Delivery date/time: ${data.delivery_datetime || "-"}
+Vehicle: ${data.vehicle || "-"}
+Transport type: ${data.transport_type || "-"}
+Load details: ${data.load_details || "-"}`;
+
+      window.location.href = `mailto:${EMAIL_TO}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
+
+    function showStatus(ok){
+      const sOk = document.getElementById("statusOk");
+      const sEr = document.getElementById("statusErr");
+      sOk.style.display = ok ? "block" : "none";
+      sEr.style.display = ok ? "none" : "block";
+      if(ok){
+        setTimeout(()=>{ sOk.style.display="none"; }, 6000);
+      }
+    }
 
     const form = document.getElementById("quoteForm");
-    const statusEl = document.getElementById("status");
-    const sendBtn = document.getElementById("sendBtn");
-    const waBtn = document.getElementById("waBtn");
-    const emailBtn = document.getElementById("emailBtn");
-
-    const hamburger = document.getElementById("hamburger");
-    const mobileMenu = document.getElementById("mobileMenu");
-
-    document.getElementById("year").textContent = new Date().getFullYear();
-
-    // Hamburger toggle
-    hamburger?.addEventListener("click", () => {
-      const isOpen = hamburger.getAttribute("aria-expanded") === "true";
-      hamburger.setAttribute("aria-expanded", String(!isOpen));
-      if (mobileMenu.hasAttribute("hidden")) mobileMenu.removeAttribute("hidden");
-      else mobileMenu.setAttribute("hidden", "");
-    });
-
-    // Close menu after click
-    document.querySelectorAll(".mobileMenuInner a").forEach(a => {
-      a.addEventListener("click", () => {
-        mobileMenu.setAttribute("hidden", "");
-        hamburger.setAttribute("aria-expanded", "false");
-      });
-    });
-
-    // Defaults for dates (today)
-    const todayISO = new Date().toISOString().slice(0,10);
-    const collectionDate = document.getElementById("collection_date");
-    const deliveryDate = document.getElementById("delivery_date");
-    if (collectionDate && !collectionDate.value) collectionDate.value = todayISO;
-    if (deliveryDate && !deliveryDate.value) deliveryDate.value = todayISO;
-
-    function showStatus(type, msg){
-      statusEl.className = "status " + (type === "ok" ? "ok" : "err");
-      statusEl.textContent = msg;
-      statusEl.style.display = "block";
-      statusEl.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-
-    function normalizePhone(raw){
-      return (raw || "").trim().replace(/\s+/g, " ");
-    }
-
-    function isPhoneValid(phone){
-      // Accept: +44..., 07..., 0044..., or international with + prefix
-      const p = phone.replace(/\s+/g,'');
-      if (!p) return false;
-      // UK formats
-      if (/^\+44\d{9,12}$/.test(p)) return true;
-      if (/^0044\d{9,12}$/.test(p)) return true;
-      if (/^07\d{9}$/.test(p)) return true;
-      // International format with + (10-15 digits total)
-      if (/^\+\d{10,15}$/.test(p)) return true;
-      return false;
-    }
-
-    function toDateTime(dateStr, timeStr){
-      // dateStr: YYYY-MM-DD, timeStr: HH:MM
-      if (!dateStr || !timeStr) return null;
-      const iso = `${dateStr}T${timeStr}:00`;
-      const d = new Date(iso);
-      return isNaN(d.getTime()) ? null : d;
-    }
-
-    function buildMessage(data){
-      return [
-        "XDrive Logistics Request",
-        "------------------------",
-        `Name/Company: ${data.name}`,
-        `Phone (WhatsApp): ${data.phone}`,
-        `Pickup: ${data.pickup}`,
-        `Drop-off: ${data.dropoff}`,
-        `Collection: ${data.collection_date} ${data.collection_time}`,
-        `Delivery: ${data.delivery_date} ${data.delivery_time}`,
-        `Vehicle: ${data.vehicle}`,
-        `Load details: ${data.load_details}`,
-        `Source: ${data.source}`,
-        `Submitted at: ${data.submitted_at}`
-      ].join("\n");
-    }
-
-    function setQuickButtons(data){
-      const msg = encodeURIComponent(buildMessage(data));
-      waBtn.href = `https://wa.me/${WHATSAPP_PHONE_E164}?text=${msg}`;
-      emailBtn.href = `mailto:${EMAIL_TO}?subject=${encodeURIComponent("XDrive Logistics Request")}&body=${msg}`;
-    }
-
-    async function postToMake(payload){
-      const res = await fetch(MAKE_WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      if(!res.ok){
-        const text = await res.text().catch(()=> "");
-        throw new Error(`Webhook failed (${res.status}). ${text}`);
-      }
-      return true;
-    }
+    const fields = Array.from(form.querySelectorAll("input,select,textarea"));
 
     function getFormData(){
-      return {
-        name: form.name.value.trim(),
-        phone: normalizePhone(form.phone.value),
-        pickup: form.pickup.value.trim(),
-        dropoff: form.dropoff.value.trim(),
-        collection_date: form.collection_date.value,
-        collection_time: form.collection_time.value,
-        delivery_date: form.delivery_date.value,
-        delivery_time: form.delivery_time.value,
-        vehicle: form.vehicle.value,
-        load_details: form.load_details.value.trim(),
-        source: form.source.value,
-        submitted_at: new Date().toISOString()
-      };
+      const fd = new FormData(form);
+      const obj = {};
+      for (const [k,v] of fd.entries()) obj[k] = String(v || "").trim();
+      return obj;
     }
 
-    // Autosave draft
     function saveDraft(){
-      try{
-        const d = getFormData();
-        // don't store submitted_at
-        delete d.submitted_at;
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
-      }catch(e){}
+      const data = getFormData();
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
     }
+
     function loadDraft(){
       try{
         const raw = localStorage.getItem(DRAFT_KEY);
-        if (!raw) return;
-        const d = JSON.parse(raw);
-        if (d.name) form.name.value = d.name;
-        if (d.phone) form.phone.value = d.phone;
-        if (d.pickup) form.pickup.value = d.pickup;
-        if (d.dropoff) form.dropoff.value = d.dropoff;
-        if (d.collection_date) form.collection_date.value = d.collection_date;
-        if (d.collection_time) form.collection_time.value = d.collection_time;
-        if (d.delivery_date) form.delivery_date.value = d.delivery_date;
-        if (d.delivery_time) form.delivery_time.value = d.delivery_time;
-        if (d.vehicle) form.vehicle.value = d.vehicle;
-        if (d.load_details) form.load_details.value = d.load_details;
-        if (d.source) form.source.value = d.source;
+        if(!raw) return;
+        const data = JSON.parse(raw);
+        fields.forEach(el=>{
+          if(data[el.name] !== undefined) el.value = data[el.name];
+        });
       }catch(e){}
     }
+
+    function clearDraft(){
+      localStorage.removeItem(DRAFT_KEY);
+      form.reset();
+    }
+
+    fields.forEach(el=>{
+      el.addEventListener("input", saveDraft);
+      el.addEventListener("change", saveDraft);
+    });
+
     loadDraft();
 
-    // Save on input changes
-    ["input","change","keyup"].forEach(evt => {
-      form.addEventListener(evt, () => saveDraft());
-    });
-    
-    // Real-time phone validation
-    const phoneInput = document.getElementById("phone");
-    const phoneField = phoneInput.closest(".field");
-    const phoneError = document.getElementById("phone-error");
-    
-    phoneInput.addEventListener("blur", () => {
-      const phone = normalizePhone(phoneInput.value);
-      if (phone && !isPhoneValid(phone)) {
-        phoneField.classList.add("invalid");
-        phoneError.textContent = "Please enter a valid phone number (e.g., +44... or 07...)";
-      } else {
-        phoneField.classList.remove("invalid");
-        phoneError.textContent = "";
-      }
-    });
-    
-    phoneInput.addEventListener("input", () => {
-      if (phoneField.classList.contains("invalid")) {
-        const phone = normalizePhone(phoneInput.value);
-        if (phone && isPhoneValid(phone)) {
-          phoneField.classList.remove("invalid");
-          phoneError.textContent = "";
-        }
-      }
-    });
-
-    // Init buttons
-    setQuickButtons(getFormData());
-
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", async (e)=>{
       e.preventDefault();
-      statusEl.style.display = "none";
-
-      const data = getFormData();
-      setQuickButtons(data);
-
-      // Required checks
-      const requiredOk =
-        data.name && data.phone && data.pickup && data.dropoff &&
-        data.collection_date && data.collection_time &&
-        data.delivery_date && data.delivery_time &&
-        data.vehicle && data.load_details;
-
-      if(!requiredOk){
-        showStatus("err", "Please complete all fields.");
-        return;
-      }
-
-      if(!isPhoneValid(data.phone)){
-        showStatus("err", "Phone number looks invalid. Please enter a valid UK number (e.g., 074.. or +44..).");
-        return;
-      }
-
-      const cdt = toDateTime(data.collection_date, data.collection_time);
-      const ddt = toDateTime(data.delivery_date, data.delivery_time);
-
-      if(!cdt || !ddt){
-        showStatus("err", "Please select valid dates and times.");
-        return;
-      }
-
-      if(ddt.getTime() < cdt.getTime()){
-        showStatus("err", "Delivery must be AFTER collection. Please adjust delivery date/time.");
-        return;
-      }
-
-      // Send
-      sendBtn.disabled = true;
-      const btnText = document.getElementById("btnText");
-      const btnLoader = document.getElementById("btnLoader");
-      btnText.style.display = "none";
-      btnLoader.style.display = "inline";
+      const payload = getFormData();
+      payload.source = "xdrivelogistics.co.uk";
+      payload.submitted_at = new Date().toISOString();
 
       try{
-        await postToMake(data);
-        showStatus("ok", "✅ Thank you! Request received. We’ll reply shortly.");
-        // Keep draft but you can clear after success:
+        const res = await fetch(MAKE_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if(!res.ok) throw new Error("Bad response");
+        showStatus(true);
         localStorage.removeItem(DRAFT_KEY);
+        form.reset();
       }catch(err){
-        console.error("Submission error:", err);
-        showStatus("err", "❌ Not sent. Please try again or use WhatsApp. (" + (err?.message || "error") + ")");
-      }finally{
-        sendBtn.disabled = false;
-        btnText.style.display = 'inline';
-        btnLoader.style.display = 'none';
+        showStatus(false);
       }
     });
   </script>
