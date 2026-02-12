@@ -7,6 +7,7 @@ A modern, single-page website for XDrive Logistics - UK & EU dedicated transport
 This website provides a simple, elegant interface for customers to request quotes for transport services. Features include:
 
 - **Quote Request Form**: Comprehensive form for transport quotes
+- **Login Page**: Professional login interface for customer accounts
 - **Multiple Contact Methods**: Form submission, WhatsApp, and email
 - **Responsive Design**: Works on all devices
 - **Modern UI**: Glassmorphic design with smooth animations
@@ -121,18 +122,75 @@ Temporary location in `index.html`:
 const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/YOUR_WEBHOOK_ID";
 ```
 
+## Login Page
+
+The website now includes a professional login page at `login.html` with the following features:
+
+### Features
+- **Modern Design**: Matches the main website's glassmorphic aesthetic
+- **Form Validation**: Real-time email and password validation
+- **User Experience**: 
+  - Remember me checkbox
+  - Forgot password link
+  - Create account option
+  - Success/error message display
+- **Responsive**: Fully mobile-friendly design
+- **Accessibility**: ARIA labels, keyboard navigation, proper focus states
+
+### Important Notes
+
+⚠️ **Backend Required**: The current login page is a **frontend demonstration only**. To make it functional in production:
+
+1. **Authentication Backend**: You need to implement a backend API for user authentication
+2. **Recommended Stack**:
+   - Node.js + Express with JWT tokens
+   - Serverless functions (Vercel, Netlify, AWS Lambda)
+   - Firebase Authentication
+   - Auth0 or similar service
+3. **Security Requirements**:
+   - HTTPS only (already configured)
+   - Secure password hashing (bcrypt, Argon2)
+   - Session management with secure cookies
+   - CSRF protection
+   - Rate limiting for login attempts
+
+### Customization
+
+To integrate with your backend, modify the `simulateLogin()` function in `login.html`:
+
+```javascript
+async function simulateLogin(data) {
+  // Replace this with your actual API call
+  const response = await fetch('YOUR_API_ENDPOINT/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: data.email,
+      password: data.password,
+      remember: data.remember
+    })
+  });
+  return await response.json();
+}
+```
+
 ## File Structure
 
 ```
 xdrivelogistics/
 ├── index.html          # Main website file
-├── logo.png           # Company logo
-├── robots.txt         # Search engine directives
-├── sitemap.xml        # XML sitemap
-├── .gitignore         # Git ignore rules
-├── README.md          # This file
-├── SECURITY.md        # Security recommendations
-└── RECOMMENDATIONS.md # Full analysis and improvements
+├── login.html          # Login page
+├── logo.png            # Company logo (PNG format)
+├── logo.webp           # Company logo (WebP format)
+├── background.jpg      # Background image (JPEG format)
+├── background.webp     # Background image (WebP format)
+├── robots.txt          # Search engine directives
+├── sitemap.xml         # XML sitemap
+├── netlify.toml        # Netlify configuration
+├── .gitignore          # Git ignore rules
+├── README.md           # This file
+├── SECURITY.md         # Security recommendations
+└── RECOMMENDATIONS.md  # Full analysis and improvements
 ```
 
 ## Browser Support
