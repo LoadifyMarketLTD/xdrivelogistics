@@ -1,719 +1,961 @@
 <!doctype html>
-<html lang="ro">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>XDrive Logistics LTD — Cere ofertă</title>
-  <meta name="description" content="Transport rapid UK & EU. Cere ofertă instant. WhatsApp, Email, Formular." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>XDrive Logistics — Courier & Transport Services</title>
+  <meta name="description" content="XDrive Logistics provides UK & EU courier transport: same-day, next-day, pallets, multi-drop and dedicated van services. Fast quotes and reliable delivery." />
+  <meta name="theme-color" content="#0A2239" />
 
   <style>
     :root{
-      --bg:#f6f9ff;
-      --ink:#0b1b33;
-      --muted:#5b6b85;
-      --brand:#1b63c6;
-      --brand2:#0f4fae;
-      --line:rgba(14,36,72,.12);
-
-      --glass: rgba(255,255,255,.78);
-      --glass2: rgba(255,255,255,.68);
-      --shadow: 0 30px 70px rgba(10,40,90,.20);
-      --shadow2: 0 14px 40px rgba(10,40,90,.18);
-
-      --r16: 16px;
-      --r20: 20px;
-      --r24: 24px;
-
-      --container: 1180px;
+      --navy:#0A2239;
+      --gold:#D4AF37;
+      --bg:#061522;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.12);
+      --stroke: rgba(255,255,255,.14);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius: 22px;
     }
 
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--ink);
-      background: radial-gradient(1200px 600px at 30% -10%, rgba(40,120,255,.12), transparent 60%),
-                  radial-gradient(900px 500px at 80% 10%, rgba(60,200,255,.10), transparent 55%),
-                  var(--bg);
+      color:var(--text);
       overflow-x:hidden;
+
+      /* Premium background base */
+      background:
+        radial-gradient(1200px 600px at 20% 10%, rgba(212,175,55,.14), transparent 55%),
+        radial-gradient(900px 520px at 85% 20%, rgba(55,160,255,.10), transparent 55%),
+        radial-gradient(900px 520px at 50% 85%, rgba(255,255,255,.06), transparent 55%),
+        linear-gradient(180deg, #050e18, #04101c 55%, #030b14);
     }
 
-    a{ color:inherit; text-decoration:none; }
-    .container{ width:min(var(--container), calc(100% - 40px)); margin:0 auto; }
+    a{color:inherit; text-decoration:none}
+    .container{width:min(1160px, calc(100% - 40px)); margin:0 auto}
 
-    /* NAVBAR */
+    .blur{
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    /* Header */
+    header{
+      position:sticky; top:0; z-index:50;
+      background: rgba(3,11,20,.70);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
     .nav{
-      position:sticky;
-      top:0;
-      z-index:50;
-      backdrop-filter: blur(10px);
-      background: rgba(255,255,255,.72);
-      border-bottom:1px solid rgba(14,36,72,.10);
-    }
-    .navInner{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
+      display:flex; align-items:center; justify-content:space-between;
       padding:14px 0;
-      gap:16px;
+      gap:14px;
     }
-    .brandWrap{
-      display:flex; align-items:center; gap:10px;
-      min-width: 220px;
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      min-width:240px;
     }
 
-    /* ✅ LOGO REAL (PNG) */
-    .logoImg{
-      width:44px;
-      height:44px;
-      border-radius:14px;
+    /* Logo container (uses your logo.png) */
+    .logoBox{
+      width:56px; height:56px; border-radius:16px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.12);
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      display:grid; place-items:center;
+      overflow:hidden;
+    }
+    .logoBox img{
+      width:100%; height:100%;
       object-fit:contain;
-      background: rgba(255,255,255,.55);
-      border: 1px solid rgba(255,255,255,.65);
-      box-shadow: 0 10px 22px rgba(10,40,90,.14);
       padding:6px;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
     }
 
-    .brandText{
-      display:flex; flex-direction:column; line-height:1.1;
-    }
-    .brandText b{ font-size:16px; letter-spacing:.2px; }
-    .brandText span{ font-size:12px; color:var(--muted); }
+    .brand strong{display:block; line-height:1.1}
+    .brand small{color:var(--muted)}
 
-    .navLinks{
-      display:flex; align-items:center; gap:18px;
-      color:#27344f;
+    nav ul{
+      list-style:none; padding:0; margin:0;
+      display:flex; gap:18px; align-items:center;
+    }
+    nav a{
+      color:var(--muted);
       font-weight:600;
-    }
-    .navLinks a{
-      opacity:.9;
+      font-size:14px;
       padding:10px 10px;
       border-radius:12px;
     }
-    .navLinks a:hover{ background: rgba(20,70,150,.06); opacity:1; }
+    nav a:hover{color:var(--text); background: rgba(255,255,255,.06)}
 
-    .navCta{
-      display:flex; align-items:center; gap:10px;
-      min-width: 220px;
-      justify-content:flex-end;
-    }
-
+    .actions{display:flex; gap:10px; align-items:center}
     .btn{
-      border:0;
-      border-radius: 14px;
-      padding:12px 16px;
-      font-weight:800;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 14px;
+      border-radius:14px;
+      font-weight:700;
+      font-size:14px;
       cursor:pointer;
-      transition: transform .15s ease, box-shadow .15s ease, background .15s ease, opacity .15s ease;
-      display:inline-flex; align-items:center; gap:10px;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
       white-space:nowrap;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
     }
-    .btn:active{ transform: translateY(1px); }
-    .btnPrimary{
-      color:#fff;
-      background: linear-gradient(180deg, #2a7cff, #0f4fae);
-      box-shadow: 0 14px 28px rgba(15,79,174,.28);
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.22)}
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(212,175,55,.98), rgba(212,175,55,.70));
+      border-color: rgba(212,175,55,.65);
+      color:#0a1b2e;
+      box-shadow: 0 16px 44px rgba(212,175,55,.18);
     }
-    .btnPrimary:hover{ box-shadow: 0 18px 36px rgba(15,79,174,.32); }
+    .btn.primary:hover{filter:brightness(1.03)}
+    .menuBtn{display:none}
 
-    .btnGhost{
-      background: rgba(255,255,255,.78);
-      border:1px solid rgba(14,36,72,.12);
-      box-shadow: 0 10px 22px rgba(10,40,90,.10);
-      color:#183052;
-    }
-    .btnGhost:hover{ background: rgba(255,255,255,.90); }
-
-    /* HERO */
-    .hero{
+    /* HERO background photo (VAN) */
+    .heroWrap{
       position:relative;
-      padding: 34px 0 160px;
+      padding:44px 0 18px;
       overflow:hidden;
     }
-
-    /* ✅ HERO SERIOS (local file) */
-    .heroBg{
-      position:absolute; inset:0;
-      background:
-        linear-gradient(90deg,
-          rgba(8,22,44,.62) 0%,
-          rgba(8,22,44,.34) 52%,
-          rgba(8,22,44,.18) 100%
-        ),
-        url("hero-logistics.jpg");
-      background-size:cover;
-      background-position:center right;
-      background-repeat:no-repeat;
-      filter:saturate(1.08) contrast(1.04) brightness(1.03);
-      transform: scale(1.03);
+    .heroPhoto{
+      position:absolute;
+      inset:-40px -40px -40px -40px;
+      background-image:
+        linear-gradient(180deg, rgba(4,12,22,.85), rgba(4,12,22,.55) 45%, rgba(4,12,22,.92)),
+        radial-gradient(900px 520px at 25% 15%, rgba(212,175,55,.16), transparent 55%),
+        url("https://images.unsplash.com/photo-1613214149922-f1809c99b414?auto=format&fit=crop&w=2400&q=80");
+      background-size: cover;
+      background-position: center;
+      filter: saturate(1.05) contrast(1.08);
+      transform: scale(1.02);
     }
-
-    .hero:before{
-      content:"";
-      position:absolute; inset:0;
-      background: radial-gradient(900px 500px at 20% 20%, rgba(60,160,255,.22), transparent 60%),
-                  radial-gradient(700px 420px at 90% 20%, rgba(255,255,255,.12), transparent 58%);
+    .heroGlow{
+      position:absolute;
+      width:900px; height:900px;
+      border-radius:999px;
+      background: radial-gradient(circle, rgba(212,175,55,.18), transparent 60%);
+      top:-420px; left:-380px;
       pointer-events:none;
     }
-    .heroInner{
-      position:relative;
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 34px;
-      align-items:center;
-      padding-top: 10px;
-    }
+    .heroInner{position:relative}
 
-    .heroCopy{
-      color:#fff;
-      max-width: 640px;
+    /* Hero layout */
+    .heroGrid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:22px;
+      align-items:stretch;
     }
-    .heroCopy h1{
-      margin:0 0 10px;
-      font-size: clamp(34px, 4.2vw, 54px);
-      line-height:1.02;
+    .heroCard{
+      border:1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .heroLeft{
+      padding:34px 34px 28px;
+      min-height: 430px;
+    }
+    .kicker{
+      display:inline-flex;
+      align-items:center; gap:10px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(212,175,55,.35);
+      background: rgba(212,175,55,.10);
+      color: rgba(255,255,255,.9);
+      font-weight:800;
+      letter-spacing:.2px;
+      font-size:12px;
+      text-transform: uppercase;
+    }
+    .kicker .dot{
+      width:8px; height:8px; border-radius:99px;
+      background: var(--gold);
+      box-shadow: 0 0 0 6px rgba(212,175,55,.15);
+    }
+    h1{
+      margin:14px 0 12px;
+      font-size: clamp(34px, 3.4vw, 54px);
+      line-height:1.05;
       letter-spacing:-.6px;
-      text-shadow: 0 12px 40px rgba(0,0,0,.30);
     }
-    .heroCopy p{
-      margin: 0 0 18px;
-      color: rgba(255,255,255,.86);
+    .lead{
+      margin:0 0 18px;
+      color: var(--muted);
       font-size: 16px;
       line-height:1.6;
-      text-shadow: 0 10px 30px rgba(0,0,0,.25);
-      max-width: 560px;
+      max-width: 58ch;
     }
-    .heroCtas{ display:flex; gap:12px; flex-wrap:wrap; }
-    .heroNote{
-      margin-top: 14px;
-      display:flex; gap:10px; align-items:center;
-      color: rgba(255,255,255,.82);
-      font-weight:600;
-      font-size: 13px;
-      opacity:.95;
-    }
-    .dot{
-      width:10px; height:10px; border-radius:999px;
-      background: rgba(255,255,255,.85);
-      box-shadow: 0 8px 18px rgba(0,0,0,.25);
-    }
-
-    /* 3 BLOCKS (like in image) */
-    .triCards{
-      position:relative;
-      margin-top: 28px;
+    .heroStats{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      padding: 16px 16px;
-      border-radius: var(--r24);
-      background: rgba(255,255,255,.30);
-      border: 1px solid rgba(255,255,255,.35);
-      backdrop-filter: blur(14px);
-      box-shadow: 0 18px 50px rgba(0,0,0,.16);
+      gap:12px;
+      margin-top:18px;
     }
-    .triCard{
-      background: rgba(255,255,255,.72);
-      border: 1px solid rgba(14,36,72,.10);
-      border-radius: 18px;
-      padding: 14px 14px;
-      display:flex; gap:12px;
-      align-items:flex-start;
+    .stat{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      border-radius:18px;
+      padding:14px 14px;
     }
-    .triIcon{
-      width:40px; height:40px; border-radius:14px;
-      display:grid; place-items:center;
-      background: linear-gradient(180deg, rgba(42,124,255,.16), rgba(15,79,174,.10));
-      border: 1px solid rgba(15,79,174,.16);
-      color:#0f4fae;
-      flex:0 0 auto;
-    }
-    .triCard b{ display:block; margin-bottom:3px; }
-    .triCard small{ color: var(--muted); line-height:1.35; }
-
-    /* FLOATING FORM */
-    .floatingForm{
-      position:relative;
-      margin-top: 26px;
-      transform: translateY(70px);
-      z-index:10;
-    }
-    .formShell{
-      background: var(--glass);
-      border: 1px solid rgba(255,255,255,.85);
-      border-radius: 26px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
-      overflow:hidden;
-    }
-    .formTop{
-      padding: 18px 18px 10px;
-      border-bottom: 1px solid rgba(14,36,72,.08);
-      background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.70));
-    }
-    .formTop h2{
-      margin:0;
-      font-size: 22px;
-      letter-spacing:-.2px;
-      text-align:center;
-      color:#12335d;
-    }
-    .formTop p{
-      margin:6px 0 0;
-      text-align:center;
-      color: rgba(18,51,93,.72);
-      font-weight:600;
-      font-size: 13px;
-    }
-
-    .formBody{ padding: 16px 18px 18px; background: rgba(255,255,255,.62); }
-
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-    .field{
-      display:flex; flex-direction:column;
-      gap:6px;
-    }
-    label{
-      font-size: 12px;
-      font-weight: 800;
-      color: rgba(18,51,93,.82);
-      letter-spacing:.2px;
-    }
-    input, select, textarea{
-      width:100%;
-      border-radius: 14px;
-      border: 1px solid rgba(14,36,72,.14);
-      background: rgba(255,255,255,.86);
-      padding: 12px 12px;
-      font-weight: 700;
-      color: #102a4b;
-      outline:none;
-      transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
-    }
-    textarea{ min-height: 96px; resize: vertical; }
-    input:focus, select:focus, textarea:focus{
-      border-color: rgba(27,99,198,.55);
-      box-shadow: 0 0 0 4px rgba(27,99,198,.12);
-      background: rgba(255,255,255,.95);
-    }
-
-    .span2{ grid-column: span 2; }
-    .span3{ grid-column: span 3; }
-
-    .actions{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap: 10px;
-      flex-wrap:wrap;
-      margin-top: 14px;
-    }
-
-    .btnWide{
-      padding: 13px 18px;
-      min-width: 220px;
-      justify-content:center;
-      border-radius: 16px;
-    }
-
-    .pillRow{
-      display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
-      margin-top: 10px;
+    .stat strong{font-size:18px; display:block}
+    .stat span{color:var(--muted); font-size:12px}
+    .heroCtas{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+    .trustRow{
+      margin-top:18px;
+      display:flex; flex-wrap:wrap; gap:10px;
+      color: rgba(255,255,255,.72);
+      font-size:13px;
     }
     .pill{
-      display:inline-flex; align-items:center; gap:10px;
-      padding: 10px 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(14,36,72,.12);
-      background: rgba(255,255,255,.82);
-      box-shadow: 0 10px 22px rgba(10,40,90,.10);
-      font-weight: 900;
-      color:#14345f;
-      cursor:pointer;
-      transition: transform .15s ease, box-shadow .15s ease;
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.16);
+      padding:8px 10px;
+      border-radius:999px;
     }
-    .pill:hover{ transform: translateY(-1px); box-shadow: 0 14px 28px rgba(10,40,90,.14); }
-    .pillGreen{
-      color:#0b4a2a;
-      border-color: rgba(0,170,90,.25);
-      background: rgba(225,255,240,.78);
-    }
-
-    .status{
-      margin-top: 10px;
-      text-align:center;
+    .pill i{
+      width:18px; height:18px;
+      display:inline-grid; place-items:center;
+      border-radius:8px;
+      background: rgba(212,175,55,.14);
+      color: var(--gold);
+      font-style:normal;
       font-weight:900;
-      color:#0b5a2a;
-      display:none;
-    }
-    .statusErr{
-      color:#8a1020;
+      font-size:12px;
     }
 
-    /* Sections below */
-    .below{
-      padding: 120px 0 60px;
+    /* Quote */
+    .quote{padding:22px}
+    .quoteHead{
+      display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+      margin-bottom:12px;
     }
-    .section{
-      margin-top: 26px;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
+    .quoteHead h3{margin:0; font-size:18px}
+    .quoteHead p{margin:4px 0 0; color:var(--muted); font-size:13px; line-height:1.35}
+    .badge{
+      padding:8px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      font-size:12px;
+      font-weight:800;
+      color:rgba(255,255,255,.86);
+      white-space:nowrap;
     }
-    .panel{
-      background: rgba(255,255,255,.82);
-      border: 1px solid rgba(14,36,72,.10);
-      border-radius: 22px;
-      padding: 18px;
-      box-shadow: var(--shadow2);
+    form{display:grid; gap:10px; margin-top:12px}
+    .row{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
+    label{font-size:12px; color: rgba(255,255,255,.72); font-weight:700}
+    input, select, textarea{
+      width:100%;
+      margin-top:6px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      padding:12px 12px;
+      outline:none;
     }
-    .panel h3{ margin:0 0 8px; letter-spacing:-.2px; }
-    .panel p{ margin:0; color:var(--muted); line-height:1.6; font-weight:600; }
+    textarea{min-height:88px; resize:vertical}
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(212,175,55,.58);
+      box-shadow: 0 0 0 4px rgba(212,175,55,.14)
+    }
+    .formActions{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:6px}
+    .hint{font-size:12px; color: var(--muted)}
 
-    .footer{
-      padding: 26px 0 34px;
-      color: rgba(15,40,75,.72);
-      text-align:center;
+    /* Sections */
+    section{padding:46px 0}
+    .sectionTitle{
+      display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+    .sectionTitle h2{
+      margin:0;
+      font-size: clamp(22px, 2.1vw, 30px);
+      letter-spacing:-.3px;
+    }
+    .sectionTitle p{margin:0; color:var(--muted); max-width:60ch; line-height:1.55}
+    .grid3{display:grid; grid-template-columns: repeat(3, 1fr); gap:14px}
+    .grid2{display:grid; grid-template-columns: repeat(2, 1fr); gap:14px}
+
+    .card{
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
+      border-radius: var(--radius);
+      padding:18px;
+      box-shadow: 0 12px 38px rgba(0,0,0,.22);
+    }
+    .card h3{margin:10px 0 8px; font-size:16px}
+    .card p{margin:0; color:var(--muted); line-height:1.55; font-size:14px}
+
+    .icon{
+      width:44px; height:44px; border-radius:16px;
+      border:1px solid rgba(212,175,55,.35);
+      background: rgba(212,175,55,.12);
+      display:grid; place-items:center;
+      color: var(--gold);
+      font-weight:900;
+      letter-spacing:.4px;
+    }
+    .list{
+      margin:10px 0 0; padding:0; list-style:none;
+      display:grid; gap:10px;
+      color: var(--muted);
+      font-size:14px;
+    }
+    .list li{display:flex; gap:10px; align-items:flex-start}
+    .check{
+      width:18px; height:18px; border-radius:8px;
+      background: rgba(212,175,55,.14);
+      border:1px solid rgba(212,175,55,.28);
+      color: var(--gold);
+      display:grid; place-items:center;
+      font-weight:900;
+      flex:0 0 auto;
+      margin-top:2px;
+      font-size:12px;
+    }
+
+    /* Fleet chips */
+    .chips{display:flex; gap:10px; flex-wrap:wrap}
+    .chip{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      padding:10px 12px;
+      border-radius:999px;
+      color: rgba(255,255,255,.82);
       font-weight:700;
-      border-top: 1px solid rgba(14,36,72,.10);
-      background: rgba(255,255,255,.55);
-      backdrop-filter: blur(10px);
+      font-size:13px;
     }
 
-    /* Responsive */
-    @media (max-width: 980px){
-      .navLinks{ display:none; }
-      .heroInner{ grid-template-columns: 1fr; }
-      .triCards{ grid-template-columns: 1fr; }
-      .grid{ grid-template-columns: 1fr; }
-      .span2,.span3{ grid-column: auto; }
-      .below{ padding-top: 140px; }
-      .section{ grid-template-columns: 1fr; }
-      .floatingForm{ transform: translateY(54px); }
-      .hero{ padding-bottom: 190px; }
+    /* Coverage tags */
+    .coverage{display:flex; gap:12px; flex-wrap:wrap; margin-top:10px}
+    .tag{
+      padding:10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.14);
+      color: rgba(255,255,255,.78);
+      font-size:13px;
+      font-weight:700;
     }
-    @media (max-width: 480px){
-      .container{ width: calc(100% - 24px); }
-      .btn{ padding: 12px 14px; border-radius: 14px; }
-      .brandWrap{ min-width:unset; }
-      .navCta{ min-width:unset; }
-      .heroCopy p{ font-size: 15px; }
+
+    /* FAQ */
+    details{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      border-radius: 18px;
+      padding:14px 14px;
+    }
+    details + details{margin-top:10px}
+    summary{
+      cursor:pointer;
+      font-weight:800;
+      color: rgba(255,255,255,.90);
+      outline:none;
+    }
+    details p{color:var(--muted); margin:10px 0 0; line-height:1.55; font-size:14px}
+
+    /* Footer */
+    footer{
+      padding:26px 0 36px;
+      border-top:1px solid rgba(255,255,255,.08);
+      background: rgba(3,11,20,.55);
+    }
+    .footerGrid{
+      display:grid; grid-template-columns: 1.2fr .8fr; gap:14px; align-items:start;
+    }
+    .footSmall{color:var(--muted); font-size:13px; line-height:1.55}
+    .footLinks{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+    .footLinks a{
+      padding:10px 12px; border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: rgba(255,255,255,.78);
+      font-weight:700; font-size:13px
+    }
+    .footLinks a:hover{color:var(--text); border-color: rgba(255,255,255,.18)}
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 18px;
+      max-width: min(520px, calc(100% - 24px));
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(10,34,57,.88);
+      box-shadow: var(--shadow);
+      color: rgba(255,255,255,.9);
+      font-weight: 700;
+      display:none;
+      z-index: 99;
+    }
+
+    /* Mobile */
+    @media (max-width: 980px){
+      .heroGrid{grid-template-columns: 1fr}
+      nav ul{display:none}
+      .menuBtn{display:inline-flex}
+      .footerGrid{grid-template-columns: 1fr}
+      .footLinks{justify-content:flex-start}
+    }
+    @media (max-width: 640px){
+      .heroLeft{padding:26px 18px 20px}
+      .quote{padding:18px}
+      .grid3{grid-template-columns: 1fr}
+      .grid2{grid-template-columns: 1fr}
+      .row{grid-template-columns: 1fr}
+      .heroStats{grid-template-columns: 1fr}
+      .logoBox{width:52px;height:52px}
     }
   </style>
 </head>
 
 <body>
+  <header class="blur">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="#top" aria-label="XDrive Logistics Home">
+          <div class="logoBox">
+            <img src="logo.png" alt="XDrive Logistics Logo" />
+          </div>
+          <div>
+            <strong>XDrive Logistics</strong>
+            <small>Courier & Transport</small>
+          </div>
+        </a>
 
-  <!-- NAV -->
-  <header class="nav">
-    <div class="container navInner">
-      <a class="brandWrap" href="#top" aria-label="XDrive Logistics">
-        <!-- ✅ LOGO PNG -->
-        <img class="logoImg" src="logo.png" alt="XDrive Logistics logo" />
-        <div class="brandText">
-          <b>XDrive Logistics LTD</b>
-          <span>UK & EU Transport • Quotes Fast</span>
+        <nav aria-label="Primary">
+          <ul>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#fleet">Fleet</a></li>
+            <li><a href="#coverage">Coverage</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
+
+        <div class="actions">
+          <a class="btn" href="#contact">Call / WhatsApp</a>
+          <a class="btn primary" href="#quote">Get a Quote</a>
+          <button class="btn menuBtn" id="menuBtn" aria-label="Open menu">Menu</button>
         </div>
-      </a>
-
-      <nav class="navLinks" aria-label="Meniu">
-        <a href="#services">Serviciile Noastre</a>
-        <a href="#about">Despre Noi</a>
-        <a href="#contact">Contact</a>
-      </nav>
-
-      <div class="navCta">
-        <button class="btn btnPrimary" onclick="scrollToQuote()">Cere Ofertă</button>
       </div>
     </div>
   </header>
 
-  <!-- HERO -->
-  <main id="top" class="hero">
-    <div class="heroBg" aria-hidden="true"></div>
-
-    <div class="container heroInner">
-      <div class="heroCopy">
-        <h1>Transport de încredere<br/>pentru afacerea ta</h1>
-        <p>Soluții profesioniste pentru transport rapid și sigur în UK și Europa. Trimite cererea, iar noi îți răspundem rapid cu preț și disponibilitate.</p>
-
-        <div class="heroCtas">
-          <button class="btn btnPrimary" onclick="scrollToQuote()">Cere Ofertă</button>
-          <button class="btn btnGhost" onclick="openWhatsApp()">Contactează-ne</button>
-        </div>
-
-        <div class="heroNote">
-          <span class="dot"></span>
-          <span>Răspuns rapid • WhatsApp + Email • Ofertă clară</span>
-        </div>
-
-        <!-- 3 BLOCKS -->
-        <div id="services" class="triCards" aria-label="Servicii / Despre / Ce oferim">
-          <div class="triCard">
-            <div class="triIcon" aria-hidden="true">🚚</div>
-            <div>
-              <b>Serviciile Noastre</b>
-              <small>Transport marfă, livrări expres, colectări rapide.</small>
-            </div>
-          </div>
-          <div class="triCard">
-            <div class="triIcon" aria-hidden="true">📍</div>
-            <div>
-              <b>Cine Suntem Noi</b>
-              <small>Profesioniști cu experiență în logistică și transport.</small>
-            </div>
-          </div>
-          <div class="triCard">
-            <div class="triIcon" aria-hidden="true">🧾</div>
-            <div>
-              <b>Ce Oferim</b>
-              <small>Soluții personalizate pentru nevoile tale, simplu și rapid.</small>
-            </div>
-          </div>
-        </div>
-
-        <!-- FORM OVER HERO -->
-        <div id="quote" class="floatingForm">
-          <div class="formShell">
-            <div class="formTop">
-              <h2>Cere o Ofertă de Transport</h2>
-              <p>Completează detaliile și trimitem preț + disponibilitate.</p>
-            </div>
-
-            <div class="formBody">
-              <form id="quoteForm">
-                <div class="grid">
-                  <div class="field">
-                    <label>Nume / Companie</label>
-                    <input name="name" placeholder="Numele tău sau compania" autocomplete="name" required />
-                  </div>
-
-                  <div class="field">
-                    <label>Telefon (WhatsApp)</label>
-                    <input name="phone" placeholder="+44..." autocomplete="tel" required />
-                  </div>
-
-                  <div class="field">
-                    <label>Email</label>
-                    <input name="email" placeholder="example@email.com" autocomplete="email" required />
-                  </div>
-
-                  <div class="field">
-                    <label>Loc de încărcare (Pickup)</label>
-                    <input name="pickup" placeholder="ex: Blackburn BB1" required />
-                  </div>
-
-                  <div class="field">
-                    <label>Loc de descărcare (Drop-off)</label>
-                    <input name="dropoff" placeholder="ex: Manchester" required />
-                  </div>
-
-                  <div class="field">
-                    <label>Tip vehicul</label>
-                    <select name="vehicle" required>
-                      <option value="" selected>Select vehicle</option>
-                      <option>Small van</option>
-                      <option>Medium van</option>
-                      <option>Long wheelbase</option>
-                      <option>Luton van</option>
-                    </select>
-                  </div>
-
-                  <div class="field">
-                    <label>Data & ora colectării</label>
-                    <input type="datetime-local" name="pickup_datetime" required />
-                  </div>
-
-                  <div class="field">
-                    <label>Data & ora livrării</label>
-                    <input type="datetime-local" name="delivery_datetime" required />
-                  </div>
-
-                  <div class="field">
-                    <label>Tip transport</label>
-                    <select name="transport_type" required>
-                      <option value="" selected>Alege</option>
-                      <option>Express</option>
-                      <option>Same-day</option>
-                      <option>Next-day</option>
-                      <option>Scheduled</option>
-                    </select>
-                  </div>
-
-                  <div class="field span3">
-                    <label>Detalii încărcătură</label>
-                    <textarea name="load_details" placeholder="Greutate, paleți/colete, dimensiuni, fereastră de colectare, note speciale..." required></textarea>
-                  </div>
-                </div>
-
-                <div class="actions">
-                  <button class="btn btnPrimary btnWide" type="submit">Trimite Cererea</button>
-                  <button class="btn btnGhost btnWide" type="button" onclick="clearDraft()">Șterge</button>
-                </div>
-
-                <div class="pillRow" id="contact">
-                  <div class="pill pillGreen" onclick="openWhatsApp()">✅ WhatsApp</div>
-                  <div class="pill" onclick="sendEmailClient()">✉️ Email</div>
-                </div>
-
-                <div id="statusOk" class="status">✅ Cererea a fost trimisă. Îți răspundem în curând.</div>
-                <div id="statusErr" class="status statusErr">❌ Eroare la trimitere. Încearcă din nou sau folosește WhatsApp.</div>
-              </form>
-            </div>
-          </div>
-        </div>
-
+  <!-- Mobile menu -->
+  <div id="mobileMenu" class="container" style="display:none; padding:10px 0 0;">
+    <div class="card blur" style="padding:12px;">
+      <div class="chips" style="gap:8px;">
+        <a class="chip" href="#services">Services</a>
+        <a class="chip" href="#fleet">Fleet</a>
+        <a class="chip" href="#coverage">Coverage</a>
+        <a class="chip" href="#faq">FAQ</a>
+        <a class="chip" href="#contact">Contact</a>
       </div>
-
-      <div></div>
     </div>
+  </div>
+
+  <main id="top">
+    <!-- HERO with VAN photo background -->
+    <div class="heroWrap">
+      <div class="heroPhoto" aria-hidden="true"></div>
+      <div class="heroGlow" aria-hidden="true"></div>
+
+      <div class="container heroInner">
+        <div class="heroGrid">
+          <div class="heroCard blur">
+            <div class="heroLeft">
+              <span class="kicker"><span class="dot"></span> UK & EU Transport • Reliable • Fast</span>
+              <h1>Premium courier transport that keeps your business moving.</h1>
+              <p class="lead">
+                Dedicated vans, multi-drop, pallets and urgent collections — with clear pricing, live updates and professional drivers.
+                Built for brokers, dispatchers and direct clients who need speed and trust.
+              </p>
+
+              <div class="heroCtas">
+                <a class="btn primary" href="#quote">Instant Quote</a>
+                <a class="btn" href="#services">Explore Services</a>
+              </div>
+
+              <div class="heroStats">
+                <div class="stat">
+                  <strong>Same-day</strong>
+                  <span>Urgent collections & deliveries</span>
+                </div>
+                <div class="stat">
+                  <strong>Next-day</strong>
+                  <span>Reliable scheduled transport</span>
+                </div>
+                <div class="stat">
+                  <strong>Dedicated</strong>
+                  <span>Van only for your load</span>
+                </div>
+              </div>
+
+              <div class="trustRow">
+                <span class="pill"><i>✓</i> Insured transport</span>
+                <span class="pill"><i>✓</i> POD on delivery</span>
+                <span class="pill"><i>✓</i> Transparent communication</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- QUOTE -->
+          <div class="heroCard blur" id="quote">
+            <div class="quote">
+              <div class="quoteHead">
+                <div>
+                  <h3>Request a quote</h3>
+                  <p>Fill in the details — we’ll reply fast with price & availability.</p>
+                </div>
+                <div class="badge">Fast Response</div>
+              </div>
+
+              <form id="quoteForm">
+                <div class="row">
+                  <div>
+                    <label>Pickup (City / Postcode)
+                      <input name="pickup" placeholder="e.g. BB1, Blackburn" required />
+                    </label>
+                  </div>
+                  <div>
+                    <label>Drop-off (City / Postcode)
+                      <input name="dropoff" placeholder="e.g. M1, Manchester" required />
+                    </label>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div>
+                    <label>Service type
+                      <select name="service" required>
+                        <option value="" selected disabled>Select…</option>
+                        <option>Same-day courier</option>
+                        <option>Next-day delivery</option>
+                        <option>Dedicated van</option>
+                        <option>Pallet transport</option>
+                        <option>Multi-drop route</option>
+                        <option>EU transport</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div>
+                    <label>Vehicle
+                      <select name="vehicle" required>
+                        <option value="" selected disabled>Select…</option>
+                        <option>Small van</option>
+                        <option>Medium van</option>
+                        <option>Large van / Luton</option>
+                        <option>7.5t (on request)</option>
+                      </select>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div>
+                    <label>Date
+                      <input name="date" type="date" required />
+                    </label>
+                  </div>
+                  <div>
+                    <label>Contact (phone / email)
+                      <input name="contact" placeholder="e.g. 07423 272138 / email" required />
+                    </label>
+                  </div>
+                </div>
+
+                <div>
+                  <label>Load details
+                    <textarea name="details" placeholder="Weight/size, pallets, collection time window, special notes…" required></textarea>
+                  </label>
+                </div>
+
+                <div class="formActions">
+                  <button class="btn primary" type="submit">Send Request</button>
+                  <button class="btn" type="button" id="copyMsgBtn">Copy Message</button>
+                  <span class="hint">Opens email compose (or copy message) — no backend needed.</span>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <section id="services">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Services</h2>
+            <p>Flexible courier transport for urgent, scheduled and dedicated jobs across the UK and Europe.</p>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="card blur">
+            <div class="icon">SD</div>
+            <h3>Same-Day Courier</h3>
+            <p>Urgent collections with direct delivery — fastest option when time matters.</p>
+            <ul class="list">
+              <li><span class="check">✓</span>Direct route</li>
+              <li><span class="check">✓</span>Live updates</li>
+              <li><span class="check">✓</span>POD included</li>
+            </ul>
+          </div>
+
+          <div class="card blur">
+            <div class="icon">ND</div>
+            <h3>Next-Day Delivery</h3>
+            <p>Reliable scheduled transport for regular routes and planned shipments.</p>
+            <ul class="list">
+              <li><span class="check">✓</span>Planned collection slots</li>
+              <li><span class="check">✓</span>Clear pricing</li>
+              <li><span class="check">✓</span>Professional handling</li>
+            </ul>
+          </div>
+
+          <div class="card blur">
+            <div class="icon">DV</div>
+            <h3>Dedicated Van</h3>
+            <p>Van assigned only to your load — ideal for high-value or fragile goods.</p>
+            <ul class="list">
+              <li><span class="check">✓</span>Exclusive capacity</li>
+              <li><span class="check">✓</span>Fast dispatch</li>
+              <li><span class="check">✓</span>Insurance options</li>
+            </ul>
+          </div>
+
+          <div class="card blur">
+            <div class="icon">PL</div>
+            <h3>Pallet Transport</h3>
+            <p>From single pallets to multiple — tail-lift options on request.</p>
+            <ul class="list">
+              <li><span class="check">✓</span>Business freight</li>
+              <li><span class="check">✓</span>Timed deliveries</li>
+              <li><span class="check">✓</span>Careful securing</li>
+            </ul>
+          </div>
+
+          <div class="card blur">
+            <div class="icon">MD</div>
+            <h3>Multi-Drop Routes</h3>
+            <p>Optimised routes for multiple stops — reduce cost per drop.</p>
+            <ul class="list">
+              <li><span class="check">✓</span>Route planning</li>
+              <li><span class="check">✓</span>Stop-by-stop POD</li>
+              <li><span class="check">✓</span>Daily/weekly options</li>
+            </ul>
+          </div>
+
+          <div class="card blur">
+            <div class="icon">EU</div>
+            <h3>EU Transport</h3>
+            <p>Cross-border movements with clear paperwork guidance and tracking.</p>
+            <ul class="list">
+              <li><span class="check">✓</span>Dedicated runs</li>
+              <li><span class="check">✓</span>Documentation support</li>
+              <li><span class="check">✓</span>Transparent comms</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY US + FLEET -->
+    <section id="fleet">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Why XDrive + Fleet</h2>
+            <p>Professional drivers, clean communication, and delivery proof — the basics done exceptionally well.</p>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card blur">
+            <h3>What you get</h3>
+            <ul class="list">
+              <li><span class="check">✓</span><strong>Fast quoting</strong> & availability checks</li>
+              <li><span class="check">✓</span><strong>Updates</strong> from collection to delivery</li>
+              <li><span class="check">✓</span><strong>POD</strong> (Proof of Delivery) after completion</li>
+              <li><span class="check">✓</span><strong>Careful handling</strong> & secured loads</li>
+              <li><span class="check">✓</span><strong>Invoice-ready</strong> documentation</li>
+            </ul>
+          </div>
+
+          <div class="card blur">
+            <h3>Fleet options</h3>
+            <p>We match the right vehicle to your job — size, access, and load type.</p>
+            <div class="chips" style="margin-top:12px;">
+              <span class="chip">Small Van</span>
+              <span class="chip">Medium Van</span>
+              <span class="chip">Large Van</span>
+              <span class="chip">Luton Van</span>
+              <span class="chip">Tail-lift (on request)</span>
+              <span class="chip">Straps & blankets</span>
+            </div>
+            <div style="margin-top:12px; color:var(--muted); font-size:13px; line-height:1.55">
+              Tip: for pallets/heavy items, mention loading method (forklift/tail-lift/manual) in the quote form.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COVERAGE -->
+    <section id="coverage">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Coverage</h2>
+            <p>UK nationwide coverage with EU routes available on request.</p>
+          </div>
+        </div>
+
+        <div class="card blur">
+          <h3>Typical lanes</h3>
+          <div class="coverage">
+            <span class="tag">North West</span>
+            <span class="tag">Midlands</span>
+            <span class="tag">London & South East</span>
+            <span class="tag">Scotland</span>
+            <span class="tag">Wales</span>
+            <span class="tag">EU Dedicated Runs</span>
+          </div>
+          <p style="margin-top:12px;">Send pickup/drop-off postcodes and load details — we’ll confirm price and timing.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>FAQ</h2>
+            <p>Quick answers to the most common questions.</p>
+          </div>
+        </div>
+
+        <details class="blur">
+          <summary>How fast do you respond to quote requests?</summary>
+          <p>Usually fast during business hours. For urgent jobs, use WhatsApp/phone and include pickup/drop-off plus load details.</p>
+        </details>
+        <details class="blur">
+          <summary>Do you provide proof of delivery?</summary>
+          <p>Yes — POD (signature/photo depending on the job and location).</p>
+        </details>
+        <details class="blur">
+          <summary>Can you handle pallets and heavy items?</summary>
+          <p>Yes. Please mention weight, dimensions, number of pallets, and whether loading is forklift/tail-lift/manual.</p>
+        </details>
+        <details class="blur">
+          <summary>Do you cover Europe?</summary>
+          <p>EU dedicated runs are available on request. Share route, dates, and cargo details for a tailored quote.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Contact</h2>
+            <p>Fastest: WhatsApp or phone. For planned jobs, email works great.</p>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="card blur">
+            <div class="icon">WA</div>
+            <h3>WhatsApp</h3>
+            <p><a id="waLink" href="#" class="btn primary" style="display:inline-flex; margin-top:12px;">Open WhatsApp</a></p>
+            <p style="margin-top:10px;">Send route + date + load details.</p>
+          </div>
+
+          <div class="card blur">
+            <div class="icon">PH</div>
+            <h3>Phone</h3>
+            <p style="margin-top:12px;">
+              <a id="phoneLink" class="btn" href="#">Call now</a>
+            </p>
+            <p style="margin-top:10px;">Best for immediate dispatch.</p>
+          </div>
+
+          <div class="card blur">
+            <div class="icon">EM</div>
+            <h3>Email</h3>
+            <p style="margin-top:12px;">
+              <a id="emailLink" class="btn" href="#">Send email</a>
+            </p>
+            <p style="margin-top:10px;">Quotes & paperwork.</p>
+          </div>
+        </div>
+
+        <div class="card blur" style="margin-top:14px;">
+          <h3>Our details</h3>
+          <ul class="list">
+            <li><span class="check">✓</span><span><strong>WhatsApp:</strong> <span style="color:rgba(255,255,255,.86)" id="waText"></span></span></li>
+            <li><span class="check">✓</span><span><strong>Phone:</strong> <span style="color:rgba(255,255,255,.86)" id="phoneText"></span></span></li>
+            <li><span class="check">✓</span><span><strong>Email:</strong> <span style="color:rgba(255,255,255,.86)" id="emailText"></span></span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <section class="below">
+  <footer class="blur">
     <div class="container">
-      <div class="section">
-        <div class="panel" id="about">
-          <h3>Despre XDrive Logistics</h3>
-          <p>Transport pentru clienți business și dispeceri: rapid, organizat, comunicare clară, confirmări și statusuri rapide. Scopul nostru: să fie ușor să ceri ofertă și să primești răspunsul imediat.</p>
+      <div class="footerGrid">
+        <div>
+          <div class="brand" style="gap:10px;">
+            <div class="logoBox" style="width:46px;height:46px;border-radius:16px;">
+              <img src="logo.png" alt="XDrive Logistics Logo" />
+            </div>
+            <div>
+              <strong>XDrive Logistics</strong>
+              <div class="footSmall">Courier & Transport • UK & EU</div>
+            </div>
+          </div>
+          <p class="footSmall" style="margin-top:10px;">
+            © <span id="year"></span> XDrive Logistics. All rights reserved.
+          </p>
         </div>
 
-        <div class="panel">
-          <h3>Acoperire UK & EU</h3>
-          <p>Disponibilitate în funcție de rută și timp. Pentru cel mai rapid răspuns, WhatsApp este cea mai bună opțiune — include pickup, drop-off, date/time și detalii încărcătură.</p>
+        <div class="footLinks">
+          <a href="#quote">Quote</a>
+          <a href="#services">Services</a>
+          <a href="#contact">Contact</a>
+          <a href="#top">Back to top</a>
         </div>
       </div>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <div class="container">
-      © <span id="y"></span> XDrive Logistics LTD • UK & EU Transport • WhatsApp & Email
     </div>
   </footer>
 
+  <div class="toast" id="toast"></div>
+
   <script>
-    const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/ys8ddlbqd8xknxh5ruqsa4q9hwr5e783";
-    const DRAFT_KEY = "xdrive_quote_draft_v1";
-    const WHATSAPP_NUMBER = "447423272138";
-    const EMAIL_TO = "xdrivelogisticsltd@gmail.com";
+    // ====== YOUR CONTACT DETAILS (already set) ======
+    const CONTACT = {
+      whatsappNumber: "+447423272138",
+      phoneNumber: "+447423272138",
+      phoneDisplay: "07423 272 138",
+      email: "xdrivelogisticsltd@gmail.com"
+    };
 
-    document.getElementById("y").textContent = new Date().getFullYear();
+    const toast = (msg) => {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.style.display = "block";
+      clearTimeout(window.__t);
+      window.__t = setTimeout(() => (el.style.display = "none"), 2600);
+    };
 
-    function scrollToQuote(){
-      document.getElementById("quote").scrollIntoView({behavior:"smooth", block:"start"});
-    }
-
-    function openWhatsApp(){
-      const data = getFormData();
-      const msg =
-`XDrive Logistics - Quote Request
-Name/Company: ${data.name || "-"}
-Phone: ${data.phone || "-"}
-Email: ${data.email || "-"}
-Pickup: ${data.pickup || "-"}
-Drop-off: ${data.dropoff || "-"}
-Pickup date/time: ${data.pickup_datetime || "-"}
-Delivery date/time: ${data.delivery_datetime || "-"}
-Vehicle: ${data.vehicle || "-"}
-Transport type: ${data.transport_type || "-"}
-Load details: ${data.load_details || "-"}`;
-
-      const url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg);
-      window.open(url, "_blank");
-    }
-
-    function sendEmailClient(){
-      const data = getFormData();
-      const subject = "XDrive Quote Request";
-      const body =
-`Name/Company: ${data.name || "-"}
-Phone: ${data.phone || "-"}
-Email: ${data.email || "-"}
-Pickup: ${data.pickup || "-"}
-Drop-off: ${data.dropoff || "-"}
-Pickup date/time: ${data.pickup_datetime || "-"}
-Delivery date/time: ${data.delivery_datetime || "-"}
-Vehicle: ${data.vehicle || "-"}
-Transport type: ${data.transport_type || "-"}
-Load details: ${data.load_details || "-"}`;
-
-      window.location.href = `mailto:${EMAIL_TO}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    }
-
-    function showStatus(ok){
-      const sOk = document.getElementById("statusOk");
-      const sEr = document.getElementById("statusErr");
-      sOk.style.display = ok ? "block" : "none";
-      sEr.style.display = ok ? "none" : "block";
-      if(ok){
-        setTimeout(()=>{ sOk.style.display="none"; }, 6000);
-      }
-    }
-
-    const form = document.getElementById("quoteForm");
-    const fields = Array.from(form.querySelectorAll("input,select,textarea"));
-
-    function getFormData(){
-      const fd = new FormData(form);
-      const obj = {};
-      for (const [k,v] of fd.entries()) obj[k] = String(v || "").trim();
-      return obj;
-    }
-
-    function saveDraft(){
-      const data = getFormData();
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
-    }
-
-    function loadDraft(){
-      try{
-        const raw = localStorage.getItem(DRAFT_KEY);
-        if(!raw) return;
-        const data = JSON.parse(raw);
-        fields.forEach(el=>{
-          if(data[el.name] !== undefined) el.value = data[el.name];
-        });
-      }catch(e){}
-    }
-
-    function clearDraft(){
-      localStorage.removeItem(DRAFT_KEY);
-      form.reset();
-    }
-
-    fields.forEach(el=>{
-      el.addEventListener("input", saveDraft);
-      el.addEventListener("change", saveDraft);
+    // Smooth anchors
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener("click", (e)=>{
+        const id = a.getAttribute("href");
+        if(!id || id === "#") return;
+        const target = document.querySelector(id);
+        if(target){
+          e.preventDefault();
+          target.scrollIntoView({behavior:"smooth", block:"start"});
+          history.replaceState(null, "", id);
+        }
+      });
     });
 
-    loadDraft();
+    // Mobile menu
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    if(menuBtn){
+      menuBtn.addEventListener("click", ()=>{
+        const open = mobileMenu.style.display !== "none";
+        mobileMenu.style.display = open ? "none" : "block";
+      });
+    }
 
-    form.addEventListener("submit", async (e)=>{
+    // Contact links
+    const waLink = document.getElementById("waLink");
+    const phoneLink = document.getElementById("phoneLink");
+    const emailLink = document.getElementById("emailLink");
+
+    waLink.href = `https://wa.me/${CONTACT.whatsappNumber.replace(/\D/g,"")}?text=${encodeURIComponent("Hi XDrive Logistics, I’d like a quote. Pickup: ___ | Drop-off: ___ | Date: ___ | Load: ___")}`;
+    phoneLink.href = `tel:${CONTACT.phoneNumber}`;
+    emailLink.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent("Quote Request — XDrive Logistics")}&body=${encodeURIComponent("Hello XDrive Logistics,%0D%0A%0D%0APickup:%0D%0ADrop-off:%0D%0AService:%0D%0AVehicle:%0D%0ADate:%0D%0ALoad details:%0D%0A%0D%0AContact:%0D%0A")}`;
+
+    // Show details text
+    document.getElementById("waText").textContent = CONTACT.phoneDisplay;
+    document.getElementById("phoneText").textContent = CONTACT.phoneDisplay;
+    document.getElementById("emailText").textContent = CONTACT.email;
+
+    // Quote form -> opens email compose
+    const quoteForm = document.getElementById("quoteForm");
+    const copyBtn = document.getElementById("copyMsgBtn");
+
+    const buildMessage = (data) => {
+      return [
+        "Quote Request — XDrive Logistics",
+        "",
+        `Pickup: ${data.pickup || ""}`,
+        `Drop-off: ${data.dropoff || ""}`,
+        `Service: ${data.service || ""}`,
+        `Vehicle: ${data.vehicle || ""}`,
+        `Date: ${data.date || ""}`,
+        `Contact: ${data.contact || ""}`,
+        "",
+        `Load details:`,
+        `${data.details || ""}`
+      ].join("\n");
+    };
+
+    quoteForm.addEventListener("submit", (e)=>{
       e.preventDefault();
-      const payload = getFormData();
-      payload.source = "xdrivelogistics.co.uk";
-      payload.submitted_at = new Date().toISOString();
+      const formData = new FormData(quoteForm);
+      const data = Object.fromEntries(formData.entries());
+      const body = buildMessage(data);
+
+      const mailto = `mailto:${CONTACT.email}?subject=${encodeURIComponent("Quote Request — XDrive Logistics")}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailto;
+      toast("Opening your email app…");
+    });
+
+    copyBtn.addEventListener("click", async ()=>{
+      const formData = new FormData(quoteForm);
+      const data = Object.fromEntries(formData.entries());
+      const text = buildMessage(data);
 
       try{
-        const res = await fetch(MAKE_WEBHOOK_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        if(!res.ok) throw new Error("Bad response");
-        showStatus(true);
-        localStorage.removeItem(DRAFT_KEY);
-        form.reset();
-      }catch(err){
-        showStatus(false);
+        await navigator.clipboard.writeText(text);
+        toast("Message copied to clipboard ✅");
+      }catch{
+        toast("Copy failed — your browser blocked clipboard.");
       }
     });
+
+    document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
