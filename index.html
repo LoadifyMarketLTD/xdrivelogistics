@@ -253,11 +253,17 @@
       line-height:1.08;
       letter-spacing:-.8px;
       font-weight: 800;
+      color: rgba(255,255,255,.95); /* Fallback for accessibility */
       background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(255,255,255,.85));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       text-shadow: 0 2px 20px rgba(0,0,0,.15);
+    }
+    @supports not (background-clip: text) {
+      h1 {
+        color: rgba(255,255,255,.95);
+      }
     }
     .lead{
       margin:0 0 20px;
@@ -396,7 +402,7 @@
       font-size: 14px;
     }
     input::placeholder, textarea::placeholder {
-      color: rgba(255,255,255,.45);
+      color: rgba(255,255,255,.62);
     }
     textarea{min-height:92px; resize:vertical; line-height: 1.5}
     input:focus, select:focus, textarea:focus{
