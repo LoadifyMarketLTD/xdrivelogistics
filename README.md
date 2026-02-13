@@ -194,6 +194,6 @@ See [SECURITY.md](SECURITY.md) for:
 
 ## License
 
-© 2021 XDrive Logistics. All rights reserved.
+© 2021 - 2026 XDrive Logistics LTD. All rights reserved.
 
 This website is proprietary software owned by XDrive Logistics / Loadify Market LTD.
