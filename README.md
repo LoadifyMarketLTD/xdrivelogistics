@@ -1,6 +1,6 @@
 # XDrive Logistics Website
 
-A modern, single-page website for XDrive Logistics - UK & EU dedicated transport services.
+A modern, single-page website for XDrive Logistics - UK dedicated transport services.
 
 ## Overview
 
@@ -194,6 +194,6 @@ See [SECURITY.md](SECURITY.md) for:
 
 ## License
 
-© 2026 XDrive Logistics. All rights reserved.
+© 2021 XDrive Logistics. All rights reserved.
 
 This website is proprietary software owned by XDrive Logistics / Loadify Market LTD.
