@@ -8,7 +8,7 @@ This website provides a professional interface for customers to request quotes f
 
 ## Tech Stack
 
-- **Next.js**: 14.2.35
+- **Next.js**: 15.5.12 (secure, patched version)
 - **React**: 18.3.1
 - **TypeScript**: 5.x
 - **Node.js**: 20.x or higher
