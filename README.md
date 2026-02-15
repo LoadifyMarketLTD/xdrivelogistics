@@ -1,60 +1,37 @@
 # XDrive Logistics Website
 
-A modern, single-page website for XDrive Logistics - UK dedicated transport services.
+A modern website for XDrive Logistics - UK dedicated transport services, built with Next.js 14.
 
 ## Overview
 
-This website provides a simple, elegant interface for customers to request quotes for transport services. Features include:
-
-- **Quote Request Form**: Comprehensive form for transport quotes
-- **Multiple Contact Methods**: Form submission, WhatsApp, and email
-- **Responsive Design**: Works on all devices
-- **Modern UI**: Glassmorphic design with smooth animations
-- **Accessibility**: ARIA labels, keyboard navigation, screen reader support
-- **Form Autosave**: Automatically saves form progress
+This website provides a professional interface for customers to request quotes for transport services.
 
 ## Tech Stack
 
-- **HTML5**: Semantic markup
-- **CSS3**: Modern styling with CSS Grid and Flexbox
-- **Vanilla JavaScript**: No dependencies
-- **Make.com**: Webhook integration for form submissions
+- **Next.js**: 14.2.5
+- **React**: 18.3.1
+- **TypeScript**: 5.x
+- **Node.js**: 20.x or higher
 
 ## Features
 
-### 🎨 Design
-- Dark theme with glassmorphic effects
-- Gradient overlays and blur effects
-- Responsive layout for all screen sizes
-- Smooth animations and transitions
+This Next.js 14 project includes:
 
-### ♿ Accessibility
-- ARIA labels and attributes
-- Keyboard navigation support
-- Screen reader compatible
-- Required field indicators
-- Error messages with proper roles
+- **App Router**: Modern Next.js routing system
+- **TypeScript**: Type-safe development
+- **React 18**: Latest React features
+- **CSS Modules**: Component-scoped styling support
+- **SEO Ready**: Built-in metadata API
+- **Performance**: Automatic code splitting and optimization
 
-### 🚀 Performance
-- Optimized background images
-- Preloaded critical assets
-- Minimal dependencies
-- Lazy loading support
-- Data saver mode support
-
-### 📱 Mobile-First
-- Responsive hamburger menu
-- Touch-friendly controls
-- Mobile-optimized forms
-- Proper viewport settings
-
-### 🔒 Security
-- Input validation
-- Sanitized form data
-- Security recommendations documented
-- HTTPS ready
+Components and features will be added incrementally.
 
 ## Getting Started
+
+### Prerequisites
+
+- Node.js 20.x or higher
+- npm or yarn
 
 ### Local Development
 
@@ -64,76 +41,67 @@ This website provides a simple, elegant interface for customers to request quote
    cd xdrivelogistics
    ```
 
-2. **Start a local server**
+2. **Install dependencies**
    ```bash
-   # Using Python 3
-   python3 -m http.server 8080
-   
-   # Using Node.js
-   npx http-server -p 8080
-   
-   # Using PHP
-   php -S localhost:8080
+   npm install
    ```
 
-3. **Open in browser**
+3. **Run the development server**
+   ```bash
+   npm run dev
    ```
-   http://localhost:8080
+
+4. **Open in browser**
+   ```
+   http://localhost:3000
+   ```
+
+The page will auto-reload when you make changes.
+
+### Building for Production
+
+1. **Build the application**
+   ```bash
+   npm run build
+   ```
+
+2. **Start the production server**
+   ```bash
+   npm start
    ```
 
 ### Deployment
 
-This is a static website and can be deployed to:
+This Next.js application can be deployed to:
 
-- **GitHub Pages**: Free hosting for static sites
+- **Vercel**: Zero-config deployment (recommended for Next.js)
 - **Netlify**: Automatic deployments from Git
-- **Vercel**: Zero-config deployment
-- **Cloudflare Pages**: Fast global CDN
-- **Traditional Hosting**: Any web hosting with HTML support
+- **AWS**: Using AWS Amplify or EC2
+- **Docker**: Containerized deployment
+- **Any Node.js hosting**: With Node.js 20+ support
 
-#### Example: Deploy to GitHub Pages
-
-1. Go to repository Settings
-2. Navigate to Pages
-3. Select branch: `main`
-4. Select folder: `/` (root)
-5. Click Save
-
-Your site will be live at: `https://loadifymarketltd.github.io/xdrivelogistics/`
-
-## Configuration
-
-### Update Contact Information
-
-Edit `index.html` and update these constants:
-
-```javascript
-const WHATSAPP_PHONE_E164 = "447423272138"; // Your WhatsApp number
-const EMAIL_TO = "xdrivelogisticsltd@gmail.com"; // Your email
-```
-
-### Update Webhook URL
-
-⚠️ **IMPORTANT**: The webhook URL should be moved to a backend service. See [SECURITY.md](SECURITY.md) for details.
-
-Temporary location in `index.html`:
-```javascript
-const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/YOUR_WEBHOOK_ID";
-```
-
-## File Structure
+## Project Structure
 
 ```
 xdrivelogistics/
-├── index.html          # Main website file
-├── logo.png           # Company logo
-├── robots.txt         # Search engine directives
-├── sitemap.xml        # XML sitemap
-├── .gitignore         # Git ignore rules
-├── README.md          # This file
-├── SECURITY.md        # Security recommendations
-└── RECOMMENDATIONS.md # Full analysis and improvements
+├── app/               # Next.js App Router directory
+│   ├── layout.tsx    # Root layout
+│   ├── page.tsx      # Home page
+│   └── globals.css   # Global styles
+├── components/        # React components (to be added)
+├── public/           # Static assets
+├── next.config.mjs   # Next.js configuration
+├── tsconfig.json     # TypeScript configuration
+├── package.json      # Dependencies and scripts
+└── README.md         # This file
 ```
+
+## Development Scripts
+
+- `npm run dev` - Start development server on http://localhost:3000
+- `npm run build` - Build the application for production
+- `npm start` - Start the production server
+- `npm run lint` - Run ESLint to check code quality
 
 ## Browser Support
 
