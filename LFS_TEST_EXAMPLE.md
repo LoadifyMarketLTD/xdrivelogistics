@@ -6,13 +6,26 @@ This is a test document to demonstrate Git LFS setup.
 
 To test that Git LFS is working, try adding a test file:
 
+### On Linux/Mac/WSL:
 ```bash
 # Create a dummy large file (for testing only)
 dd if=/dev/zero of=test-large-file.mp4 bs=1M count=150
 
 # Check file size (should be 150MB)
 ls -lh test-large-file.mp4
+```
 
+### On Windows (PowerShell):
+```powershell
+# Create a dummy large file (for testing only)
+fsutil file createnew test-large-file.mp4 157286400
+
+# Check file size (should be 150MB)
+dir test-large-file.mp4
+```
+
+### Then, regardless of OS:
+```bash
 # Add to git
 git add test-large-file.mp4
 

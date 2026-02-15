@@ -12,13 +12,17 @@ Git LFS este o extensie Git care înlocuiește fișierele mari cu pointeri mici 
 ✅ Git LFS este acum instalat și configurat în acest repository
 ✅ Am creat fișierul `.gitattributes` care specifică ce tipuri de fișiere folosesc LFS
 ✅ Următoarele tipuri de fișiere sunt configurate automat pentru LFS:
-   - Video: mp4, mov, avi, mkv, webm
-   - Imagini mari: psd, ai, tiff
-   - Arhive: zip, rar, 7z, tar.gz
-   - Audio: mp3, wav, flac
-   - PDF-uri mari
-   - Database dumps: sql, db
-   - Și altele...
+   - Video: mp4, mov, avi, mkv, webm, wmv, flv
+   - Imagini mari de design: psd, ai, tiff
+   - Audio lossless: wav, flac, aiff, ape
+   - Modele 3D: obj, fbx, blend, stl
+   - Binare mari: bin, exe, dmg, iso
+
+⚠️ **Important**: Pentru a economisi quota LFS, următoarele NU sunt urmărite automat:
+   - Arhive mici (zip, rar, 7z) - adaugă doar dacă sunt >100MB
+   - PDF-uri mici - adaugă doar dacă sunt >100MB
+   - MP3 (comprimate, de obicei <10MB) - nu necesită LFS
+   - Fișiere SQL mici (scheme, migrări) - doar dump-uri mari
 
 ## Cum să adaugi fișierele tale mari
 
@@ -66,6 +70,26 @@ GitHub oferă gratuit:
 Pentru fișiere mai mari sau mai multe fișiere:
 - Poți cumpăra pachete suplimentare de la GitHub ($5/lună pentru 50GB storage + 50GB bandwidth)
 - Sau poți folosi un serviciu alternativ de hosting pentru fișierele mari
+
+## Cum să adaugi tipuri specifice de fișiere la LFS
+
+Dacă ai fișiere mari care nu sunt în lista de mai sus (ex: arhive ZIP mari, PDF-uri mari):
+
+```bash
+# Pentru fișiere într-un director specific
+git lfs track "assets/downloads/*.zip"
+git lfs track "documents/large-pdfs/*.pdf"
+
+# Pentru fișiere peste o anumită mărime (manual, doar când știi că sunt mari)
+git lfs track "backups/*dump.sql"
+
+# Verifică ce este urmărit
+git lfs track
+
+# Nu uita să adaugi .gitattributes în Git
+git add .gitattributes
+git commit -m "Track large files with LFS"
+```
 
 ## Alternative pentru fișiere foarte mari
 
@@ -125,10 +149,23 @@ git commit -m "Track *.extensia-ta with LFS"
 ```
 
 ### Vreau să convertesc fișiere existente la LFS
+⚠️ **ATENȚIE**: Această comandă rescrie istoricul Git și necesită force push. Folosește doar pe branch-uri de test sau după coordonare cu echipa!
+
 ```bash
+# Creează un branch de test mai întâi
+git checkout -b lfs-migration
+
+# Migrează fișierele
 git lfs migrate import --include="*.mp4" --everything
-git push origin main --force
+
+# Testează că totul funcționează corect
+git lfs ls-files
+
+# Dacă totul e OK, poți merge în main
+# NU face force push direct pe main fără backup!
 ```
+
+Pentru repository-uri cu colaboratori, contactează echipa înainte de a face migrarea!
 
 ## Ajutor suplimentar
 

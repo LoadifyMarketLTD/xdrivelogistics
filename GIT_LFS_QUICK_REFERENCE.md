@@ -48,12 +48,15 @@ git lfs migrate import --include="*.mp4"
 
 ✅ **Videos**: mp4, mov, avi, mkv, wmv, flv, webm
 ✅ **Images**: psd, ai, tiff, tif
-✅ **Archives**: zip, rar, 7z, tar.gz, tgz
-✅ **Audio**: mp3, wav, flac
-✅ **Documents**: pdf
-✅ **Databases**: sql, db
-✅ **3D Models**: obj, fbx, blend
+✅ **Audio (lossless)**: wav, flac, aiff, ape
+✅ **3D Models**: obj, fbx, blend, stl
 ✅ **Binaries**: bin, exe, dmg, iso
+
+⚠️ **Not automatically tracked** (to save LFS quota):
+- Small archives: zip, rar, 7z (track only if in specific directories)
+- Small PDFs (track only if in specific directories)
+- Compressed audio: mp3 (typically small, doesn't need LFS)
+- SQL files (track only large dumps, not schemas)
 
 ## ❗ Important / Important
 

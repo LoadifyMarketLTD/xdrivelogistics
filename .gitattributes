@@ -1,7 +1,7 @@
 # Git LFS Configuration
 # Use Git LFS for large files to avoid GitHub's 100MB file size limit
 
-# Video files
+# Video files (most videos are large)
 *.mp4 filter=lfs diff=lfs merge=lfs -text
 *.mov filter=lfs diff=lfs merge=lfs -text
 *.avi filter=lfs diff=lfs merge=lfs -text
@@ -10,38 +10,33 @@
 *.flv filter=lfs diff=lfs merge=lfs -text
 *.webm filter=lfs diff=lfs merge=lfs -text
 
-# High-resolution images
+# High-resolution images (design files are typically large)
 *.psd filter=lfs diff=lfs merge=lfs -text
 *.ai filter=lfs diff=lfs merge=lfs -text
 *.tiff filter=lfs diff=lfs merge=lfs -text
 *.tif filter=lfs diff=lfs merge=lfs -text
 
-# Archives (large backups or datasets)
-*.zip filter=lfs diff=lfs merge=lfs -text
-*.rar filter=lfs diff=lfs merge=lfs -text
-*.7z filter=lfs diff=lfs merge=lfs -text
-*.tar.gz filter=lfs diff=lfs merge=lfs -text
-*.tgz filter=lfs diff=lfs merge=lfs -text
-
-# Database dumps
-*.sql filter=lfs diff=lfs merge=lfs -text
-*.db filter=lfs diff=lfs merge=lfs -text
-
-# PDF files (if very large)
-*.pdf filter=lfs diff=lfs merge=lfs -text
-
-# Audio files
-*.mp3 filter=lfs diff=lfs merge=lfs -text
+# Large audio files (uncompressed or lossless)
 *.wav filter=lfs diff=lfs merge=lfs -text
 *.flac filter=lfs diff=lfs merge=lfs -text
+*.aiff filter=lfs diff=lfs merge=lfs -text
+*.ape filter=lfs diff=lfs merge=lfs -text
 
 # 3D models and CAD files
 *.obj filter=lfs diff=lfs merge=lfs -text
 *.fbx filter=lfs diff=lfs merge=lfs -text
 *.blend filter=lfs diff=lfs merge=lfs -text
+*.stl filter=lfs diff=lfs merge=lfs -text
 
 # Other large binary files
 *.bin filter=lfs diff=lfs merge=lfs -text
 *.exe filter=lfs diff=lfs merge=lfs -text
 *.dmg filter=lfs diff=lfs merge=lfs -text
 *.iso filter=lfs diff=lfs merge=lfs -text
+
+# Note: For archives, PDFs, MP3s, and SQL files, only track them if they are
+# in specific directories known to contain large files. Examples:
+# assets/large-downloads/*.zip filter=lfs diff=lfs merge=lfs -text
+# backups/*dump.sql filter=lfs diff=lfs merge=lfs -text
+# documents/large-pdfs/*.pdf filter=lfs diff=lfs merge=lfs -text
+
