@@ -121,18 +121,35 @@ Temporary location in `index.html`:
 const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/YOUR_WEBHOOK_ID";
 ```
 
+## Working with Large Files
+
+This repository is configured with **Git LFS (Large File Storage)** to handle files larger than 100MB.
+
+📖 **For detailed instructions in Romanian**: See [GIT_LFS_GUIDE_RO.md](GIT_LFS_GUIDE_RO.md)
+
+Common large file types (videos, high-res images, archives, etc.) are automatically tracked with LFS. To add your large files:
+
+```bash
+git lfs install
+git add your-large-file.mp4
+git commit -m "Add large file"
+git push
+```
+
 ## File Structure
 
 ```
 xdrivelogistics/
-├── index.html          # Main website file
-├── logo.png           # Company logo
-├── robots.txt         # Search engine directives
-├── sitemap.xml        # XML sitemap
-├── .gitignore         # Git ignore rules
-├── README.md          # This file
-├── SECURITY.md        # Security recommendations
-└── RECOMMENDATIONS.md # Full analysis and improvements
+├── index.html             # Main website file
+├── logo.png              # Company logo
+├── robots.txt            # Search engine directives
+├── sitemap.xml           # XML sitemap
+├── .gitignore            # Git ignore rules
+├── .gitattributes        # Git LFS configuration
+├── README.md             # This file
+├── GIT_LFS_GUIDE_RO.md   # Guide for large files (Romanian)
+├── SECURITY.md           # Security recommendations
+└── RECOMMENDATIONS.md    # Full analysis and improvements
 ```
 
 ## Browser Support
