@@ -38,16 +38,20 @@ Utilizator → /forgot-password → Email → Link reset → /reset-password →
 /dashboard → Verifică sesiune → Redirecționează la /login dacă nu e autentificat
 ```
 
-### 3. BAZA DE DATE NECESARĂ
+### 3. BAZA DE DATE NECESARĂ (ARHITECTURĂ MULTI-TENANT)
 
-**6 Tabele Principale:**
+**10 Tabele Principale:**
 
-1. **users** - Profiluri utilizatori (admin, șoferi, clienți)
-2. **quotes** - Cereri de ofertă de la formular
-3. **jobs** - Transporturi confirmate
-4. **invoices** - Facturi și plăți
-5. **audit_logs** - Istoric acțiuni (securitate)
-6. **notifications** - Notificări utilizatori
+1. **profiles** - Profiluri utilizatori (auto-creat la signup)
+2. **companies** - Companii (XDrive Logistics Ltd)
+3. **company_members** - Membrii companiei cu roluri (owner, admin, dispatcher, driver, accounting, viewer)
+4. **drivers** - Șoferi (pot fi membri sau externi)
+5. **jobs** - Transporturi/Job-uri
+6. **job_events** - Timeline job-uri (creat, asignat, pickup, delivery)
+7. **invoices** - Facturi
+8. **invoice_items** - Linii facturi (detalii)
+9. **payments** - Plăți primite
+10. **audit_logs** - Istoric complet acțiuni (securitate)
 
 ---
 
@@ -103,29 +107,65 @@ Utilizator → /forgot-password → Email → Link reset → /reset-password →
    - Password: `Johnny2000$$` (sau alta mai sigură)
    - ✅ Auto Confirm User
 4. Click **Create user**
-5. **Notează User ID** (de exemplu: `123e4567-e89b-12d3-a456-426614174000`)
+5. **Notează User ID** (UUID) - îl vei găsi în lista de utilizatori
 
-6. Mergi înapoi la **SQL Editor**
-7. Rulează acest query pentru a-l face admin:
+6. **CREAZĂ COMPANIA ȘI ADAUGĂ USER-UL CA OWNER**
+7. Mergi la **SQL Editor**
+8. Rulează acest query (înlocuiește `<YOUR_USER_UUID>` cu ID-ul tău):
    ```sql
-   UPDATE public.users 
-   SET role = 'admin', full_name = 'XDrive Admin'
-   WHERE email = 'xdrivelogisticsltd@gmail.com';
+   -- Inserează compania
+   INSERT INTO public.companies (name, email, phone, created_by)
+   VALUES ('XDrive Logistics Ltd', 'xdrivelogisticsltd@gmail.com', '07423272138', '<YOUR_USER_UUID>')
+   RETURNING id;
+   
+   -- Notează COMPANY_ID returnat, apoi rulează:
+   INSERT INTO public.company_members (company_id, user_id, role)
+   VALUES ('<COMPANY_ID>', '<YOUR_USER_UUID>', 'owner');
    ```
+
+**Exemplu complet:**
+```sql
+-- Pas 1: Creează compania (înlocuiește USER_UUID cu al tău)
+INSERT INTO public.companies (name, email, phone, vat_number, company_number, address_line1, city, postcode, created_by)
+VALUES (
+  'XDrive Logistics Ltd',
+  'xdrivelogisticsltd@gmail.com',
+  '07423272138',
+  'GB123456789',
+  '12345678',
+  '123 Business Street',
+  'London',
+  'SW1A 1AA',
+  'a1b2c3d4-e5f6-7890-abcd-ef1234567890'  -- <-- ÎNLOCUIEȘTE CU USER ID-UL TĂU
+) RETURNING id;
+
+-- Pas 2: După ce primești company_id, adaugă user-ul ca owner
+INSERT INTO public.company_members (company_id, user_id, role)
+VALUES (
+  'x1y2z3a4-b5c6-7890-defg-hi9876543210',  -- <-- COMPANY ID returnat mai sus
+  'a1b2c3d4-e5f6-7890-abcd-ef1234567890',  -- <-- USER ID-ul tău
+  'owner'
+);
+```
 
 ### PAS 5: Verifică Configurația
 
 1. Mergi la **Table Editor** în Supabase
 2. Ar trebui să vezi toate tabelele:
-   - users
-   - quotes
+   - profiles
+   - companies
+   - company_members
+   - drivers
    - jobs
+   - job_events
    - invoices
+   - invoice_items
+   - payments
    - audit_logs
-   - notifications
-   - dashboard_stats (view)
 
-3. Click pe **users** → ar trebui să vezi utilizatorul admin creat
+3. Click pe **profiles** → ar trebui să vezi utilizatorul creat automat
+4. Click pe **companies** → ar trebui să vezi compania XDrive Logistics
+5. Click pe **company_members** → ar trebui să vezi user-ul cu rol 'owner'
 
 ### PAS 6: Configurează Storage (Opțional, dar Recomandat)
 
@@ -146,25 +186,52 @@ Utilizator → /forgot-password → Email → Link reset → /reset-password →
 
 SQL-ul creat automat a setat:
 
-✅ **Users:**
+✅ **Profiles:**
 - Utilizatorii văd doar propriul profil
-- Admin-ii văd toți utilizatorii
+- Pot actualiza doar propriul profil
 
-✅ **Quotes:**
-- Oricine poate trimite o cerere de ofertă (formular public)
-- Admin-ii văd toate cererile
+✅ **Companies:**
+- Membrii companiei pot vedea datele companiei
+- Orice utilizator autentificat poate crea o companie nouă
+- Doar admin-ii/owner-ii pot modifica compania
+
+✅ **Company Members:**
+- Membrii pot vedea lista de membri
+- Doar admin-ii/owner-ii pot adăuga/șterge membri
+
+✅ **Drivers:**
+- Membrii companiei văd toți șoferii
+- Doar admin-ii pot adăuga/modifica/șterge șoferi
 
 ✅ **Jobs:**
-- Clienții văd doar job-urile lor
-- Șoferii văd job-urile alocate lor
-- Admin-ii văd toate job-urile
+- Membrii companiei văd toate job-urile companiei
+- Membrii pot crea job-uri
+- Membrii pot actualiza job-uri
+- Doar admin-ii pot șterge job-uri
+
+✅ **Job Events:**
+- Membrii companiei văd evenimentele job-urilor
+- Membrii pot adăuga evenimente (pickup, delivery, etc.)
 
 ✅ **Invoices:**
-- Clienții văd doar facturile lor
-- Admin-ii văd toate facturile
+- Membrii companiei văd toate facturile
+- Membrii pot crea/modifica facturi
+- Doar admin-ii pot șterge facturi
 
-✅ **Notifications:**
-- Fiecare utilizator vede doar notificările proprii
+✅ **Invoice Items:**
+- Membrii pot vedea/modifica liniile facturilor
+- Acces bazat pe apartenență la companie
+
+✅ **Payments:**
+- Membrii pot vedea/adăuga plăți
+
+✅ **Audit Logs:**
+- Membrii pot vedea istoricul acțiunilor din companie
+- Membrii pot adăuga log-uri
+
+**Funcții Helper Disponibile:**
+- `public.is_company_member(company_id)` - verifică dacă user-ul e membru
+- `public.is_company_admin(company_id)` - verifică dacă user-ul e admin/owner
 
 ---
 
