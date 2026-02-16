@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XDrive Platform Dashboard</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+  <!-- Login Screen (default state) -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <h1 class="login-title">
+        <span class="login-title-accent">XDrive</span> Platform Login
+      </h1>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            class="form-input" 
+            placeholder="admin@xdrive.com"
+            required
+          >
+        </div>
+        
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            class="form-input" 
+            placeholder="Enter password"
+            required
+          >
+        </div>
+        
+        <button type="submit" class="login-btn">Login to Platform</button>
+        
+        <div id="error-message" class="error-message"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard Content (hidden by default) -->
+  <div id="dashboard-content" class="dashboard-content">
+    
+    <!-- Platform Header -->
+    <header class="platform-header">
+      <div class="container">
+        <div class="platform-nav">
+          <div class="platform-brand">
+            <span class="platform-brand-accent">XDrive</span> Platform
+          </div>
+          
+          <nav>
+            <ul class="platform-links">
+              <li><a href="#dashboard">Dashboard</a></li>
+              <li><a href="#jobs">Jobs</a></li>
+              <li><a href="#invoices">Invoices</a></li>
+              <li><a href="#settings">Settings</a></li>
+              <li><a href="#" id="logout-btn" class="logout">Logout</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Dashboard Content -->
+    <main class="container">
+      
+      <!-- KPI Cards -->
+      <section class="kpi-grid">
+        <!-- Active Jobs Card -->
+        <div class="kpi-card">
+          <div class="kpi-icon">📦</div>
+          <div class="kpi-number">24</div>
+          <div class="kpi-label">Active Jobs</div>
+        </div>
+        
+        <!-- Revenue Card -->
+        <div class="kpi-card">
+          <div class="kpi-icon">💰</div>
+          <div class="kpi-number">£8,420</div>
+          <div class="kpi-label">This Week Revenue</div>
+        </div>
+        
+        <!-- Profit Card -->
+        <div class="kpi-card">
+          <div class="kpi-icon">📈</div>
+          <div class="kpi-number">£156</div>
+          <div class="kpi-label">Avg Profit per Job</div>
+        </div>
+        
+        <!-- On-Time Rate Card -->
+        <div class="kpi-card">
+          <div class="kpi-icon">⏱️</div>
+          <div class="kpi-number">96%</div>
+          <div class="kpi-label">On-Time Delivery Rate</div>
+        </div>
+      </section>
+
+      <!-- Jobs Table -->
+      <section class="table-section">
+        <h2 class="section-title">Recent Jobs</h2>
+        
+        <div class="jobs-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Job ID</th>
+                <th>Pickup</th>
+                <th>Delivery</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>JOB-1001</td>
+                <td>BB1 Blackburn</td>
+                <td>L1 Liverpool</td>
+                <td>£120</td>
+                <td><span class="status-badge in-transit">In Transit</span></td>
+                <td>2026-02-16</td>
+              </tr>
+              <tr>
+                <td>JOB-1002</td>
+                <td>M1 Manchester</td>
+                <td>LS1 Leeds</td>
+                <td>£180</td>
+                <td><span class="status-badge delivered">Delivered</span></td>
+                <td>2026-02-15</td>
+              </tr>
+              <tr>
+                <td>JOB-1003</td>
+                <td>L2 Liverpool</td>
+                <td>BB2 Blackburn</td>
+                <td>£95</td>
+                <td><span class="status-badge pending">Pending</span></td>
+                <td>2026-02-16</td>
+              </tr>
+              <tr>
+                <td>JOB-1004</td>
+                <td>LS2 Leeds</td>
+                <td>M2 Manchester</td>
+                <td>£140</td>
+                <td><span class="status-badge in-transit">In Transit</span></td>
+                <td>2026-02-16</td>
+              </tr>
+              <tr>
+                <td>JOB-1005</td>
+                <td>BB3 Blackburn</td>
+                <td>L3 Liverpool</td>
+                <td>£110</td>
+                <td><span class="status-badge delivered">Delivered</span></td>
+                <td>2026-02-14</td>
+              </tr>
+              <tr>
+                <td>JOB-1006</td>
+                <td>M3 Manchester</td>
+                <td>BB4 Blackburn</td>
+                <td>£165</td>
+                <td><span class="status-badge in-transit">In Transit</span></td>
+                <td>2026-02-15</td>
+              </tr>
+              <tr>
+                <td>JOB-1007</td>
+                <td>L4 Liverpool</td>
+                <td>LS3 Leeds</td>
+                <td>£200</td>
+                <td><span class="status-badge delivered">Delivered</span></td>
+                <td>2026-02-13</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Quick Actions -->
+      <section class="quick-actions">
+        <h2 class="section-title">Quick Actions</h2>
+        
+        <div class="actions-grid">
+          <button class="action-btn primary">Create Job</button>
+          <button class="action-btn success">Generate Invoice</button>
+          <button class="action-btn secondary">Add Driver</button>
+          <button class="action-btn secondary">Export CSV</button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
