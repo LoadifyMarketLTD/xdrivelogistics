@@ -45,34 +45,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setProfile(data)
       setCompanyId(data.company_id)
-
-      // If user doesn't have a company, create one
-      if (!data.company_id) {
-        console.log('User has no company, creating one...')
-        await createCompany()
-      }
     } catch (err: any) {
       console.error('Error fetching profile:', err)
-      setError(err.message)
-    }
-  }
-
-  const createCompany = async () => {
-    try {
-      // Call the RPC function to create company
-      const { data, error } = await supabase
-        .rpc('create_company', { company_name: 'XDrive Logistics' })
-
-      if (error) throw error
-
-      console.log('Company created successfully:', data)
-      
-      // Refetch profile to get the new company_id
-      if (user) {
-        await fetchProfile(user.id)
-      }
-    } catch (err: any) {
-      console.error('Error creating company:', err)
       setError(err.message)
     }
   }
@@ -92,10 +66,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null)
       if (session?.user) {
-        fetchProfile(session.user.id)
+        await fetchProfile(session.user.id)
       }
       setLoading(false)
     })
@@ -103,10 +77,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null)
       if (session?.user) {
-        fetchProfile(session.user.id)
+        await fetchProfile(session.user.id)
       } else {
         setProfile(null)
         setCompanyId(null)
