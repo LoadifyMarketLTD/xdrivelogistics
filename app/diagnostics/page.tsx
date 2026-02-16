@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabaseClient'
 
 export default function DiagnosticsPage() {
   const [diagnostics, setDiagnostics] = useState({
@@ -12,6 +11,7 @@ export default function DiagnosticsPage() {
     sessionStatus: 'checking...',
     sessionError: '',
     userEmail: '',
+    supabaseClientError: '',
   })
 
   useEffect(() => {
@@ -37,22 +37,37 @@ export default function DiagnosticsPage() {
       let sessionStatus = 'No session'
       let sessionError = ''
       let userEmail = ''
+      let supabaseClientError = ''
 
-      try {
-        const { data, error } = await supabase.auth.getSession()
-        
-        if (error) {
-          sessionStatus = 'Error'
-          sessionError = error.message
-        } else if (data.session) {
-          sessionStatus = 'Active session'
-          userEmail = data.session.user?.email || 'No email'
-        } else {
-          sessionStatus = 'No active session'
+      // Only try to load supabase client if env vars are present
+      if (url && anonKey) {
+        try {
+          // Dynamically import to avoid the error throwing at module load time
+          const { supabase } = await import('@/lib/supabaseClient')
+          
+          try {
+            const { data, error } = await supabase.auth.getSession()
+            
+            if (error) {
+              sessionStatus = 'Error'
+              sessionError = error.message
+            } else if (data.session) {
+              sessionStatus = 'Active session'
+              userEmail = data.session.user?.email || 'No email'
+            } else {
+              sessionStatus = 'No active session'
+            }
+          } catch (err) {
+            sessionStatus = 'Exception'
+            sessionError = err instanceof Error ? err.message : String(err)
+          }
+        } catch (clientErr) {
+          supabaseClientError = clientErr instanceof Error ? clientErr.message : String(clientErr)
+          sessionStatus = 'Cannot initialize Supabase client'
         }
-      } catch (err) {
-        sessionStatus = 'Exception'
-        sessionError = err instanceof Error ? err.message : String(err)
+      } else {
+        sessionStatus = 'Skipped - env vars missing'
+        sessionError = 'Cannot check session without valid Supabase credentials'
       }
 
       setDiagnostics({
@@ -63,6 +78,7 @@ export default function DiagnosticsPage() {
         sessionStatus,
         sessionError,
         userEmail,
+        supabaseClientError,
       })
     }
 
@@ -142,7 +158,7 @@ export default function DiagnosticsPage() {
             <span style={{ 
               color: diagnostics.sessionStatus === 'Active session' ? '#4ade80' : 
                      diagnostics.sessionStatus === 'checking...' ? '#fbbf24' : 
-                     diagnostics.sessionStatus.includes('Error') || diagnostics.sessionStatus.includes('Exception') ? '#ff6b6b' :
+                     diagnostics.sessionStatus.includes('Error') || diagnostics.sessionStatus.includes('Exception') || diagnostics.sessionStatus.includes('Cannot') ? '#ff6b6b' :
                      '#94a3b8'
             }}>
               {diagnostics.sessionStatus}
@@ -155,6 +171,19 @@ export default function DiagnosticsPage() {
             </div>
           )}
           
+          {diagnostics.supabaseClientError && (
+            <div style={{ 
+              marginTop: '10px',
+              padding: '10px',
+              backgroundColor: 'rgba(255, 107, 107, 0.1)',
+              border: '1px solid rgba(255, 107, 107, 0.3)',
+              borderRadius: '4px',
+              color: '#ff6b6b'
+            }}>
+              <strong>Supabase Client Error:</strong> {diagnostics.supabaseClientError}
+            </div>
+          )}
+          
           {diagnostics.sessionError && (
             <div style={{ 
               marginTop: '10px',
@@ -164,7 +193,7 @@ export default function DiagnosticsPage() {
               borderRadius: '4px',
               color: '#ff6b6b'
             }}>
-              <strong>Error:</strong> {diagnostics.sessionError}
+              <strong>Session Error:</strong> {diagnostics.sessionError}
             </div>
           )}
         </div>
