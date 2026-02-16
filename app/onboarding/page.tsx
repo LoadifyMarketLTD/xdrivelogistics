@@ -1,0 +1,201 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/lib/AuthContext'
+import { supabase } from '@/lib/supabaseClient'
+import '@/styles/dashboard.css'
+
+export const dynamic = 'force-dynamic'
+
+export default function OnboardingPage() {
+  const router = useRouter()
+  const { user, companyId, loading: authLoading, refreshProfile } = useAuth()
+  
+  const [companyName, setCompanyName] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login')
+      return
+    }
+
+    // If user already has a company, redirect to dashboard
+    if (!authLoading && companyId) {
+      router.push('/dashboard')
+      return
+    }
+  }, [authLoading, user, companyId, router])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!companyName.trim()) {
+      setError('Company name is required')
+      return
+    }
+
+    try {
+      setSubmitting(true)
+      setError(null)
+
+      // Call the create_company RPC function
+      const { data: newCompanyId, error: rpcError } = await supabase
+        .rpc('create_company', { company_name: companyName.trim() })
+
+      if (rpcError) throw rpcError
+
+      console.log('Company created successfully:', newCompanyId)
+
+      // Refresh profile to get the new company_id
+      await refreshProfile()
+
+      alert('Company created successfully!')
+      router.push('/dashboard')
+    } catch (err: any) {
+      console.error('Error creating company:', err)
+      setError(err.message || 'Failed to create company')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (authLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0F1F2E', color: '#fff' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '18px' }}>Loading...</div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="dashboard-content">
+      <header className="platform-header">
+        <div className="container">
+          <div className="platform-nav">
+            <div className="platform-brand">
+              <span className="platform-brand-accent">XDrive</span> Onboarding
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="container">
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 'calc(100vh - 200px)',
+          padding: '40px 20px'
+        }}>
+          <div style={{
+            backgroundColor: '#132433',
+            borderRadius: '12px',
+            padding: '48px',
+            border: '1px solid rgba(255,255,255,0.08)',
+            maxWidth: '500px',
+            width: '100%'
+          }}>
+            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🚚</div>
+              <h1 style={{ fontSize: '28px', marginBottom: '12px', color: '#fff' }}>
+                Welcome to XDrive Marketplace
+              </h1>
+              <p style={{ fontSize: '15px', color: '#94a3b8', lineHeight: '1.6' }}>
+                To post jobs and bid on transport opportunities, you need to create your company profile.
+              </p>
+            </div>
+
+            {error && (
+              <div style={{
+                padding: '12px 16px',
+                backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                border: '1px solid rgba(255, 107, 107, 0.3)',
+                borderRadius: '8px',
+                marginBottom: '24px',
+                color: '#ff6b6b',
+                fontSize: '14px'
+              }}>
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#fff'
+                }}>
+                  Company Name *
+                </label>
+                <input
+                  type="text"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  required
+                  autoFocus
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '6px',
+                    color: '#fff',
+                    fontSize: '16px'
+                  }}
+                  placeholder="Enter your company name"
+                />
+                <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '6px' }}>
+                  This will be visible to other companies in the marketplace
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="action-btn primary"
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  opacity: submitting ? 0.6 : 1
+                }}
+              >
+                {submitting ? 'Creating Company...' : 'Create Company & Continue'}
+              </button>
+            </form>
+
+            <div style={{
+              marginTop: '24px',
+              padding: '16px',
+              backgroundColor: 'rgba(200,166,77,0.1)',
+              border: '1px solid rgba(200,166,77,0.2)',
+              borderRadius: '8px',
+              fontSize: '13px',
+              color: '#94a3b8',
+              lineHeight: '1.6'
+            }}>
+              <strong style={{ color: 'var(--gold-premium)', display: 'block', marginBottom: '8px' }}>
+                ℹ️ What happens next:
+              </strong>
+              <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                <li>Your company profile will be created</li>
+                <li>You'll be assigned as the admin</li>
+                <li>You can start posting jobs to the marketplace</li>
+                <li>You can browse and bid on other jobs</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}
