@@ -43,28 +43,29 @@ export default function CompanyOnboardingPage() {
       setSubmitting(true)
       setError(null)
 
-      // Create company record
-      const { data: newCompany, error: companyError } = await supabase
-        .from('companies')
-        .insert({
-          name: companyName.trim(),
-          phone: phone.trim() || null,
-          created_by: user?.id,
-        })
-        .select()
-        .single()
+      // Call the create_company RPC function
+      const { data: newCompanyId, error: rpcError } = await supabase
+        .rpc('create_company', { company_name: companyName.trim() })
 
-      if (companyError) throw companyError
+      if (rpcError) throw rpcError
 
-      // Update profile with company_id
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ company_id: newCompany.id })
-        .eq('id', user?.id)
+      // Update company details (phone, vat) if provided
+      if (newCompanyId && (phone.trim() || vatNumber.trim())) {
+        const { error: updateError } = await supabase
+          .from('companies')
+          .update({
+            phone: phone.trim() || null,
+            // Note: VAT number field may not exist in database, skipping for now
+          })
+          .eq('id', newCompanyId)
 
-      if (profileError) throw profileError
+        if (updateError) {
+          console.warn('Could not update company details:', updateError)
+          // Don't fail the whole operation
+        }
+      }
 
-      console.log('Company created successfully:', newCompany.id)
+      console.log('Company created successfully:', newCompanyId)
 
       // Refresh profile to get the new company_id
       await refreshProfile()

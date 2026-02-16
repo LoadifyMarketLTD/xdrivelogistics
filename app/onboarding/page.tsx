@@ -27,6 +27,12 @@ export default function OnboardingPage() {
       router.push('/dashboard')
       return
     }
+
+    // Redirect to the new company-specific onboarding page
+    if (!authLoading && user && !companyId) {
+      router.push('/onboarding/company')
+      return
+    }
   }, [authLoading, user, companyId, router])
 
   const handleSubmit = async (e: React.FormEvent) => {

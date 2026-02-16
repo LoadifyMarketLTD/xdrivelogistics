@@ -172,6 +172,23 @@ export default function LoginPage() {
           color: #D4B866;
         }
 
+        .login-link {
+          display: block;
+          text-align: center;
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 14px;
+        }
+
+        .login-link a {
+          color: #C8A64D;
+          text-decoration: none;
+          transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+          color: #D4B866;
+        }
+
         .support-text {
           text-align: center;
           margin-top: 32px;
@@ -241,6 +258,10 @@ export default function LoginPage() {
         <Link href="/forgot-password" className="forgot-password-link">
           Forgot password?
         </Link>
+
+        <div className="login-link" style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+          Don't have an account? <Link href="/register">Register here</Link>
+        </div>
 
         <div className="support-text">
           Need help? Call or WhatsApp:<br />
