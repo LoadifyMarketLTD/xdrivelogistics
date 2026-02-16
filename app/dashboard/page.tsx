@@ -66,6 +66,27 @@ export default function DashboardPage() {
     router.push('/')
   }
 
+  // Quick Action handlers
+  const handleCreateJob = () => {
+    console.log('Create Job action triggered')
+    alert('Create Job feature - Coming soon!')
+  }
+
+  const handleGenerateInvoice = () => {
+    console.log('Generate Invoice action triggered')
+    alert('Generate Invoice feature - Coming soon!')
+  }
+
+  const handleAddDriver = () => {
+    console.log('Add Driver action triggered')
+    alert('Add Driver feature - Coming soon!')
+  }
+
+  const handleExportCSV = () => {
+    console.log('Export CSV action triggered')
+    alert('Export CSV feature - Coming soon!')
+  }
+
   // Show error state if authentication failed
   if (error) {
     return (
@@ -289,10 +310,10 @@ export default function DashboardPage() {
           <h2 className="section-title">Quick Actions</h2>
           
           <div className="actions-grid">
-            <button className="action-btn primary">Create Job</button>
-            <button className="action-btn success">Generate Invoice</button>
-            <button className="action-btn secondary">Add Driver</button>
-            <button className="action-btn secondary">Export CSV</button>
+            <button className="action-btn primary" onClick={handleCreateJob}>Create Job</button>
+            <button className="action-btn success" onClick={handleGenerateInvoice}>Generate Invoice</button>
+            <button className="action-btn secondary" onClick={handleAddDriver}>Add Driver</button>
+            <button className="action-btn secondary" onClick={handleExportCSV}>Export CSV</button>
           </div>
         </section>
 

@@ -245,12 +245,15 @@ a {
 .quick-actions {
   margin-top: 32px;
   margin-bottom: 32px;
+  position: relative;
+  z-index: 10;
 }
 
 .actions-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+  position: relative;
 }
 
 .action-btn {
@@ -262,6 +265,9 @@ a {
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
+  position: relative;
+  pointer-events: auto;
+  z-index: 1;
 }
 
 .action-btn.primary {

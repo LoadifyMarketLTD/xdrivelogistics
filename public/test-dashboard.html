@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Test</title>
+    <link rel="stylesheet" href=".next/dev/static/chunks/styles_dashboard_b83d9f28.css">
+    <style>
+        /* Ensure buttons are clickable */
+        .action-btn {
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-content">
+        <!-- Platform Header -->
+        <header class="platform-header">
+            <div class="container">
+                <div class="platform-nav">
+                    <div class="platform-brand">
+                        <span class="platform-brand-accent">XDrive</span> Platform
+                    </div>
+                    
+                    <nav>
+                        <ul class="platform-links">
+                            <li><a href="#dashboard">Dashboard</a></li>
+                            <li><a href="#jobs">Jobs</a></li>
+                            <li><a href="#invoices">Invoices</a></li>
+                            <li><a href="#settings">Settings</a></li>
+                            <li><a href="#" class="logout">Logout</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Content -->
+        <main class="container">
+            
+            <!-- KPI Cards -->
+            <section class="kpi-grid">
+                <!-- Active Jobs Card -->
+                <div class="kpi-card">
+                    <div class="kpi-icon">📦</div>
+                    <div class="kpi-number">24</div>
+                    <div class="kpi-label">Active Jobs</div>
+                </div>
+                
+                <!-- Revenue Card -->
+                <div class="kpi-card">
+                    <div class="kpi-icon">💰</div>
+                    <div class="kpi-number">£8,420</div>
+                    <div class="kpi-label">This Week Revenue</div>
+                </div>
+                
+                <!-- Profit Card -->
+                <div class="kpi-card">
+                    <div class="kpi-icon">📈</div>
+                    <div class="kpi-number">£156</div>
+                    <div class="kpi-label">Avg Profit per Job</div>
+                </div>
+                
+                <!-- On-Time Rate Card -->
+                <div class="kpi-card">
+                    <div class="kpi-icon">⏱️</div>
+                    <div class="kpi-number">96%</div>
+                    <div class="kpi-label">On-Time Delivery Rate</div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <h2 class="section-title">Quick Actions</h2>
+                
+                <div class="actions-grid">
+                    <button class="action-btn primary" onclick="alert('Create Job clicked!')">Create Job</button>
+                    <button class="action-btn success" onclick="alert('Generate Invoice clicked!')">Generate Invoice</button>
+                    <button class="action-btn secondary" onclick="alert('Add Driver clicked!')">Add Driver</button>
+                    <button class="action-btn secondary" onclick="alert('Export CSV clicked!')">Export CSV</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+    
+    <script>
+        console.log('Test page loaded');
+        // Test if buttons are clickable
+        document.querySelectorAll('.action-btn').forEach((btn, index) => {
+            console.log(`Button ${index}: ${btn.textContent} - pointer-events:`, window.getComputedStyle(btn).pointerEvents);
+            console.log(`Button ${index}: z-index:`, window.getComputedStyle(btn).zIndex);
+        });
+    </script>
+</body>
+</html>
