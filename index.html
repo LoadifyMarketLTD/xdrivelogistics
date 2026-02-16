@@ -62,11 +62,11 @@
       margin: 0 auto;
       padding-left: 24px;
       padding-right: 24px;
+      box-sizing: border-box;
     }
 
     .blur{
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      /* Removed backdrop-filter for compatibility */
     }
 
     /* Header - EXACT SPEC */
@@ -251,8 +251,8 @@
     .heroCard{
       border:1px solid rgba(0,0,0,.06);
       background: #FFFFFF;
-      border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
       overflow:hidden;
       position:relative;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -712,6 +712,9 @@
     @media (max-width: 768px){
       section{padding: 60px 0;}
       .container{padding-left: 20px; padding-right: 20px;}
+      .brand{min-width: auto; flex-shrink: 1;}
+      .nav{max-width: 100%; flex-wrap: wrap;}
+      .actions{max-width: 100%; flex-wrap: wrap; justify-content: flex-start;}
       h1{font-size: 36px;}
       .sectionTitle h2{font-size: 26px;}
       .lead{font-size: 16px;}
@@ -759,6 +762,7 @@
             <li><a href="#coverage">Coverage</a></li>
             <li><a href="#faq">FAQ</a></li>
             <li><a href="#contact">Contact</a></li>
+            <li><a href="/dashboard/">Login</a></li>
           </ul>
         </nav>
 
