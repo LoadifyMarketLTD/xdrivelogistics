@@ -49,7 +49,13 @@ CREATE TABLE IF NOT EXISTS public.companies (
   name TEXT NOT NULL,
   email TEXT,
   phone TEXT,
-  address TEXT,
+  vat_number TEXT,
+  company_number TEXT,
+  address_line1 TEXT,
+  address_line2 TEXT,
+  city TEXT,
+  postcode TEXT,
+  country TEXT,
   created_by UUID REFERENCES auth.users(id),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -65,6 +71,21 @@ ALTER TABLE public.profiles
 
 -- Index
 CREATE INDEX IF NOT EXISTS idx_companies_created_by ON public.companies(created_by);
+
+-- Trigger to auto-update updated_at timestamp
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS update_companies_updated_at ON public.companies;
+CREATE TRIGGER update_companies_updated_at
+  BEFORE UPDATE ON public.companies
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_updated_at_column();
 
 -- ============================================================
 -- 3. JOBS TABLE (PUBLIC MARKETPLACE)
@@ -141,7 +162,10 @@ $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 -- ============================================================
 -- 6. RPC: CREATE COMPANY
 -- ============================================================
-CREATE OR REPLACE FUNCTION public.create_company(company_name TEXT)
+CREATE OR REPLACE FUNCTION public.create_company(
+  company_name TEXT,
+  phone TEXT DEFAULT NULL
+)
 RETURNS UUID AS $$
 DECLARE
   new_company_id UUID;
@@ -158,9 +182,9 @@ BEGIN
     RAISE EXCEPTION 'User already belongs to a company';
   END IF;
   
-  -- Create new company
-  INSERT INTO public.companies (name, created_by)
-  VALUES (company_name, user_id)
+  -- Create new company with name and phone
+  INSERT INTO public.companies (name, phone, created_by)
+  VALUES (company_name, phone, user_id)
   RETURNING id INTO new_company_id;
   
   -- Update user profile with company_id
