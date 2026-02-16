@@ -4,7 +4,6 @@ import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import Link from 'next/link'
-import '../globals.css'
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -55,8 +54,8 @@ export default function RegisterPage() {
         setPassword('')
         setConfirmPassword('')
       } else if (data.user) {
-        // Redirect to company onboarding after successful registration
-        router.push('/onboarding/company')
+        // Redirect to dashboard after successful registration
+        router.push('/dashboard')
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred. Please try again.')
@@ -66,206 +65,217 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="login-screen">
-      <style jsx global>{`
-        body {
-          margin: 0;
-          font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-          background: linear-gradient(135deg, #0F1F2E 0%, #152B3C 50%, #1A3347 100%);
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .login-screen {
-          width: 100%;
-          max-width: 420px;
-          padding: 24px;
-        }
-
-        .login-card {
-          background: rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 20px;
-          padding: 48px 40px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-        }
-
-        .login-title {
-          font-size: 32px;
-          font-weight: 700;
-          color: #FFFFFF;
-          margin: 0 0 12px 0;
-          text-align: center;
-        }
-
-        .login-subtitle {
-          font-size: 15px;
-          color: rgba(255, 255, 255, 0.7);
-          margin: 0 0 32px 0;
-          text-align: center;
-        }
-
-        .login-title-accent {
-          color: #C8A64D;
-        }
-
-        .form-group {
-          margin-bottom: 24px;
-        }
-
-        .form-label {
-          display: block;
-          color: rgba(255, 255, 255, 0.9);
-          font-size: 14px;
-          font-weight: 500;
-          margin-bottom: 8px;
-        }
-
-        .form-input {
-          width: 100%;
-          padding: 12px 16px;
-          background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          border-radius: 8px;
-          color: #FFFFFF;
-          font-size: 15px;
-          transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-          outline: none;
-          border-color: #C8A64D;
-          background: rgba(255, 255, 255, 0.12);
-        }
-
-        .form-input::placeholder {
-          color: rgba(255, 255, 255, 0.4);
-        }
-
-        .login-btn {
-          width: 100%;
-          padding: 14px;
-          background: linear-gradient(135deg, #C8A64D 0%, #B39543 100%);
-          border: none;
-          border-radius: 8px;
-          color: #0F1F2E;
-          font-size: 16px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          margin-top: 8px;
-        }
-
-        .login-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(200, 166, 77, 0.3);
-        }
-
-        .login-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-          transform: none;
-        }
-
-        .error-message {
-          color: #ff6b6b;
-          font-size: 14px;
-          margin-top: 16px;
-          text-align: center;
-          padding: 12px;
-          background: rgba(255, 107, 107, 0.1);
-          border: 1px solid rgba(255, 107, 107, 0.3);
-          border-radius: 8px;
-        }
-
-        .login-link {
-          display: block;
-          text-align: center;
-          margin-top: 20px;
-          color: rgba(255, 255, 255, 0.7);
-          font-size: 14px;
-        }
-
-        .login-link a {
-          color: #C8A64D;
-          text-decoration: none;
-          transition: color 0.3s ease;
-        }
-
-        .login-link a:hover {
-          color: #D4B866;
-        }
-      `}</style>
-
-      <div className="login-card">
-        <h1 className="login-title">
-          Join <span className="login-title-accent">XDrive</span> Platform
-        </h1>
-        <p className="login-subtitle">
-          Create your account to get started
-        </p>
-
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="form-input"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-            />
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#f9fafb',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '24px'
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '420px'
+      }}>
+        <div style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '12px',
+          padding: '48px 40px',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          border: '1px solid #e5e7eb'
+        }}>
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <h1 style={{
+              fontSize: '28px',
+              fontWeight: '700',
+              color: '#1f2937',
+              margin: '0 0 8px 0'
+            }}>
+              Join <span style={{ color: '#C8A64D' }}>XDrive</span>
+            </h1>
+            <p style={{
+              fontSize: '15px',
+              color: '#6b7280',
+              margin: 0
+            }}>
+              Create your account to get started
+            </p>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="form-input"
-              placeholder="Minimum 6 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: '20px' }}>
+              <label htmlFor="email" style={{
+                display: 'block',
+                color: '#374151',
+                fontSize: '14px',
+                fontWeight: '500',
+                marginBottom: '8px'
+              }}>
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={loading}
+                placeholder="your@email.com"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  color: '#1f2937',
+                  fontSize: '15px',
+                  transition: 'all 0.2s',
+                  outline: 'none'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#C8A64D'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+              />
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label htmlFor="password" style={{
+                display: 'block',
+                color: '#374151',
+                fontSize: '14px',
+                fontWeight: '500',
+                marginBottom: '8px'
+              }}>
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+                placeholder="Minimum 6 characters"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  color: '#1f2937',
+                  fontSize: '15px',
+                  transition: 'all 0.2s',
+                  outline: 'none'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#C8A64D'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+              />
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <label htmlFor="confirmPassword" style={{
+                display: 'block',
+                color: '#374151',
+                fontSize: '14px',
+                fontWeight: '500',
+                marginBottom: '8px'
+              }}>
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                disabled={loading}
+                placeholder="Re-enter password"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  color: '#1f2937',
+                  fontSize: '15px',
+                  transition: 'all 0.2s',
+                  outline: 'none'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#C8A64D'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+              />
+            </div>
+
+            <button
+              type="submit"
               disabled={loading}
-            />
+              style={{
+                width: '100%',
+                padding: '14px',
+                backgroundColor: '#C8A64D',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#ffffff',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s',
+                opacity: loading ? 0.6 : 1
+              }}
+              onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = '#B39543')}
+              onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = '#C8A64D')}
+            >
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </button>
+
+            {error && (
+              <div style={{
+                marginTop: '16px',
+                padding: '12px',
+                backgroundColor: '#fef2f2',
+                border: '1px solid #fecaca',
+                borderRadius: '8px',
+                color: '#dc2626',
+                fontSize: '14px',
+                textAlign: 'center'
+              }}>
+                {error}
+              </div>
+            )}
+          </form>
+
+          <div style={{
+            marginTop: '24px',
+            paddingTop: '24px',
+            borderTop: '1px solid #e5e7eb',
+            textAlign: 'center',
+            color: '#6b7280',
+            fontSize: '14px'
+          }}>
+            Already have an account?{' '}
+            <Link href="/login" style={{
+              color: '#C8A64D',
+              textDecoration: 'none',
+              fontWeight: '600'
+            }}>
+              Login here
+            </Link>
           </div>
+        </div>
 
-          <div className="form-group">
-            <label htmlFor="confirmPassword" className="form-label">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              className="form-input"
-              placeholder="Re-enter password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
-
-          <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? 'Creating Account...' : 'Create Account'}
-          </button>
-
-          {error && <div className="error-message">{error}</div>}
-        </form>
-
-        <div className="login-link">
-          Already have an account? <Link href="/login">Login here</Link>
+        <div style={{
+          marginTop: '24px',
+          textAlign: 'center',
+          color: '#6b7280',
+          fontSize: '13px'
+        }}>
+          Need help? Call or WhatsApp:{' '}
+          <a href="tel:07423272138" style={{
+            color: '#C8A64D',
+            fontWeight: '600',
+            textDecoration: 'none'
+          }}>
+            07423272138
+          </a>
         </div>
       </div>
     </div>
