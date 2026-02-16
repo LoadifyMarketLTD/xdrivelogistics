@@ -49,7 +49,13 @@ CREATE TABLE IF NOT EXISTS public.companies (
   name TEXT NOT NULL,
   email TEXT,
   phone TEXT,
-  address TEXT,
+  vat_number TEXT,
+  company_number TEXT,
+  address_line1 TEXT,
+  address_line2 TEXT,
+  city TEXT,
+  postcode TEXT,
+  country TEXT,
   created_by UUID REFERENCES auth.users(id),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -141,7 +147,10 @@ $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 -- ============================================================
 -- 6. RPC: CREATE COMPANY
 -- ============================================================
-CREATE OR REPLACE FUNCTION public.create_company(company_name TEXT)
+CREATE OR REPLACE FUNCTION public.create_company(
+  company_name TEXT,
+  phone TEXT DEFAULT NULL
+)
 RETURNS UUID AS $$
 DECLARE
   new_company_id UUID;
@@ -158,9 +167,9 @@ BEGIN
     RAISE EXCEPTION 'User already belongs to a company';
   END IF;
   
-  -- Create new company
-  INSERT INTO public.companies (name, created_by)
-  VALUES (company_name, user_id)
+  -- Create new company with name and phone
+  INSERT INTO public.companies (name, phone, created_by)
+  VALUES (company_name, phone, user_id)
   RETURNING id INTO new_company_id;
   
   -- Update user profile with company_id
