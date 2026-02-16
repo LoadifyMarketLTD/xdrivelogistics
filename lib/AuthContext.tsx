@@ -45,34 +45,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setProfile(data)
       setCompanyId(data.company_id)
-
-      // If user doesn't have a company, create one
-      if (!data.company_id) {
-        console.log('User has no company, creating one...')
-        await createCompany()
-      }
     } catch (err: any) {
       console.error('Error fetching profile:', err)
-      setError(err.message)
-    }
-  }
-
-  const createCompany = async () => {
-    try {
-      // Call the RPC function to create company
-      const { data, error } = await supabase
-        .rpc('create_company', { company_name: 'XDrive Logistics' })
-
-      if (error) throw error
-
-      console.log('Company created successfully:', data)
-      
-      // Refetch profile to get the new company_id
-      if (user) {
-        await fetchProfile(user.id)
-      }
-    } catch (err: any) {
-      console.error('Error creating company:', err)
       setError(err.message)
     }
   }
@@ -92,21 +66,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const initializeAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
       setUser(session?.user ?? null)
       if (session?.user) {
-        fetchProfile(session.user.id)
+        await fetchProfile(session.user.id)
       }
       setLoading(false)
-    })
+    }
+
+    initializeAuth()
 
     // Listen for auth changes
+    // Note: We don't set loading=true here to avoid showing loading screens
+    // during normal auth state changes. The profile fetch is fast and pages
+    // handle the transition gracefully with their own loading states.
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null)
       if (session?.user) {
-        fetchProfile(session.user.id)
+        await fetchProfile(session.user.id)
       } else {
         setProfile(null)
         setCompanyId(null)
