@@ -1,4 +1,4 @@
-// Database types for XDrive Logistics
+// Database types for XDrive Logistics - Public Marketplace
 
 export interface Profile {
   id: string
@@ -23,89 +23,63 @@ export interface Company {
   updated_at: string
 }
 
-export interface Driver {
-  id: string
-  company_id: string
-  full_name: string
-  phone: string
-  email: string | null
-  license_number: string | null
-  is_active: boolean
-  notes: string | null
-  created_at: string
-  updated_at: string
-}
-
+// PUBLIC MARKETPLACE JOB
 export interface Job {
   id: string
-  company_id: string
-  job_code: string
-  customer_name: string | null
-  customer_email: string | null
-  customer_phone: string | null
-  pickup: string
-  pickup_postcode: string | null
-  delivery: string
-  delivery_postcode: string | null
-  price: number
-  cost: number | null
-  status: 'pending' | 'confirmed' | 'in-transit' | 'delivered' | 'cancelled'
-  driver_id: string | null
-  scheduled_date: string | null
-  scheduled_time: string | null
-  notes: string | null
   created_at: string
   updated_at: string
+  posted_by_company_id: string
+  status: 'open' | 'assigned' | 'in-transit' | 'completed' | 'cancelled'
+  pickup_location: string
+  delivery_location: string
+  pickup_datetime: string | null
+  delivery_datetime: string | null
+  vehicle_type: string | null
+  load_details: string | null
+  pallets: number | null
+  weight_kg: number | null
+  budget: number | null
+  assigned_company_id: string | null
+  accepted_bid_id: string | null
 }
 
-export interface Invoice {
+// MARKETPLACE BID
+export interface JobBid {
   id: string
-  company_id: string
-  invoice_number: string
-  job_id: string | null
-  customer_name: string
-  customer_email: string | null
-  amount: number
-  vat_amount: number
-  status: 'pending' | 'sent' | 'paid' | 'overdue' | 'cancelled'
-  issue_date: string
-  due_date: string
-  paid_date: string | null
-  notes: string | null
   created_at: string
-  updated_at: string
+  job_id: string
+  bidder_company_id: string
+  bidder_user_id: string
+  quote_amount: number
+  message: string | null
+  status: 'submitted' | 'withdrawn' | 'rejected' | 'accepted'
 }
 
+// Form data types
 export interface JobFormData {
-  pickup: string
-  pickup_postcode?: string
-  delivery: string
-  delivery_postcode?: string
-  customer_name?: string
-  customer_email?: string
-  customer_phone?: string
-  price: number
-  cost?: number
-  status?: Job['status']
-  scheduled_date?: string
-  scheduled_time?: string
-  notes?: string
+  pickup_location: string
+  delivery_location: string
+  pickup_datetime?: string
+  delivery_datetime?: string
+  vehicle_type?: string
+  load_details?: string
+  pallets?: number
+  weight_kg?: number
+  budget?: number
 }
 
-export interface DriverFormData {
-  full_name: string
-  phone: string
-  email?: string
-  license_number?: string
-  notes?: string
+export interface BidFormData {
+  job_id: string
+  quote_amount: number
+  message?: string
 }
 
-export interface InvoiceFormData {
-  job_id?: string
-  customer_name: string
-  customer_email?: string
-  amount: number
-  vat_amount?: number
-  due_date: string
-  notes?: string
+// Join types for display
+export interface JobWithBids extends Job {
+  bids?: JobBid[]
+  poster_company?: Company
+}
+
+export interface BidWithJob extends JobBid {
+  job?: Job
 }
