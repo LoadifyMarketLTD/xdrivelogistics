@@ -226,7 +226,7 @@ a {
   letter-spacing: 0.3px;
 }
 
-.status-badge.in-transit {
+.status-badge.intransit {
   background: rgba(200,166,77,0.15);
   color: var(--gold-premium);
 }
@@ -241,16 +241,29 @@ a {
   color: var(--muted);
 }
 
+.status-badge.confirmed {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.status-badge.cancelled {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
 /* Quick Actions Panel */
 .quick-actions {
   margin-top: 32px;
   margin-bottom: 32px;
+  position: relative;
+  z-index: 10;
 }
 
 .actions-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+  position: relative;
 }
 
 .action-btn {
@@ -262,6 +275,9 @@ a {
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
+  position: relative;
+  pointer-events: auto;
+  z-index: 1;
 }
 
 .action-btn.primary {
