@@ -386,13 +386,11 @@ a {
   display: block;
 }
 
-/* Dashboard Content - Hidden by default */
+/* Dashboard Content */
 .dashboard-content {
-  display: none;
-}
-
-.dashboard-content.show {
   display: block;
+  min-height: 100vh;
+  background: var(--background-dark);
 }
 
 /* Responsive Design */

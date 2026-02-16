@@ -10,20 +10,55 @@ export const dynamic = 'force-dynamic'
 export default function DashboardPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      
-      if (!session) {
-        router.push('/login')
-        return
+    // Set a timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (loading) {
+        setError(
+          'Authentication check timed out. This may indicate missing Supabase configuration. ' +
+          'Please check that NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in Netlify for all deploy contexts.'
+        )
+        setLoading(false)
       }
-      
-      setLoading(false)
+    }, 10000) // 10 second timeout
+
+    const checkAuth = async () => {
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError)
+          setError(`Authentication error: ${sessionError.message}`)
+          setLoading(false)
+          clearTimeout(timeout)
+          return
+        }
+        
+        if (!session) {
+          clearTimeout(timeout)
+          router.push('/login')
+          return
+        }
+        
+        setLoading(false)
+        clearTimeout(timeout)
+      } catch (err) {
+        console.error('Auth check exception:', err)
+        setError(
+          'Failed to check authentication. Please ensure Supabase is configured correctly. ' +
+          'Visit /diagnostics to verify your environment variables.'
+        )
+        setLoading(false)
+        clearTimeout(timeout)
+      }
     }
 
     checkAuth()
+
+    // Cleanup timeout on unmount
+    return () => clearTimeout(timeout)
   }, [router])
 
   const handleLogout = async () => {
@@ -31,10 +66,85 @@ export default function DashboardPage() {
     router.push('/')
   }
 
+  // Show error state if authentication failed
+  if (error) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column',
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        backgroundColor: '#0F1F2E',
+        color: '#fff',
+        padding: '20px',
+        textAlign: 'center'
+      }}>
+        <div style={{
+          maxWidth: '600px',
+          backgroundColor: 'rgba(255, 107, 107, 0.1)',
+          border: '1px solid rgba(255, 107, 107, 0.3)',
+          borderRadius: '12px',
+          padding: '30px',
+        }}>
+          <h2 style={{ color: '#ff6b6b', marginBottom: '20px' }}>⚠️ Authentication Error</h2>
+          <p style={{ lineHeight: '1.6', marginBottom: '25px' }}>{error}</p>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a 
+              href="/diagnostics"
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#C8A64D',
+                color: '#0F1F2E',
+                textDecoration: 'none',
+                borderRadius: '6px',
+                fontWeight: '600',
+                display: 'inline-block'
+              }}
+            >
+              View Diagnostics
+            </a>
+            <a 
+              href="/login"
+              style={{
+                padding: '12px 24px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                color: '#fff',
+                textDecoration: 'none',
+                borderRadius: '6px',
+                fontWeight: '600',
+                display: 'inline-block'
+              }}
+            >
+              Go to Login
+            </a>
+            <a 
+              href="/"
+              style={{
+                padding: '12px 24px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                color: '#fff',
+                textDecoration: 'none',
+                borderRadius: '6px',
+                fontWeight: '600',
+                display: 'inline-block'
+              }}
+            >
+              Go Home
+            </a>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        Loading...
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0F1F2E', color: '#fff' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '18px', marginBottom: '10px' }}>Loading dashboard...</div>
+          <div style={{ fontSize: '14px', color: '#94a3b8' }}>Checking authentication...</div>
+        </div>
       </div>
     )
   }
