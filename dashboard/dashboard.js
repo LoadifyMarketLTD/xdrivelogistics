@@ -1,5 +1,7 @@
 // XDrive Platform Authentication & Logic
 // Static HTML limitation - basic access gate only
+// WARNING: This is NOT real security - password is visible in source code
+// This only blocks casual access. For production, implement proper server-side authentication.
 
 const PLATFORM_PASSWORD = "XDRIVE2026!";
 
