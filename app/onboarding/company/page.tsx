@@ -44,22 +44,17 @@ export default function CompanyOnboardingPage() {
       setError(null)
       setSuccess(false)
 
-      // Call the create_company RPC function
+      // Call the create_company RPC function with both name and phone
       const { data: newCompanyId, error: rpcError } = await supabase
-        .rpc('create_company', { company_name: companyName.trim() })
+        .rpc('create_company', { 
+          company_name: companyName.trim(),
+          phone: phone.trim() || null
+        })
 
       if (rpcError) throw rpcError
-
-      // Update company phone if provided
-      if (newCompanyId && phone.trim()) {
-        const { error: updateError } = await supabase
-          .from('companies')
-          .update({ phone: phone.trim() })
-          .eq('id', newCompanyId)
-
-        if (updateError) {
-          console.warn('Could not update company phone:', updateError)
-        }
+      
+      if (!newCompanyId) {
+        throw new Error('Company creation failed - no ID returned')
       }
 
       console.log('Company created successfully:', newCompanyId)

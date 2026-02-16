@@ -164,6 +164,9 @@ export default function DashboardPage() {
             <button className="action-btn success" onClick={() => router.push('/marketplace')}>
               🔍 Browse Marketplace
             </button>
+            <button className="action-btn secondary" onClick={() => router.push('/company/settings')}>
+              ⚙️ Company Settings
+            </button>
             <button className="action-btn secondary" onClick={() => fetchDashboardData()}>
               🔄 Refresh Data
             </button>

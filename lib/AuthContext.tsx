@@ -39,12 +39,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single()
+        .maybeSingle()
 
       if (error) throw error
 
-      setProfile(data)
-      setCompanyId(data.company_id)
+      if (data) {
+        setProfile(data)
+        setCompanyId(data.company_id)
+      } else {
+        // Profile doesn't exist yet - this is OK for new users
+        setProfile(null)
+        setCompanyId(null)
+      }
     } catch (err: any) {
       console.error('Error fetching profile:', err)
       setError(err.message)

@@ -49,7 +49,13 @@ CREATE TABLE IF NOT EXISTS public.companies (
   name TEXT NOT NULL,
   email TEXT,
   phone TEXT,
-  address TEXT,
+  vat_number TEXT,
+  company_number TEXT,
+  address_line1 TEXT,
+  address_line2 TEXT,
+  city TEXT,
+  postcode TEXT,
+  country TEXT,
   created_by UUID REFERENCES auth.users(id),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -69,7 +75,10 @@ CREATE INDEX IF NOT EXISTS idx_companies_created_by ON public.companies(created_
 -- ============================================================
 -- 3. RPC FUNCTION: create_company
 -- ============================================================
-CREATE OR REPLACE FUNCTION public.create_company(company_name TEXT)
+CREATE OR REPLACE FUNCTION public.create_company(
+  company_name TEXT,
+  phone TEXT DEFAULT NULL
+)
 RETURNS UUID AS $$
 DECLARE
   new_company_id UUID;
@@ -87,9 +96,9 @@ BEGIN
     RAISE EXCEPTION 'User already belongs to a company';
   END IF;
   
-  -- Create new company
-  INSERT INTO public.companies (name, created_by)
-  VALUES (company_name, user_id)
+  -- Create new company with name and phone
+  INSERT INTO public.companies (name, phone, created_by)
+  VALUES (company_name, phone, user_id)
   RETURNING id INTO new_company_id;
   
   -- Update user profile with company_id
@@ -240,17 +249,24 @@ CREATE POLICY "Users can update own profile"
 
 -- Companies policies
 DROP POLICY IF EXISTS "Users can view own company" ON public.companies;
-CREATE POLICY "Users can view own company"
+DROP POLICY IF EXISTS "companies_select_owner" ON public.companies;
+CREATE POLICY "companies_select_owner"
   ON public.companies FOR SELECT
-  USING (
-    id IN (
-      SELECT company_id FROM public.profiles WHERE id = auth.uid()
-    )
-  );
+  TO authenticated
+  USING (created_by = auth.uid());
 
 DROP POLICY IF EXISTS "Users can insert companies" ON public.companies;
-CREATE POLICY "Users can insert companies"
+DROP POLICY IF EXISTS "companies_insert_owner" ON public.companies;
+CREATE POLICY "companies_insert_owner"
   ON public.companies FOR INSERT
+  TO authenticated
+  WITH CHECK (created_by = auth.uid());
+
+DROP POLICY IF EXISTS "companies_update_owner" ON public.companies;
+CREATE POLICY "companies_update_owner"
+  ON public.companies FOR UPDATE
+  TO authenticated
+  USING (created_by = auth.uid())
   WITH CHECK (created_by = auth.uid());
 
 -- Drivers policies
