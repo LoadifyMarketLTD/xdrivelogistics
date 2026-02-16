@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import Link from 'next/link'
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -17,6 +18,7 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
 
+    // Validation
     if (!email) {
       setError('Please enter an email address')
       setLoading(false)
@@ -29,20 +31,34 @@ export default function LoginPage() {
       return
     }
 
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters')
+      setLoading(false)
+      return
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      setLoading(false)
+      return
+    }
+
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
       })
 
-      if (signInError) {
-        setError('Invalid email or password. Please try again.')
+      if (signUpError) {
+        setError(signUpError.message)
         setPassword('')
+        setConfirmPassword('')
       } else if (data.user) {
+        // Redirect to dashboard after successful registration
         router.push('/dashboard')
       }
-    } catch (err) {
-      setError('An error occurred. Please try again.')
+    } catch (err: any) {
+      setError(err.message || 'An error occurred. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -75,14 +91,14 @@ export default function LoginPage() {
               color: '#1f2937',
               margin: '0 0 8px 0'
             }}>
-              Welcome to <span style={{ color: '#C8A64D' }}>XDrive</span>
+              Join <span style={{ color: '#C8A64D' }}>XDrive</span>
             </h1>
             <p style={{
               fontSize: '15px',
               color: '#6b7280',
               margin: 0
             }}>
-              Sign in to your account
+              Create your account to get started
             </p>
           </div>
 
@@ -121,7 +137,7 @@ export default function LoginPage() {
               />
             </div>
 
-            <div style={{ marginBottom: '24px' }}>
+            <div style={{ marginBottom: '20px' }}>
               <label htmlFor="password" style={{
                 display: 'block',
                 color: '#374151',
@@ -138,7 +154,41 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
-                placeholder="Enter your password"
+                placeholder="Minimum 6 characters"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  color: '#1f2937',
+                  fontSize: '15px',
+                  transition: 'all 0.2s',
+                  outline: 'none'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#C8A64D'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+              />
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <label htmlFor="confirmPassword" style={{
+                display: 'block',
+                color: '#374151',
+                fontSize: '14px',
+                fontWeight: '500',
+                marginBottom: '8px'
+              }}>
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                disabled={loading}
+                placeholder="Re-enter password"
                 style={{
                   width: '100%',
                   padding: '12px 16px',
@@ -174,7 +224,7 @@ export default function LoginPage() {
               onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = '#B39543')}
               onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = '#C8A64D')}
             >
-              {loading ? 'Logging in...' : 'Login to Account'}
+              {loading ? 'Creating Account...' : 'Create Account'}
             </button>
 
             {error && (
@@ -193,17 +243,6 @@ export default function LoginPage() {
             )}
           </form>
 
-          <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <Link href="/forgot-password" style={{
-              color: '#C8A64D',
-              fontSize: '14px',
-              textDecoration: 'none',
-              fontWeight: '500'
-            }}>
-              Forgot password?
-            </Link>
-          </div>
-
           <div style={{
             marginTop: '24px',
             paddingTop: '24px',
@@ -212,13 +251,13 @@ export default function LoginPage() {
             color: '#6b7280',
             fontSize: '14px'
           }}>
-            Don't have an account?{' '}
-            <Link href="/register" style={{
+            Already have an account?{' '}
+            <Link href="/login" style={{
               color: '#C8A64D',
               textDecoration: 'none',
               fontWeight: '600'
             }}>
-              Register here
+              Login here
             </Link>
           </div>
         </div>

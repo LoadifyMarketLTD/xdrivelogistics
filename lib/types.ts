@@ -23,6 +23,17 @@ export interface Company {
   updated_at: string
 }
 
+export interface Driver {
+  id: string
+  user_id: string
+  first_name: string
+  last_name: string
+  phone: string | null
+  license_type: string
+  created_at: string
+  updated_at: string
+}
+
 // PUBLIC MARKETPLACE JOB
 export interface Job {
   id: string

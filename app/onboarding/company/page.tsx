@@ -8,13 +8,15 @@ import '@/styles/dashboard.css'
 
 export const dynamic = 'force-dynamic'
 
-export default function OnboardingPage() {
+export default function CompanyOnboardingPage() {
   const router = useRouter()
   const { user, companyId, loading: authLoading, refreshProfile } = useAuth()
   
   const [companyName, setCompanyName] = useState('')
+  const [phone, setPhone] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -25,12 +27,6 @@ export default function OnboardingPage() {
     // If user already has a company, redirect to dashboard
     if (!authLoading && companyId) {
       router.push('/dashboard')
-      return
-    }
-
-    // Redirect to the new company-specific onboarding page
-    if (!authLoading && user && !companyId) {
-      router.push('/onboarding/company')
       return
     }
   }, [authLoading, user, companyId, router])
@@ -46,6 +42,7 @@ export default function OnboardingPage() {
     try {
       setSubmitting(true)
       setError(null)
+      setSuccess(false)
 
       // Call the create_company RPC function
       const { data: newCompanyId, error: rpcError } = await supabase
@@ -53,13 +50,29 @@ export default function OnboardingPage() {
 
       if (rpcError) throw rpcError
 
+      // Update company phone if provided
+      if (newCompanyId && phone.trim()) {
+        const { error: updateError } = await supabase
+          .from('companies')
+          .update({ phone: phone.trim() })
+          .eq('id', newCompanyId)
+
+        if (updateError) {
+          console.warn('Could not update company phone:', updateError)
+        }
+      }
+
       console.log('Company created successfully:', newCompanyId)
 
       // Refresh profile to get the new company_id
       await refreshProfile()
 
-      alert('Company created successfully!')
-      router.push('/dashboard')
+      setSuccess(true)
+      
+      // Redirect after a brief delay to show success message
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 1500)
     } catch (err: any) {
       console.error('Error creating company:', err)
       setError(err.message || 'Failed to create company')
@@ -84,7 +97,7 @@ export default function OnboardingPage() {
         <div className="container">
           <div className="platform-nav">
             <div className="platform-brand">
-              <span className="platform-brand-accent">XDrive</span> Onboarding
+              <span className="platform-brand-accent">XDrive</span> Company Onboarding
             </div>
           </div>
         </div>
@@ -103,16 +116,16 @@ export default function OnboardingPage() {
             borderRadius: '12px',
             padding: '48px',
             border: '1px solid rgba(255,255,255,0.08)',
-            maxWidth: '500px',
+            maxWidth: '600px',
             width: '100%'
           }}>
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>🚚</div>
               <h1 style={{ fontSize: '28px', marginBottom: '12px', color: '#fff' }}>
-                Welcome to XDrive Marketplace
+                Create Your Company Profile
               </h1>
               <p style={{ fontSize: '15px', color: '#94a3b8', lineHeight: '1.6' }}>
-                To post jobs and bid on transport opportunities, you need to create your company profile.
+                Enter your company details to start using the XDrive Marketplace.
               </p>
             </div>
 
@@ -127,6 +140,20 @@ export default function OnboardingPage() {
                 fontSize: '14px'
               }}>
                 {error}
+              </div>
+            )}
+
+            {success && (
+              <div style={{
+                padding: '12px 16px',
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                border: '1px solid rgba(34, 197, 94, 0.3)',
+                borderRadius: '8px',
+                marginBottom: '24px',
+                color: '#22c55e',
+                fontSize: '14px'
+              }}>
+                ✓ Company created successfully! Redirecting to dashboard...
               </div>
             )}
 
@@ -158,9 +185,33 @@ export default function OnboardingPage() {
                   }}
                   placeholder="Enter your company name"
                 />
-                <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '6px' }}>
-                  This will be visible to other companies in the marketplace
-                </div>
+              </div>
+
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#fff'
+                }}>
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '6px',
+                    color: '#fff',
+                    fontSize: '16px'
+                  }}
+                  placeholder="+44 7xxx xxx xxx"
+                />
               </div>
 
               <button
