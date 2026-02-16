@@ -13,10 +13,10 @@ export default function CompanyOnboardingPage() {
   const { user, companyId, loading: authLoading, refreshProfile } = useAuth()
   
   const [companyName, setCompanyName] = useState('')
-  const [vatNumber, setVatNumber] = useState('')
   const [phone, setPhone] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -42,6 +42,7 @@ export default function CompanyOnboardingPage() {
     try {
       setSubmitting(true)
       setError(null)
+      setSuccess(false)
 
       // Call the create_company RPC function
       const { data: newCompanyId, error: rpcError } = await supabase
@@ -49,19 +50,15 @@ export default function CompanyOnboardingPage() {
 
       if (rpcError) throw rpcError
 
-      // Update company details (phone, vat) if provided
-      if (newCompanyId && (phone.trim() || vatNumber.trim())) {
+      // Update company phone if provided
+      if (newCompanyId && phone.trim()) {
         const { error: updateError } = await supabase
           .from('companies')
-          .update({
-            phone: phone.trim() || null,
-            // Note: VAT number field may not exist in database, skipping for now
-          })
+          .update({ phone: phone.trim() })
           .eq('id', newCompanyId)
 
         if (updateError) {
-          console.warn('Could not update company details:', updateError)
-          // Don't fail the whole operation
+          console.warn('Could not update company phone:', updateError)
         }
       }
 
@@ -70,8 +67,12 @@ export default function CompanyOnboardingPage() {
       // Refresh profile to get the new company_id
       await refreshProfile()
 
-      alert('Company created successfully!')
-      router.push('/dashboard')
+      setSuccess(true)
+      
+      // Redirect after a brief delay to show success message
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 1500)
     } catch (err: any) {
       console.error('Error creating company:', err)
       setError(err.message || 'Failed to create company')
@@ -142,6 +143,20 @@ export default function CompanyOnboardingPage() {
               </div>
             )}
 
+            {success && (
+              <div style={{
+                padding: '12px 16px',
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                border: '1px solid rgba(34, 197, 94, 0.3)',
+                borderRadius: '8px',
+                marginBottom: '24px',
+                color: '#22c55e',
+                fontSize: '14px'
+              }}>
+                ✓ Company created successfully! Redirecting to dashboard...
+              </div>
+            )}
+
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: '24px' }}>
                 <label style={{
@@ -170,36 +185,6 @@ export default function CompanyOnboardingPage() {
                   }}
                   placeholder="Enter your company name"
                 />
-              </div>
-
-              <div style={{ marginBottom: '24px' }}>
-                <label style={{
-                  display: 'block',
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#fff'
-                }}>
-                  VAT Number
-                </label>
-                <input
-                  type="text"
-                  value={vatNumber}
-                  onChange={(e) => setVatNumber(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '14px',
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '6px',
-                    color: '#fff',
-                    fontSize: '16px'
-                  }}
-                  placeholder="GB123456789 (optional)"
-                />
-                <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '6px' }}>
-                  Optional - for invoicing purposes
-                </div>
               </div>
 
               <div style={{ marginBottom: '24px' }}>

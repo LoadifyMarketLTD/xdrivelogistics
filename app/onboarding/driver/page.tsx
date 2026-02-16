@@ -18,6 +18,7 @@ export default function DriverOnboardingPage() {
   const [licenseType, setLicenseType] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -47,6 +48,7 @@ export default function DriverOnboardingPage() {
     try {
       setSubmitting(true)
       setError(null)
+      setSuccess(false)
 
       // Create driver record
       const { error: driverError } = await supabase
@@ -63,8 +65,12 @@ export default function DriverOnboardingPage() {
 
       console.log('Driver profile created successfully')
 
-      alert('Driver profile created successfully!')
-      router.push('/dashboard')
+      setSuccess(true)
+      
+      // Redirect after a brief delay to show success message
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 1500)
     } catch (err: any) {
       console.error('Error creating driver profile:', err)
       setError(err.message || 'Failed to create driver profile')
@@ -132,6 +138,20 @@ export default function DriverOnboardingPage() {
                 fontSize: '14px'
               }}>
                 {error}
+              </div>
+            )}
+
+            {success && (
+              <div style={{
+                padding: '12px 16px',
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                border: '1px solid rgba(34, 197, 94, 0.3)',
+                borderRadius: '8px',
+                marginBottom: '24px',
+                color: '#22c55e',
+                fontSize: '14px'
+              }}>
+                ✓ Driver profile created successfully! Redirecting to dashboard...
               </div>
             )}
 
