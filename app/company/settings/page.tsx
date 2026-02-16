@@ -121,7 +121,7 @@ export default function CompanySettingsPage() {
       setError(null)
       setSuccess(false)
 
-      // Update company details
+      // Update company details (updated_at is automatically set by database trigger)
       const { error: updateError } = await supabase
         .from('companies')
         .update({
@@ -134,8 +134,7 @@ export default function CompanySettingsPage() {
           address_line2: addressLine2.trim() || null,
           city: city.trim() || null,
           postcode: postcode.trim() || null,
-          country: country.trim() || null,
-          updated_at: new Date().toISOString()
+          country: country.trim() || null
         })
         .eq('created_by', user.id)
 

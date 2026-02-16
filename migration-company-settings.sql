@@ -15,7 +15,9 @@ ADD COLUMN IF NOT EXISTS postcode TEXT,
 ADD COLUMN IF NOT EXISTS country TEXT;
 
 -- Remove old address column if it exists (replaced by address_line1, address_line2)
--- This is safe as we're adding the new columns first
+-- WARNING: If you have existing data in the 'address' column, you may want to migrate it first:
+--   UPDATE public.companies SET address_line1 = address WHERE address IS NOT NULL;
+-- This is safe to run as we're adding the new columns first, allowing for manual migration if needed
 ALTER TABLE public.companies
 DROP COLUMN IF EXISTS address;
 
@@ -87,5 +89,20 @@ CREATE POLICY "companies_update_owner"
   USING (created_by = auth.uid())
   WITH CHECK (created_by = auth.uid());
 
--- 4. Notify schema reload
+-- 4. Add trigger to auto-update updated_at timestamp
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS update_companies_updated_at ON public.companies;
+CREATE TRIGGER update_companies_updated_at
+  BEFORE UPDATE ON public.companies
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_updated_at_column();
+
+-- 5. Notify schema reload
 NOTIFY pgrst, 'reload schema';
