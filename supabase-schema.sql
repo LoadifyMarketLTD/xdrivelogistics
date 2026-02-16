@@ -264,14 +264,12 @@ CREATE POLICY "Users can update own profile"
 
 -- Companies policies
 DROP POLICY IF EXISTS "Users can view own company" ON public.companies;
-DROP POLICY IF EXISTS "companies_select_owner" ON public.companies;
 CREATE POLICY "companies_select_owner"
   ON public.companies FOR SELECT
   TO authenticated
   USING (created_by = auth.uid());
 
 DROP POLICY IF EXISTS "Users can insert companies" ON public.companies;
-DROP POLICY IF EXISTS "companies_insert_owner" ON public.companies;
 CREATE POLICY "companies_insert_owner"
   ON public.companies FOR INSERT
   TO authenticated

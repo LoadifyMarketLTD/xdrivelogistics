@@ -49,12 +49,7 @@ export default function CompanySettingsPage() {
       router.push('/login')
       return
     }
-
-    if (!authLoading && !companyId) {
-      router.push('/onboarding/company')
-      return
-    }
-  }, [authLoading, user, companyId, router])
+  }, [authLoading, user, router])
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -64,7 +59,7 @@ export default function CompanySettingsPage() {
         setLoading(true)
         setError(null)
 
-        // Fetch company by created_by (owner)
+        // Fetch company by created_by (only company owner can access settings)
         const { data, error: fetchError } = await supabase
           .from('companies')
           .select('*')
@@ -87,8 +82,11 @@ export default function CompanySettingsPage() {
           setPostcode(data.postcode || '')
           setCountry(data.country || '')
         } else {
-          setError('No company found. Please create a company first.')
-          router.push('/onboarding/company')
+          // User doesn't own a company - redirect to onboarding
+          setError('You must create a company first to access settings.')
+          setTimeout(() => {
+            router.push('/onboarding/company')
+          }, 2000)
         }
       } catch (err: any) {
         console.error('Error fetching company:', err)
