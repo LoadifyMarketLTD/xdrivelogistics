@@ -48,7 +48,7 @@ export default function DashboardPage() {
         console.error('Auth check exception:', err)
         setError(
           'Failed to check authentication. Please ensure Supabase is configured correctly. ' +
-          'Visit /_diagnostics to verify your environment variables.'
+          'Visit /diagnostics to verify your environment variables.'
         )
         setLoading(false)
         clearTimeout(timeout)
@@ -59,7 +59,7 @@ export default function DashboardPage() {
 
     // Cleanup timeout on unmount
     return () => clearTimeout(timeout)
-  }, [router, loading])
+  }, [router])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -91,7 +91,7 @@ export default function DashboardPage() {
           <p style={{ lineHeight: '1.6', marginBottom: '25px' }}>{error}</p>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a 
-              href="/_diagnostics"
+              href="/diagnostics"
               style={{
                 padding: '12px 24px',
                 backgroundColor: '#C8A64D',
