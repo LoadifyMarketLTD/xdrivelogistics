@@ -78,6 +78,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initializeAuth()
 
     // Listen for auth changes
+    // Note: We don't set loading=true here to avoid showing loading screens
+    // during normal auth state changes. The profile fetch is fast and pages
+    // handle the transition gracefully with their own loading states.
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
