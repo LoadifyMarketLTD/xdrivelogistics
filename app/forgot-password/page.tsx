@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
         body {
           margin: 0;
           font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-          background: linear-gradient(135deg, #0F1F2E 0%, #152B3C 50%, #1A3347 100%);
+          background: #f9fafb;
           min-height: 100vh;
           display: flex;
           align-items: center;
@@ -62,18 +62,17 @@ export default function ForgotPasswordPage() {
         }
 
         .login-card {
-          background: rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 20px;
+          background: #ffffff;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
           padding: 48px 40px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         .login-title {
           font-size: 28px;
           font-weight: 700;
-          color: #FFFFFF;
+          color: #1f2937;
           margin: 0 0 16px 0;
           text-align: center;
         }
@@ -83,7 +82,7 @@ export default function ForgotPasswordPage() {
         }
 
         .subtitle {
-          color: rgba(255, 255, 255, 0.7);
+          color: #6b7280;
           font-size: 14px;
           text-align: center;
           margin-bottom: 32px;
@@ -96,7 +95,7 @@ export default function ForgotPasswordPage() {
 
         .form-label {
           display: block;
-          color: rgba(255, 255, 255, 0.9);
+          color: #374151;
           font-size: 14px;
           font-weight: 500;
           margin-bottom: 8px;
@@ -105,10 +104,10 @@ export default function ForgotPasswordPage() {
         .form-input {
           width: 100%;
           padding: 12px 16px;
-          background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.15);
+          background: #ffffff;
+          border: 1px solid #d1d5db;
           border-radius: 8px;
-          color: #FFFFFF;
+          color: #1f2937;
           font-size: 15px;
           transition: all 0.3s ease;
         }
@@ -116,20 +115,19 @@ export default function ForgotPasswordPage() {
         .form-input:focus {
           outline: none;
           border-color: #C8A64D;
-          background: rgba(255, 255, 255, 0.12);
         }
 
         .form-input::placeholder {
-          color: rgba(255, 255, 255, 0.4);
+          color: #9ca3af;
         }
 
         .login-btn {
           width: 100%;
           padding: 14px;
-          background: linear-gradient(135deg, #C8A64D 0%, #B39543 100%);
+          background: #C8A64D;
           border: none;
           border-radius: 8px;
-          color: #0F1F2E;
+          color: #ffffff;
           font-size: 16px;
           font-weight: 600;
           cursor: pointer;
@@ -138,35 +136,33 @@ export default function ForgotPasswordPage() {
         }
 
         .login-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(200, 166, 77, 0.3);
+          background: #B39543;
         }
 
         .login-btn:disabled {
           opacity: 0.6;
           cursor: not-allowed;
-          transform: none;
         }
 
         .error-message {
-          color: #ff6b6b;
+          color: #dc2626;
           font-size: 14px;
           margin-top: 16px;
           text-align: center;
           padding: 12px;
-          background: rgba(255, 107, 107, 0.1);
-          border: 1px solid rgba(255, 107, 107, 0.3);
+          background: #fef2f2;
+          border: 1px solid #fecaca;
           border-radius: 8px;
         }
 
         .success-message {
-          color: #4ade80;
+          color: #16a34a;
           font-size: 14px;
           margin-top: 16px;
           text-align: center;
           padding: 12px;
-          background: rgba(74, 222, 128, 0.1);
-          border: 1px solid rgba(74, 222, 128, 0.3);
+          background: #f0fdf4;
+          border: 1px solid #bbf7d0;
           border-radius: 8px;
         }
 
@@ -181,15 +177,15 @@ export default function ForgotPasswordPage() {
         }
 
         .back-link:hover {
-          color: #D4B866;
+          color: #B39543;
         }
 
         .support-text {
           text-align: center;
           margin-top: 32px;
           padding-top: 24px;
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
-          color: rgba(255, 255, 255, 0.7);
+          border-top: 1px solid #e5e7eb;
+          color: #6b7280;
           font-size: 13px;
           line-height: 1.6;
         }
@@ -201,7 +197,7 @@ export default function ForgotPasswordPage() {
         }
 
         .support-phone:hover {
-          color: #D4B866;
+          color: #B39543;
         }
       `}</style>
 
