@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useAuth } from '@/lib/AuthContext'
-import { supabase } from '@/lib/supabaseClient'
 import { Job, JobBid } from '@/lib/types'
 import '@/styles/dashboard.css'
 
@@ -20,6 +20,7 @@ interface BidWithJob extends JobBid {
 export default function DashboardPage() {
   const router = useRouter()
   const { user, companyId, loading: authLoading, signOut } = useAuth()
+  const supabase = useMemo(() => createClientComponentClient(), [])
   
   const [postedJobs, setPostedJobs] = useState<JobWithBidCount[]>([])
   const [assignedJobs, setAssignedJobs] = useState<Job[]>([])
