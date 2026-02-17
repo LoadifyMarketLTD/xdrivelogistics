@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
 import { Job, JobBid, Company } from '@/lib/types'
+import PlatformNav from '@/components/PlatformNav'
 import '@/styles/dashboard.css'
 
 export const dynamic = 'force-dynamic'
@@ -191,15 +192,7 @@ export default function JobDetailPage() {
   if (error || !job) {
     return (
       <div className="dashboard-content">
-        <header className="platform-header">
-          <div className="container">
-            <div className="platform-nav">
-              <div className="platform-brand">
-                <span className="platform-brand-accent">XDrive</span> Marketplace
-              </div>
-            </div>
-          </div>
-        </header>
+        <PlatformNav />
         <main className="container">
           <div style={{
             backgroundColor: 'rgba(255, 107, 107, 0.1)',
@@ -222,22 +215,7 @@ export default function JobDetailPage() {
 
   return (
     <div className="dashboard-content">
-      <header className="platform-header">
-        <div className="container">
-          <div className="platform-nav">
-            <div className="platform-brand">
-              <span className="platform-brand-accent">XDrive</span> Marketplace
-            </div>
-            <nav>
-              <ul className="platform-links">
-                <li><a href="/dashboard">Dashboard</a></li>
-                <li><a href="/marketplace">Marketplace</a></li>
-                <li><a href="/jobs/new">Post Job</a></li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <PlatformNav />
 
       <main className="container">
         <div style={{ marginTop: '24px', marginBottom: '16px' }}>

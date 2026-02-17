@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useAuth } from '@/lib/AuthContext'
 import { Job, JobBid } from '@/lib/types'
+import PlatformNav from '@/components/PlatformNav'
 import '@/styles/dashboard.css'
 
 export const dynamic = 'force-dynamic'
@@ -133,23 +134,7 @@ export default function DashboardPage() {
 
   return (
     <div className="dashboard-content">
-      <header className="platform-header">
-        <div className="container">
-          <div className="platform-nav">
-            <div className="platform-brand">
-              <span className="platform-brand-accent">XDrive</span> Dashboard
-            </div>
-            <nav>
-              <ul className="platform-links">
-                <li><a href="/dashboard" style={{ color: 'var(--gold-premium)' }}>Dashboard</a></li>
-                <li><a href="/marketplace">Marketplace</a></li>
-                <li><a href="/jobs/new">Post Job</a></li>
-                <li><a href="#" onClick={handleLogout} className="logout">Logout</a></li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <PlatformNav />
 
       <main className="container">
         

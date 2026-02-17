@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
+import PlatformNav from '@/components/PlatformNav'
 import '@/styles/dashboard.css'
 
 export const dynamic = 'force-dynamic'
@@ -164,29 +165,7 @@ export default function CompanySettingsPage() {
 
   return (
     <div className="dashboard-content">
-      <header className="platform-header">
-        <div className="container">
-          <div className="platform-nav">
-            <div className="platform-brand">
-              <span className="platform-brand-accent">XDrive</span> Company Settings
-            </div>
-            <button 
-              onClick={() => router.push('/dashboard')}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                borderRadius: '6px',
-                color: '#fff',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
-            >
-              ← Back to Dashboard
-            </button>
-          </div>
-        </div>
-      </header>
+      <PlatformNav />
 
       <main className="container" style={{ padding: '40px 20px', maxWidth: '900px', margin: '0 auto' }}>
         <div style={{
