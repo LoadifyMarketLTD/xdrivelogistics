@@ -29,6 +29,7 @@ export default function MyFleetPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
+  const [refetchTrigger, setRefetchTrigger] = useState(0)
   
   useEffect(() => {
     if (!companyId) return
@@ -62,20 +63,28 @@ export default function MyFleetPage() {
       } catch (err: any) {
         console.error('Error:', err)
       } finally {
+<<<<<<< copilot/complete-system-audit-verification
+        setLoading(false)
+=======
         if (mounted) {
           setLoading(false)
         }
         if (timeoutId) clearTimeout(timeoutId)
+>>>>>>> main
       }
     }
     
     fetchVehicles()
+<<<<<<< copilot/complete-system-audit-verification
+  }, [companyId, refetchTrigger])
+=======
     
     return () => {
       mounted = false
       if (timeoutId) clearTimeout(timeoutId)
     }
   }, [companyId])
+>>>>>>> main
   
   const handleSave = async (data: any) => {
     if (!companyId) return
@@ -85,6 +94,9 @@ export default function MyFleetPage() {
       } else {
         await supabase.from('vehicles').insert([{ ...data, company_id: companyId }])
       }
+<<<<<<< copilot/complete-system-audit-verification
+      setRefetchTrigger(prev => prev + 1)
+=======
       
       // Re-fetch vehicles after save
       const { data: freshData, error } = await supabase
@@ -96,6 +108,7 @@ export default function MyFleetPage() {
       if (error) throw error
       setVehicles(freshData || [])
       
+>>>>>>> main
       setShowForm(false)
       setEditingVehicle(null)
     } catch (err: any) {
@@ -107,6 +120,9 @@ export default function MyFleetPage() {
   const handleDelete = async (id: string) => {
     try {
       await supabase.from('vehicles').delete().eq('id', id)
+<<<<<<< copilot/complete-system-audit-verification
+      setRefetchTrigger(prev => prev + 1)
+=======
       
       // Re-fetch vehicles after delete
       if (companyId) {
@@ -119,6 +135,7 @@ export default function MyFleetPage() {
         if (error) throw error
         setVehicles(data || [])
       }
+>>>>>>> main
     } catch (err: any) {
       alert('Error: ' + err.message)
     }

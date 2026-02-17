@@ -21,6 +21,13 @@ export default function FreightVisionPage() {
     
     const fetch = async () => {
       try {
+<<<<<<< copilot/complete-system-audit-verification
+        const { data: jobs, error: jobsError } = await supabase.from('jobs').select('*').eq('posted_by_company_id', companyId)
+        if (jobsError) throw jobsError
+        
+        const { data: bids, error: bidsError } = await supabase.from('job_bids').select('*').eq('bidder_company_id', companyId)
+        if (bidsError) throw bidsError
+=======
         setLoading(true)
         
         // Set timeout to ensure loading always resolves
@@ -33,6 +40,7 @@ export default function FreightVisionPage() {
         
         const { data: jobs } = await supabase.from('jobs').select('*').eq('posted_by_company_id', companyId)
         const { data: bids } = await supabase.from('job_bids').select('*').eq('bidder_company_id', companyId)
+>>>>>>> main
         
         if (!mounted) return
         
@@ -43,12 +51,18 @@ export default function FreightVisionPage() {
           activeBids: bids?.filter(b => b.status === 'submitted').length || 0
         })
       } catch (e) {
+<<<<<<< copilot/complete-system-audit-verification
+        console.error('Error fetching freight vision stats:', e)
+      } finally { 
+        setLoading(false) 
+=======
         console.error('Error fetching freight vision data:', e)
       } finally {
         if (mounted) {
           setLoading(false)
         }
         if (timeoutId) clearTimeout(timeoutId)
+>>>>>>> main
       }
     }
     fetch()

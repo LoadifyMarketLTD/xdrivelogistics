@@ -86,7 +86,18 @@ export default function LoadsPage() {
         setLoading(false)
       }
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchLoads()
+    
+    // Set up polling for real-time updates (every 30s)
+    const interval = setInterval(() => {
+      fetchLoads()
+    }, 30000)
+    
+    return () => clearInterval(interval)
+  }, [fetchLoads, companyId])
 
   useEffect(() => {
     mountedRef.current = true
