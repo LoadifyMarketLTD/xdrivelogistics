@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { Job, Company } from '@/lib/types'
 import PlatformNav from '@/components/PlatformNav'
 import FilterPanel, { JobFilters } from '@/components/marketplace/FilterPanel'
+import StatusBadge from '@/components/StatusBadge'
 import '@/styles/dashboard.css'
 
 export const dynamic = 'force-dynamic'
@@ -278,13 +279,7 @@ export default function MarketplacePage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                      <span className={`status-badge ${job.status}`}>
-                        {job.status === 'open' ? '🟢 Open' : 
-                         job.status === 'assigned' ? '✅ Assigned' :
-                         job.status === 'in-transit' ? '🚚 In Transit' :
-                         job.status === 'completed' ? '✔️ Completed' :
-                         job.status}
-                      </span>
+                      <StatusBadge status={job.status} size="medium" />
                       <span style={{ fontSize: '13px', color: '#94a3b8' }}>
                         Posted by {job.poster_company?.name || 'Unknown'}
                       </span>

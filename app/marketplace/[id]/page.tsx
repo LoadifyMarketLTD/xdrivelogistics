@@ -6,6 +6,8 @@ import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
 import { Job, JobBid, Company } from '@/lib/types'
 import PlatformNav from '@/components/PlatformNav'
+import JobTimeline from '@/components/marketplace/JobTimeline'
+import StatusBadge from '@/components/StatusBadge'
 import '@/styles/dashboard.css'
 
 export const dynamic = 'force-dynamic'
@@ -224,86 +226,141 @@ export default function JobDetailPage() {
           </a>
         </div>
 
-        <div style={{
-          backgroundColor: '#132433',
-          borderRadius: '12px',
-          padding: '32px',
-          border: '1px solid rgba(255,255,255,0.08)',
-          marginBottom: '24px'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-            <div>
+        {/* Two-column layout for job details and timeline */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: '24px', marginBottom: '24px' }}>
+          {/* Main job details */}
+          <div style={{
+            backgroundColor: '#132433',
+            borderRadius: '12px',
+            padding: '32px',
+            border: '1px solid rgba(255,255,255,0.08)'
+          }}>
+            <div style={{ marginBottom: '24px' }}>
               <h1 style={{ fontSize: '28px', marginBottom: '12px', color: '#fff' }}>
                 {job.pickup_location} → {job.delivery_location}
               </h1>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span className={`status-badge ${job.status}`}>
-                  {job.status}
-                </span>
+                <StatusBadge status={job.status} size="large" />
                 <span style={{ fontSize: '14px', color: '#94a3b8' }}>
                   Posted by {job.poster_company?.name || 'Unknown'}
                 </span>
               </div>
             </div>
-          </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '20px',
-            padding: '20px',
-            backgroundColor: 'rgba(255,255,255,0.02)',
-            borderRadius: '8px',
-            marginBottom: '24px'
-          }}>
-            {job.vehicle_type && (
-              <div>
-                <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Vehicle Type</div>
-                <div style={{ fontSize: '16px', color: '#fff' }}>🚚 {job.vehicle_type}</div>
-              </div>
-            )}
-            {job.pallets && (
-              <div>
-                <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Pallets</div>
-                <div style={{ fontSize: '16px', color: '#fff' }}>📦 {job.pallets}</div>
-              </div>
-            )}
-            {job.weight_kg && (
-              <div>
-                <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Weight</div>
-                <div style={{ fontSize: '16px', color: '#fff' }}>⚖️ {job.weight_kg} kg</div>
-              </div>
-            )}
-            {job.budget && (
-              <div>
-                <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Budget</div>
-                <div style={{ fontSize: '16px', color: '#fff' }}>💰 £{job.budget.toFixed(2)}</div>
-              </div>
-            )}
-          </div>
-
-          {job.load_details && (
-            <div style={{ marginTop: '20px' }}>
-              <h3 style={{ fontSize: '16px', marginBottom: '8px', color: '#fff' }}>Load Details</h3>
-              <p style={{ fontSize: '14px', color: '#94a3b8', lineHeight: '1.6' }}>
-                {job.load_details}
-              </p>
-            </div>
-          )}
-
-          {job.assigned_company_id && (
             <div style={{
-              marginTop: '20px',
-              padding: '16px',
-              backgroundColor: 'rgba(47,143,91,0.1)',
-              border: '1px solid rgba(47,143,91,0.3)',
-              borderRadius: '8px'
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '20px',
+              padding: '20px',
+              backgroundColor: 'rgba(255,255,255,0.02)',
+              borderRadius: '8px',
+              marginBottom: '24px'
             }}>
-              <div style={{ color: 'var(--success-green)', fontWeight: '600' }}>
-                ✅ Job Assigned
-              </div>
+              {job.vehicle_type && (
+                <div>
+                  <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Vehicle Type</div>
+                  <div style={{ fontSize: '16px', color: '#fff' }}>🚚 {job.vehicle_type}</div>
+                </div>
+              )}
+              {job.pallets && (
+                <div>
+                  <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Pallets</div>
+                  <div style={{ fontSize: '16px', color: '#fff' }}>📦 {job.pallets}</div>
+                </div>
+              )}
+              {job.weight_kg && (
+                <div>
+                  <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Weight</div>
+                  <div style={{ fontSize: '16px', color: '#fff' }}>⚖️ {job.weight_kg} kg</div>
+                </div>
+              )}
+              {job.budget && (
+                <div>
+                  <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Budget</div>
+                  <div style={{ fontSize: '16px', color: '#fff' }}>💰 £{job.budget.toFixed(2)}</div>
+                </div>
+              )}
             </div>
-          )}
+
+            {(job.pickup_datetime || job.delivery_datetime) && (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: '16px',
+                padding: '20px',
+                backgroundColor: 'rgba(255,255,255,0.02)',
+                borderRadius: '8px',
+                marginBottom: '24px'
+              }}>
+                {job.pickup_datetime && (
+                  <div>
+                    <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Pickup Date</div>
+                    <div style={{ fontSize: '16px', color: '#fff' }}>
+                      📅 {new Date(job.pickup_datetime).toLocaleDateString('en-GB', {
+                        weekday: 'short',
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                      })}
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#94a3b8', marginTop: '4px' }}>
+                      ⏰ {new Date(job.pickup_datetime).toLocaleTimeString('en-GB', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </div>
+                  </div>
+                )}
+                {job.delivery_datetime && (
+                  <div>
+                    <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Delivery Date</div>
+                    <div style={{ fontSize: '16px', color: '#fff' }}>
+                      📅 {new Date(job.delivery_datetime).toLocaleDateString('en-GB', {
+                        weekday: 'short',
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                      })}
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#94a3b8', marginTop: '4px' }}>
+                      ⏰ {new Date(job.delivery_datetime).toLocaleTimeString('en-GB', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {job.load_details && (
+              <div style={{ marginTop: '20px' }}>
+                <h3 style={{ fontSize: '16px', marginBottom: '8px', color: '#fff' }}>Load Details</h3>
+                <p style={{ fontSize: '14px', color: '#94a3b8', lineHeight: '1.6' }}>
+                  {job.load_details}
+                </p>
+              </div>
+            )}
+
+            {job.assigned_company_id && (
+              <div style={{
+                marginTop: '20px',
+                padding: '16px',
+                backgroundColor: 'rgba(47,143,91,0.1)',
+                border: '1px solid rgba(47,143,91,0.3)',
+                borderRadius: '8px'
+              }}>
+                <div style={{ color: 'var(--success-green)', fontWeight: '600' }}>
+                  ✅ Job Assigned
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Timeline sidebar */}
+          <div>
+            <JobTimeline job={job} />
+          </div>
         </div>
 
         {!isPostedByMe && job.status === 'open' && !myBid && (
