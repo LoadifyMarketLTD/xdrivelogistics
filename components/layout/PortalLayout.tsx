@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
+import { useEffect, useState } from 'react'
 
 interface MenuItem {
   label: string
@@ -25,12 +26,52 @@ const menuItems: MenuItem[] = [
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, companyId } = useAuth()
+  const [newLoadsCount, setNewLoadsCount] = useState(0)
+  const [acceptedBidsCount, setAcceptedBidsCount] = useState(0)
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push('/login')
   }
+
+  useEffect(() => {
+    if (!companyId) return
+    
+    const fetchNotifications = async () => {
+      try {
+        // Get new loads count (posted in last 24 hours)
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+        const { data: newLoads } = await supabase
+          .from('jobs')
+          .select('id')
+          .eq('status', 'open')
+          .gte('created_at', twentyFourHoursAgo)
+        
+        setNewLoadsCount(newLoads?.length || 0)
+        
+        // Get accepted bids count
+        const { data: acceptedBids } = await supabase
+          .from('job_bids')
+          .select('id')
+          .eq('bidder_company_id', companyId)
+          .eq('status', 'accepted')
+        
+        setAcceptedBidsCount(acceptedBids?.length || 0)
+      } catch (err) {
+        console.error('Error fetching notifications:', err)
+      }
+    }
+    
+    fetchNotifications()
+    
+    // Refresh notifications every 60 seconds
+    const interval = setInterval(fetchNotifications, 60000)
+    
+    return () => clearInterval(interval)
+  }, [companyId])
+
+  const totalNotifications = newLoadsCount + acceptedBidsCount
 
   return (
     <div style={{
@@ -198,12 +239,40 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             </button>
           </div>
 
-          {/* Right side - User info and actions */}
+          {/* Right side - Notifications, User info and actions */}
           <div style={{
             display: 'flex',
             gap: '16px',
             alignItems: 'center',
           }}>
+            {/* Notifications */}
+            {totalNotifications > 0 && (
+              <div style={{
+                position: 'relative',
+                cursor: 'pointer',
+              }}
+              onClick={() => router.push('/loads')}
+              title={`${newLoadsCount} new loads, ${acceptedBidsCount} accepted bids`}
+              >
+                <span style={{ fontSize: '20px' }}>🔔</span>
+                <span style={{
+                  position: 'absolute',
+                  top: '-4px',
+                  right: '-8px',
+                  background: '#ef4444',
+                  color: '#ffffff',
+                  fontSize: '10px',
+                  fontWeight: '700',
+                  padding: '2px 6px',
+                  borderRadius: '10px',
+                  minWidth: '18px',
+                  textAlign: 'center',
+                }}>
+                  {totalNotifications}
+                </span>
+              </div>
+            )}
+
             <div style={{
               fontSize: '13px',
               color: '#6b7280',
