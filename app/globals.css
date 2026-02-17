@@ -2,108 +2,249 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Enterprise Global Styles */
+/* ============================================
+   LIGHT PREMIUM DESIGN SYSTEM
+   ============================================ */
+
+:root {
+  /* Light Premium background */
+  --bg: #F5F7FB;              /* soft light grey-blue */
+  --surface: #FFFFFF;         /* card surface */
+  --surface-2: #F9FAFC;       /* subtle alt surface */
+  --border: rgba(15, 23, 42, 0.12); /* slate border */
+  --text: #0F172A;            /* slate-900 */
+  --muted: rgba(15, 23, 42, 0.65);
+  --muted-2: rgba(15, 23, 42, 0.45);
+
+  /* Brand accents */
+  --brand: #1B63C6;           /* premium blue */
+  --brand-2: #0F4FAE;
+  --success: #16A34A;
+  --warning: #F59E0B;
+  --error: #DC2626;
+
+  /* Shadows (soft) */
+  --shadow-sm: 0 6px 18px rgba(2, 6, 23, 0.08);
+  --shadow-md: 0 16px 36px rgba(2, 6, 23, 0.12);
+
+  /* Radius */
+  --r-lg: 16px;
+  --r-md: 12px;
+}
+
 body {
-  background: #F4F6F8;
+  background: var(--bg);
+  color: var(--text);
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 1.5;
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  color: #111827;
 }
 
 * {
   box-sizing: border-box;
 }
 
-/* Enterprise Card Styles */
-.card,
-.enterprise-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  box-shadow: none;
-  padding: 16px;
+/* ============================================
+   LAYOUT
+   ============================================ */
+
+.lp-shell { 
+  min-height: 100vh; 
+  background: var(--bg); 
 }
 
-/* Remove heavy effects globally */
-.blur,
-.shadow-xl,
-.rounded-2xl {
-  backdrop-filter: none !important;
-  box-shadow: none !important;
-  border-radius: 4px !important;
+.lp-content { 
+  padding: 20px; 
 }
 
-/* Compact spacing utilities */
-.py-16 {
-  padding-top: 16px !important;
-  padding-bottom: 16px !important;
-}
-
-.py-20 {
-  padding-top: 20px !important;
-  padding-bottom: 20px !important;
-}
-
-.gap-12 {
-  gap: 12px !important;
-}
-
-/* Remove gradients */
-.gradient,
-[class*="gradient"] {
-  background: #ffffff !important;
-  background-image: none !important;
-}
-
-/* Portal Layout Utilities */
 .portal-container {
-  max-width: 1280px; /* max-w-7xl */
+  max-width: 1280px;
   margin-left: auto;
   margin-right: auto;
-  padding-left: 1.5rem; /* px-6 */
+  padding-left: 1.5rem;
   padding-right: 1.5rem;
-  padding-top: 2rem; /* py-8 */
+  padding-top: 2rem;
   padding-bottom: 2rem;
 }
 
 .portal-section {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; /* space-y-6 */
+  gap: 1.5rem;
 }
 
-/* Premium Card Styles */
+/* ============================================
+   CARDS
+   ============================================ */
+
+.lp-card,
 .premium-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
   padding: 1.5rem;
 }
 
-.premium-card-header {
+.lp-card-header,
+.premium-card-header { 
+  padding: 16px 18px; 
+  border-bottom: 1px solid var(--border);
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #f3f4f6;
+}
+
+.lp-card-body { 
+  padding: 16px 18px; 
 }
 
 .premium-card-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--text);
   margin: 0;
 }
 
 .premium-card-subtitle {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--muted);
   margin-top: 0.25rem;
 }
 
-/* Grid Layouts */
+/* ============================================
+   TABLES
+   ============================================ */
+
+.lp-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.lp-table th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 14px;
+}
+
+.lp-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.lp-table tr:last-child td { 
+  border-bottom: 0; 
+}
+
+.lp-table tr:hover td { 
+  background: rgba(27, 99, 198, 0.04); 
+}
+
+/* ============================================
+   INPUTS — MUST BE READABLE
+   ============================================ */
+
+.lp-input,
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
+  background: #FFFFFF;
+  color: var(--text);
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  border-radius: var(--r-md);
+  padding: 10px 12px;
+  outline: none;
+  caret-color: var(--text);
+  font-size: 14px;
+}
+
+.lp-input::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: rgba(15, 23, 42, 0.45);
+}
+
+.lp-input:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: rgba(27, 99, 198, 0.55);
+  box-shadow: 0 0 0 4px rgba(27, 99, 198, 0.14);
+}
+
+/* Ensure labels are readable */
+label {
+  color: var(--text);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lp-btn:hover {
+  background: var(--surface-2);
+}
+
+.lp-btn-primary {
+  background: var(--brand);
+  color: #fff;
+  border-color: rgba(27, 99, 198, 0.4);
+}
+
+.lp-btn-primary:hover { 
+  background: var(--brand-2); 
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+
+.lp-title { 
+  font-size: 18px; 
+  font-weight: 700; 
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.lp-subtitle { 
+  font-size: 13px; 
+  color: var(--muted); 
+}
+
+/* ============================================
+   GRID LAYOUTS
+   ============================================ */
+
 .portal-grid-2 {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
@@ -150,4 +291,35 @@ body {
   .portal-grid-4 {
     grid-template-columns: repeat(4, 1fr);
   }
+}
+
+/* ============================================
+   LEGACY COMPATIBILITY
+   ============================================ */
+
+.card,
+.enterprise-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+  padding: 16px;
+}
+
+/* Remove heavy effects globally */
+.blur,
+.shadow-xl {
+  backdrop-filter: none !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.rounded-2xl {
+  border-radius: var(--r-lg) !important;
+}
+
+/* Remove gradients */
+.gradient,
+[class*="gradient"] {
+  background: var(--surface) !important;
+  background-image: none !important;
 }
