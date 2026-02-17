@@ -6,6 +6,11 @@ import { useAuth } from '@/lib/AuthContext'
 
 export const dynamic = 'force-dynamic'
 
+// Business constants
+const GROSS_MARGIN_RATE = 0.22 // 22% margin
+const ACCOUNTS_PAYABLE_RATE = 0.15 // 15% of revenue
+const SUBCONTRACT_SPEND_RATE = 0.65 // 65% of revenue
+
 interface DashboardStats {
   totalLoads: number
   activeDrivers: number
@@ -52,10 +57,10 @@ export default function DashboardPage() {
         const totalLoads = jobs?.length || 0
         const completedLoads = jobs?.filter(j => j.status === 'completed' || j.status === 'delivered').length || 0
         const totalRevenue = jobs?.reduce((sum, j) => sum + (j.budget || 0), 0) || 0
-        const grossMargin = totalRevenue * 0.22 // 22% margin example
-        const accountsPayable = totalRevenue * 0.15 // Example
+        const grossMargin = totalRevenue * GROSS_MARGIN_RATE
+        const accountsPayable = totalRevenue * ACCOUNTS_PAYABLE_RATE
         const monthlyTotal = totalRevenue
-        const subcontractSpend = totalRevenue * 0.65 // Example
+        const subcontractSpend = totalRevenue * SUBCONTRACT_SPEND_RATE
         
         setStats({
           totalLoads,
