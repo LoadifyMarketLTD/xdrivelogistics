@@ -1,30 +1,49 @@
 'use client'
 
-import LeftIconRail from './LeftIconRail'
-import TopNavTabs from './TopNavTabs'
-import TopActions from './TopActions'
-import '@/styles/portal.css'
+import EnterpriseSidebar from './EnterpriseSidebar'
+import EnterpriseHeader from './EnterpriseHeader'
 
 export default function PortalShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="portal-shell">
-      <LeftIconRail />
+    <div style={{
+      display: 'flex',
+      minHeight: '100vh',
+      background: '#f3f4f6',
+    }}>
+      {/* Fixed Sidebar */}
+      <EnterpriseSidebar />
       
-      <div className="portal-main">
-        <div className="portal-top-nav">
-          <div className="portal-top-nav-container">
-            <div className="portal-top-actions">
-              <div className="portal-brand">XDrive Logistics</div>
-              <TopActions />
-            </div>
-            <TopNavTabs />
-          </div>
-        </div>
+      {/* Main Content Area */}
+      <div style={{
+        flex: 1,
+        marginLeft: '220px',
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+      }}
+      className="portal-main-content"
+      >
+        {/* Compact Header */}
+        <EnterpriseHeader />
         
-        <div className="portal-content">
+        {/* Scrollable Content */}
+        <div style={{
+          flex: 1,
+          padding: '16px',
+          overflowY: 'auto',
+        }}>
           {children}
         </div>
       </div>
+
+      {/* Mobile responsive styles */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .portal-main-content {
+            margin-left: 70px !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }
