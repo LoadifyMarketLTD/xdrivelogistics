@@ -22,9 +22,11 @@ interface Load {
   posted_by_company_id: string
   created_at: string
   distance_miles?: number | null
+  load_type?: string | null
 }
 
 type SortBy = 'date' | 'distance' | 'price'
+type LoadTab = 'all-live' | 'on-demand' | 'regular' | 'daily-hire'
 
 export default function LoadsPage() {
   const router = useRouter()
@@ -37,10 +39,14 @@ export default function LoadsPage() {
   const [showBidModal, setShowBidModal] = useState(false)
   const [selectedLoad, setSelectedLoad] = useState<Load | null>(null)
   
+  // Tab state
+  const [activeTab, setActiveTab] = useState<LoadTab>('all-live')
+  
   // Filter states
   const [statusFilter, setStatusFilter] = useState('all')
   const [fromPostcode, setFromPostcode] = useState('')
   const [toPostcode, setToPostcode] = useState('')
+  const [radius, setRadius] = useState('')
   const [vehicleSize, setVehicleSize] = useState('')
   const [dateFilter, setDateFilter] = useState('')
   const [sortBy, setSortBy] = useState<SortBy>('date')
@@ -84,6 +90,21 @@ export default function LoadsPage() {
 
   const filteredAndSortedLoads = useMemo(() => {
     let filtered = loads.filter(load => {
+      // Tab filter
+      if (activeTab === 'all-live') {
+        // Show all open loads
+        if (load.status !== 'open') return false
+      } else if (activeTab === 'on-demand') {
+        // Show on-demand loads (if load_type field exists)
+        if (load.status !== 'open' || (load.load_type && load.load_type !== 'on-demand')) return false
+      } else if (activeTab === 'regular') {
+        // Show regular loads
+        if (load.status !== 'open' || (load.load_type && load.load_type !== 'regular')) return false
+      } else if (activeTab === 'daily-hire') {
+        // Show daily hire loads
+        if (load.status !== 'open' || (load.load_type && load.load_type !== 'daily-hire')) return false
+      }
+      
       // Status filter
       if (statusFilter !== 'all') {
         if (statusFilter === 'live' && load.status !== 'open') return false
@@ -129,7 +150,7 @@ export default function LoadsPage() {
     })
     
     return filtered
-  }, [loads, statusFilter, fromPostcode, toPostcode, vehicleSize, dateFilter, sortBy])
+  }, [loads, activeTab, statusFilter, fromPostcode, toPostcode, vehicleSize, dateFilter, sortBy])
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, { bg: string; color: string; label: string }> = {
@@ -217,8 +238,68 @@ export default function LoadsPage() {
 
   if (loading && loads.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
-        Loading loads...
+      <div>
+        {/* Loading Skeleton */}
+        <div style={{
+          background: '#ffffff',
+          border: '1px solid #e5e7eb',
+          padding: '16px',
+          marginBottom: '20px',
+        }}>
+          <div style={{
+            height: '40px',
+            background: '#f3f4f6',
+            marginBottom: '12px',
+            animation: 'pulse 1.5s ease-in-out infinite',
+          }} />
+          <div style={{
+            height: '20px',
+            background: '#f3f4f6',
+            width: '60%',
+            animation: 'pulse 1.5s ease-in-out infinite',
+          }} />
+        </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '280px 1fr',
+          gap: '20px',
+        }}>
+          <div style={{
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
+            padding: '16px',
+            height: '400px',
+          }}>
+            <div style={{
+              height: '20px',
+              background: '#f3f4f6',
+              marginBottom: '12px',
+              animation: 'pulse 1.5s ease-in-out infinite',
+            }} />
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} style={{
+                height: '60px',
+                background: '#f3f4f6',
+                marginBottom: '12px',
+                animation: 'pulse 1.5s ease-in-out infinite',
+              }} />
+            ))}
+          </div>
+          <div style={{
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
+            padding: '16px',
+          }}>
+            {[1, 2, 3].map(i => (
+              <div key={i} style={{
+                height: '80px',
+                background: '#f3f4f6',
+                marginBottom: '12px',
+                animation: 'pulse 1.5s ease-in-out infinite',
+              }} />
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
@@ -239,421 +320,499 @@ export default function LoadsPage() {
 
   return (
     <>
-      <div style={{ display: 'flex', gap: '20px', height: 'calc(100vh - 96px)' }}>
-        {/* LEFT COLUMN - Filter Panel */}
+      <div>
+        {/* CX-Style Tabs Row */}
         <div style={{
-          width: '280px',
           background: '#ffffff',
           border: '1px solid #e5e7eb',
-          padding: '16px',
-          height: 'fit-content',
+          borderBottom: 'none',
+          display: 'flex',
+          gap: '0',
+          marginBottom: '0',
         }}>
-          <h3 style={{
-            fontSize: '14px',
-            fontWeight: '700',
-            color: '#1f2937',
-            marginBottom: '16px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}>
-            Search Filters
-          </h3>
-
-          {/* Status Filter */}
-          <div style={{ marginBottom: '14px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '12px',
-              fontWeight: '600',
-              color: '#374151',
-              marginBottom: '6px',
-            }}>
-              Status
-            </label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+          {[
+            { id: 'all-live' as LoadTab, label: 'All Live' },
+            { id: 'on-demand' as LoadTab, label: 'On Demand' },
+            { id: 'regular' as LoadTab, label: 'Regular Load' },
+            { id: 'daily-hire' as LoadTab, label: 'Daily Hire' },
+          ].map(tab => (
+            <div
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
               style={{
-                width: '100%',
-                padding: '6px 8px',
-                border: '1px solid #d1d5db',
+                padding: '12px 24px',
+                cursor: 'pointer',
+                borderBottom: activeTab === tab.id ? '3px solid #d4af37' : '3px solid transparent',
+                background: activeTab === tab.id ? '#ffffff' : 'transparent',
+                color: activeTab === tab.id ? '#1f2937' : '#6b7280',
                 fontSize: '13px',
-                color: '#1f2937',
-              }}
-            >
-              <option value="all">All Loads</option>
-              <option value="live">Live</option>
-              <option value="allocated">Allocated</option>
-              <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-
-          {/* From Postcode */}
-          <div style={{ marginBottom: '14px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '12px',
-              fontWeight: '600',
-              color: '#374151',
-              marginBottom: '6px',
-            }}>
-              From Postcode
-            </label>
-            <input
-              type="text"
-              value={fromPostcode}
-              onChange={(e) => setFromPostcode(e.target.value)}
-              placeholder="e.g. M1"
-              style={{
-                width: '100%',
-                padding: '6px 8px',
-                border: '1px solid #d1d5db',
-                fontSize: '13px',
-                color: '#1f2937',
-              }}
-            />
-          </div>
-
-          {/* To Postcode */}
-          <div style={{ marginBottom: '14px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '12px',
-              fontWeight: '600',
-              color: '#374151',
-              marginBottom: '6px',
-            }}>
-              To Postcode
-            </label>
-            <input
-              type="text"
-              value={toPostcode}
-              onChange={(e) => setToPostcode(e.target.value)}
-              placeholder="e.g. B1"
-              style={{
-                width: '100%',
-                padding: '6px 8px',
-                border: '1px solid #d1d5db',
-                fontSize: '13px',
-                color: '#1f2937',
-              }}
-            />
-          </div>
-
-          {/* Vehicle Size */}
-          <div style={{ marginBottom: '14px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '12px',
-              fontWeight: '600',
-              color: '#374151',
-              marginBottom: '6px',
-            }}>
-              Vehicle Size
-            </label>
-            <select
-              value={vehicleSize}
-              onChange={(e) => setVehicleSize(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '6px 8px',
-                border: '1px solid #d1d5db',
-                fontSize: '13px',
-                color: '#1f2937',
-              }}
-            >
-              <option value="">All Vehicles</option>
-              <option value="Small Van">Small Van</option>
-              <option value="Medium Van">Medium Van</option>
-              <option value="Large Van">Large Van</option>
-              <option value="Luton Van">Luton Van</option>
-              <option value="7.5 Tonne">7.5 Tonne</option>
-              <option value="18 Tonne">18 Tonne</option>
-              <option value="Artic">Artic</option>
-            </select>
-          </div>
-
-          {/* Date Filter */}
-          <div style={{ marginBottom: '14px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '12px',
-              fontWeight: '600',
-              color: '#374151',
-              marginBottom: '6px',
-            }}>
-              Pickup Date
-            </label>
-            <input
-              type="date"
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '6px 8px',
-                border: '1px solid #d1d5db',
-                fontSize: '13px',
-                color: '#1f2937',
-              }}
-            />
-          </div>
-
-          {/* Sort By */}
-          <div style={{ marginBottom: '14px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '12px',
-              fontWeight: '600',
-              color: '#374151',
-              marginBottom: '6px',
-            }}>
-              Sort By
-            </label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortBy)}
-              style={{
-                width: '100%',
-                padding: '6px 8px',
-                border: '1px solid #d1d5db',
-                fontSize: '13px',
-                color: '#1f2937',
-              }}
-            >
-              <option value="date">Date (Newest)</option>
-              <option value="distance">Distance</option>
-              <option value="price">Price (Highest)</option>
-            </select>
-          </div>
-
-          {/* Clear Filters Button */}
-          <button
-            onClick={() => {
-              setStatusFilter('all')
-              setFromPostcode('')
-              setToPostcode('')
-              setVehicleSize('')
-              setDateFilter('')
-              setSortBy('date')
-            }}
-            style={{
-              width: '100%',
-              padding: '8px',
-              background: '#f3f4f6',
-              color: '#374151',
-              border: '1px solid #d1d5db',
-              fontSize: '12px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              marginTop: '8px',
-            }}
-          >
-            Clear Filters
-          </button>
-        </div>
-
-        {/* RIGHT COLUMN - Results List */}
-        <div style={{
-          flex: 1,
-          background: '#ffffff',
-          border: '1px solid #e5e7eb',
-          overflowY: 'auto',
-        }}>
-          {/* Header */}
-          <div style={{
-            padding: '12px 16px',
-            background: '#f9fafb',
-            borderBottom: '1px solid #e5e7eb',
-            position: 'sticky',
-            top: 0,
-            zIndex: 10,
-          }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}>
-              <h2 style={{
-                fontSize: '14px',
-                fontWeight: '700',
-                color: '#1f2937',
+                fontWeight: activeTab === tab.id ? '700' : '500',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px',
+                transition: 'all 0.15s',
+              }}
+              onMouseEnter={(e) => {
+                if (activeTab !== tab.id) {
+                  e.currentTarget.style.background = '#f9fafb'
+                  e.currentTarget.style.color = '#1f2937'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== tab.id) {
+                  e.currentTarget.style.background = 'transparent'
+                  e.currentTarget.style.color = '#6b7280'
+                }
+              }}
+            >
+              {tab.label}
+            </div>
+          ))}
+        </div>
+
+        {/* Main Content */}
+        <div style={{ display: 'flex', gap: '20px', height: 'calc(100vh - 156px)' }}>
+          {/* LEFT COLUMN - Filter Panel */}
+          <div style={{
+            width: '280px',
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
+            padding: '16px',
+            height: 'fit-content',
+          }}>
+            <h3 style={{
+              fontSize: '14px',
+              fontWeight: '700',
+              color: '#1f2937',
+              marginBottom: '16px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+            }}>
+              Search Filters
+            </h3>
+
+            {/* Status Filter */}
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '6px',
               }}>
-                Available Loads ({filteredAndSortedLoads.length})
-              </h2>
-              <button
-                onClick={fetchLoads}
+                Status
+              </label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
                 style={{
-                  padding: '4px 12px',
-                  background: '#ffffff',
-                  color: '#6b7280',
+                  width: '100%',
+                  padding: '6px 8px',
                   border: '1px solid #d1d5db',
-                  fontSize: '11px',
-                  cursor: 'pointer',
+                  fontSize: '13px',
+                  color: '#1f2937',
                 }}
               >
-                Refresh
-              </button>
+                <option value="all">All Loads</option>
+                <option value="live">Live</option>
+                <option value="allocated">Allocated</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
             </div>
+
+            {/* From Postcode */}
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '6px',
+              }}>
+                From Postcode
+              </label>
+              <input
+                type="text"
+                value={fromPostcode}
+                onChange={(e) => setFromPostcode(e.target.value)}
+                placeholder="e.g. M1"
+                style={{
+                  width: '100%',
+                  padding: '6px 8px',
+                  border: '1px solid #d1d5db',
+                  fontSize: '13px',
+                  color: '#1f2937',
+                }}
+              />
+            </div>
+
+            {/* Radius */}
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '6px',
+              }}>
+                Radius (miles)
+              </label>
+              <input
+                type="number"
+                value={radius}
+                onChange={(e) => setRadius(e.target.value)}
+                placeholder="e.g. 50"
+                style={{
+                  width: '100%',
+                  padding: '6px 8px',
+                  border: '1px solid #d1d5db',
+                  fontSize: '13px',
+                  color: '#1f2937',
+                }}
+              />
+            </div>
+
+            {/* To Postcode */}
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '6px',
+              }}>
+                To Postcode
+              </label>
+              <input
+                type="text"
+                value={toPostcode}
+                onChange={(e) => setToPostcode(e.target.value)}
+                placeholder="e.g. B1"
+                style={{
+                  width: '100%',
+                  padding: '6px 8px',
+                  border: '1px solid #d1d5db',
+                  fontSize: '13px',
+                  color: '#1f2937',
+                }}
+              />
+            </div>
+
+            {/* Vehicle Size */}
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '6px',
+              }}>
+                Vehicle Size
+              </label>
+              <select
+                value={vehicleSize}
+                onChange={(e) => setVehicleSize(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '6px 8px',
+                  border: '1px solid #d1d5db',
+                  fontSize: '13px',
+                  color: '#1f2937',
+                }}
+              >
+                <option value="">All Vehicles</option>
+                <option value="Small Van">Small Van</option>
+                <option value="Medium Van">Medium Van</option>
+                <option value="Large Van">Large Van</option>
+                <option value="Luton Van">Luton Van</option>
+                <option value="7.5 Tonne">7.5 Tonne</option>
+                <option value="18 Tonne">18 Tonne</option>
+                <option value="Artic">Artic</option>
+              </select>
+            </div>
+
+            {/* Date Filter */}
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '6px',
+              }}>
+                Pickup Date
+              </label>
+              <input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '6px 8px',
+                  border: '1px solid #d1d5db',
+                  fontSize: '13px',
+                  color: '#1f2937',
+                }}
+              />
+            </div>
+
+            {/* Sort By */}
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '6px',
+              }}>
+                Sort By
+              </label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortBy)}
+                style={{
+                  width: '100%',
+                  padding: '6px 8px',
+                  border: '1px solid #d1d5db',
+                  fontSize: '13px',
+                  color: '#1f2937',
+                }}
+              >
+                <option value="date">Date (Newest)</option>
+                <option value="distance">Distance</option>
+                <option value="price">Price (Highest)</option>
+              </select>
+            </div>
+
+            {/* Clear Filters Button */}
+            <button
+              onClick={() => {
+                setStatusFilter('all')
+                setFromPostcode('')
+                setToPostcode('')
+                setRadius('')
+                setVehicleSize('')
+                setDateFilter('')
+                setSortBy('date')
+              }}
+              style={{
+                width: '100%',
+                padding: '8px',
+                background: '#f3f4f6',
+                color: '#374151',
+                border: '1px solid #d1d5db',
+                fontSize: '12px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                marginTop: '8px',
+              }}
+            >
+              Clear Filters
+            </button>
           </div>
 
-          {/* Loads List */}
-          <div>
-            {filteredAndSortedLoads.length === 0 ? (
+          {/* RIGHT COLUMN - Results List */}
+          <div style={{
+            flex: 1,
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
+            overflowY: 'auto',
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: '12px 16px',
+              background: '#f9fafb',
+              borderBottom: '1px solid #e5e7eb',
+              position: 'sticky',
+              top: 0,
+              zIndex: 10,
+            }}>
               <div style={{
-                textAlign: 'center',
-                padding: '60px 20px',
-                color: '#9ca3af',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
               }}>
-                <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
-                <div style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>
-                  No loads found
-                </div>
-                <div style={{ fontSize: '13px' }}>
-                  {statusFilter !== 'all' || fromPostcode || toPostcode || vehicleSize || dateFilter
-                    ? 'Try adjusting your filters'
-                    : 'No available loads at the moment'}
-                </div>
+                <h2 style={{
+                  fontSize: '14px',
+                  fontWeight: '700',
+                  color: '#1f2937',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                }}>
+                  Available Loads ({filteredAndSortedLoads.length})
+                </h2>
+                <button
+                  onClick={fetchLoads}
+                  style={{
+                    padding: '4px 12px',
+                    background: '#ffffff',
+                    color: '#6b7280',
+                    border: '1px solid #d1d5db',
+                    fontSize: '11px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Refresh
+                </button>
               </div>
-            ) : (
-              filteredAndSortedLoads.map((load) => (
-                <div key={load.id}>
-                  {/* Load Row */}
-                  <div
-                    style={{
-                      padding: '12px 16px',
-                      borderBottom: '1px solid #e5e7eb',
-                      cursor: 'pointer',
-                      background: expandedLoadId === load.id ? '#f9fafb' : '#ffffff',
-                      transition: 'background 0.15s',
-                    }}
-                    onClick={() => setExpandedLoadId(expandedLoadId === load.id ? null : load.id)}
-                    onMouseEnter={(e) => {
-                      if (expandedLoadId !== load.id) {
-                        e.currentTarget.style.background = '#fafafa'
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (expandedLoadId !== load.id) {
-                        e.currentTarget.style.background = '#ffffff'
-                      }
-                    }}
-                  >
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '12px',
-                          marginBottom: '6px',
-                        }}>
-                          <div style={{
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            color: '#1f2937',
-                          }}>
-                            {load.pickup_location} → {load.delivery_location}
-                          </div>
-                          {getStatusBadge(load.status)}
-                        </div>
-                        <div style={{
-                          fontSize: '12px',
-                          color: '#6b7280',
-                          display: 'flex',
-                          gap: '16px',
-                        }}>
-                          {load.vehicle_type && <span>🚛 {load.vehicle_type}</span>}
-                          {load.pickup_datetime && (
-                            <span>📅 {new Date(load.pickup_datetime).toLocaleDateString()}</span>
-                          )}
-                          {load.budget && <span>💰 £{load.budget.toFixed(2)}</span>}
-                          {load.distance_miles && <span>📍 {load.distance_miles} miles</span>}
-                        </div>
-                      </div>
-                      {load.status === 'open' && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handlePlaceBid(load)
-                          }}
-                          style={{
-                            padding: '6px 16px',
-                            background: '#10b981',
-                            color: '#ffffff',
-                            border: 'none',
-                            fontSize: '12px',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            textTransform: 'uppercase',
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#059669'
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = '#10b981'
-                          }}
-                        >
-                          Place Bid
-                        </button>
-                      )}
-                    </div>
-                  </div>
+            </div>
 
-                  {/* Expandable Details */}
-                  {expandedLoadId === load.id && (
-                    <div style={{
-                      padding: '16px',
-                      background: '#f9fafb',
-                      borderBottom: '1px solid #e5e7eb',
-                      fontSize: '13px',
-                      color: '#374151',
-                    }}>
-                      <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        gap: '12px',
-                        marginBottom: '12px',
-                      }}>
-                        {load.pallets && (
-                          <div>
-                            <strong>Pallets:</strong> {load.pallets}
-                          </div>
-                        )}
-                        {load.weight_kg && (
-                          <div>
-                            <strong>Weight:</strong> {load.weight_kg} kg
-                          </div>
-                        )}
-                        {load.delivery_datetime && (
-                          <div>
-                            <strong>Delivery:</strong>{' '}
-                            {new Date(load.delivery_datetime).toLocaleDateString()}
-                          </div>
-                        )}
-                        <div>
-                          <strong>Posted:</strong>{' '}
-                          {new Date(load.created_at).toLocaleDateString()}
-                        </div>
-                      </div>
-                      {load.load_details && (
-                        <div style={{ marginTop: '8px' }}>
-                          <strong>Details:</strong>
-                          <div style={{ marginTop: '4px', color: '#6b7280' }}>
-                            {load.load_details}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
+            {/* Loads List */}
+            <div>
+              {filteredAndSortedLoads.length === 0 ? (
+                <div style={{
+                  textAlign: 'center',
+                  padding: '60px 20px',
+                  color: '#9ca3af',
+                }}>
+                  <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>
+                    No loads found
+                  </div>
+                  <div style={{ fontSize: '13px' }}>
+                    {statusFilter !== 'all' || fromPostcode || toPostcode || vehicleSize || dateFilter
+                      ? 'Try adjusting your filters'
+                      : 'No available loads at the moment'}
+                  </div>
                 </div>
-              ))
-            )}
+              ) : (
+                filteredAndSortedLoads.map((load) => (
+                  <div key={load.id}>
+                    {/* Load Row */}
+                    <div
+                      style={{
+                        padding: '12px 16px',
+                        borderBottom: '1px solid #e5e7eb',
+                        cursor: 'pointer',
+                        background: expandedLoadId === load.id ? '#f9fafb' : '#ffffff',
+                        transition: 'background 0.15s',
+                      }}
+                      onClick={() => setExpandedLoadId(expandedLoadId === load.id ? null : load.id)}
+                      onMouseEnter={(e) => {
+                        if (expandedLoadId !== load.id) {
+                          e.currentTarget.style.background = '#fafafa'
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (expandedLoadId !== load.id) {
+                          e.currentTarget.style.background = '#ffffff'
+                        }
+                      }}
+                    >
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            marginBottom: '6px',
+                          }}>
+                            <div style={{
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              color: '#1f2937',
+                            }}>
+                              {load.pickup_location} → {load.delivery_location}
+                            </div>
+                            {getStatusBadge(load.status)}
+                          </div>
+                          <div style={{
+                            fontSize: '12px',
+                            color: '#6b7280',
+                            display: 'flex',
+                            gap: '16px',
+                          }}>
+                            {load.vehicle_type && <span>🚛 {load.vehicle_type}</span>}
+                            {load.pickup_datetime && (
+                              <span>📅 {new Date(load.pickup_datetime).toLocaleDateString()}</span>
+                            )}
+                            {load.budget && <span>💰 £{load.budget.toFixed(2)}</span>}
+                            {load.distance_miles && <span>📍 {load.distance_miles} miles</span>}
+                          </div>
+                        </div>
+                        {load.status === 'open' && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handlePlaceBid(load)
+                            }}
+                            style={{
+                              padding: '6px 16px',
+                              background: '#10b981',
+                              color: '#ffffff',
+                              border: 'none',
+                              fontSize: '12px',
+                              fontWeight: '700',
+                              cursor: 'pointer',
+                              textTransform: 'uppercase',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = '#059669'
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = '#10b981'
+                            }}
+                          >
+                            Quote Now
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Expandable Details */}
+                    {expandedLoadId === load.id && (
+                      <div style={{
+                        padding: '16px',
+                        background: '#f9fafb',
+                        borderBottom: '1px solid #e5e7eb',
+                        fontSize: '13px',
+                        color: '#374151',
+                      }}>
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr',
+                          gap: '12px',
+                          marginBottom: '12px',
+                        }}>
+                          {load.pallets && (
+                            <div>
+                              <strong>Pallets:</strong> {load.pallets}
+                            </div>
+                          )}
+                          {load.weight_kg && (
+                            <div>
+                              <strong>Weight:</strong> {load.weight_kg} kg
+                            </div>
+                          )}
+                          {load.delivery_datetime && (
+                            <div>
+                              <strong>Delivery:</strong>{' '}
+                              {new Date(load.delivery_datetime).toLocaleDateString()}
+                            </div>
+                          )}
+                          <div>
+                            <strong>Posted:</strong>{' '}
+                            {new Date(load.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                        {load.load_details && (
+                          <div style={{ marginTop: '8px' }}>
+                            <strong>Details:</strong>
+                            <div style={{ marginTop: '4px', color: '#6b7280' }}>
+                              {load.load_details}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>
