@@ -19,7 +19,7 @@ export default function PortalLayoutWrapper({ children }: { children: React.Reac
       router.push('/onboarding/company')
       return
     }
-  }, [loading, user, companyId, router])
+  }, [loading, user, companyId])
   
   if (loading) {
     return (

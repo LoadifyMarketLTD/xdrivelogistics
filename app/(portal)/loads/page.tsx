@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
@@ -56,18 +56,7 @@ export default function LoadsPage() {
   const [bidMessage, setBidMessage] = useState('')
   const [submittingBid, setSubmittingBid] = useState(false)
 
-  useEffect(() => {
-    fetchLoads()
-    
-    // Set up polling for real-time updates (every 30s)
-    const interval = setInterval(() => {
-      fetchLoads()
-    }, 30000)
-    
-    return () => clearInterval(interval)
-  }, [companyId])
-
-  const fetchLoads = async () => {
+  const fetchLoads = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -86,7 +75,18 @@ export default function LoadsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchLoads()
+    
+    // Set up polling for real-time updates (every 30s)
+    const interval = setInterval(() => {
+      fetchLoads()
+    }, 30000)
+    
+    return () => clearInterval(interval)
+  }, [fetchLoads])
 
   const filteredAndSortedLoads = useMemo(() => {
     let filtered = loads.filter(load => {

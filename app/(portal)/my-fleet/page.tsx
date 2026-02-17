@@ -29,24 +29,26 @@ export default function MyFleetPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
+  const [refetchTrigger, setRefetchTrigger] = useState(0)
   
-  const fetchVehicles = async () => {
+  useEffect(() => {
     if (!companyId) return
-    try {
-      setLoading(true)
-      const { data, error } = await supabase.from('vehicles').select('*').eq('company_id', companyId).order('vehicle_type', { ascending: true })
-      if (error) throw error
-      setVehicles(data || [])
-    } catch (err: any) {
-      console.error('Error:', err)
-    } finally {
-      setLoading(false)
+    
+    const fetchVehicles = async () => {
+      try {
+        setLoading(true)
+        const { data, error } = await supabase.from('vehicles').select('*').eq('company_id', companyId).order('vehicle_type', { ascending: true })
+        if (error) throw error
+        setVehicles(data || [])
+      } catch (err: any) {
+        console.error('Error:', err)
+      } finally {
+        setLoading(false)
+      }
     }
-  }
-  
-  useEffect(() => { 
-    fetchVehicles() 
-  }, [companyId])
+    
+    fetchVehicles()
+  }, [companyId, refetchTrigger])
   
   const handleSave = async (data: any) => {
     if (!companyId) return
@@ -56,7 +58,7 @@ export default function MyFleetPage() {
       } else {
         await supabase.from('vehicles').insert([{ ...data, company_id: companyId }])
       }
-      await fetchVehicles()
+      setRefetchTrigger(prev => prev + 1)
       setShowForm(false)
       setEditingVehicle(null)
     } catch (err: any) {
@@ -68,7 +70,7 @@ export default function MyFleetPage() {
   const handleDelete = async (id: string) => {
     try {
       await supabase.from('vehicles').delete().eq('id', id)
-      await fetchVehicles()
+      setRefetchTrigger(prev => prev + 1)
     } catch (err: any) {
       alert('Error: ' + err.message)
     }
