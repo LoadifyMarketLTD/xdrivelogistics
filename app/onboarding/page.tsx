@@ -158,7 +158,7 @@ export default function OnboardingPage() {
                   placeholder="Enter your company name"
                 />
                 <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '6px' }}>
-                  This will be visible to other companies in the marketplace
+                  This will be visible to other companies in the exchange
                 </div>
               </div>
 
@@ -194,8 +194,8 @@ export default function OnboardingPage() {
               <ul style={{ margin: 0, paddingLeft: '20px' }}>
                 <li>Your company profile will be created</li>
                 <li>You'll be assigned as the admin</li>
-                <li>You can start posting jobs to the marketplace</li>
-                <li>You can browse and bid on other jobs</li>
+                <li>You can start managing loads on the exchange</li>
+                <li>You can browse and respond to transport requests</li>
               </ul>
             </div>
           </div>
