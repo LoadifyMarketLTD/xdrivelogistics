@@ -8,6 +8,11 @@ import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
 
+// Shared input class for consistent styling
+const inputClass =
+  "w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-slate-900 placeholder:text-slate-400 shadow-sm " +
+  "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition";
+
 interface CompanyData {
   id: string
   name: string
@@ -161,11 +166,6 @@ export default function CompanySettingsPage() {
       </div>
     )
   }
-
-  // Shared input class for consistent styling
-  const inputClass =
-    "w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-slate-900 placeholder:text-slate-400 shadow-sm " +
-    "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
