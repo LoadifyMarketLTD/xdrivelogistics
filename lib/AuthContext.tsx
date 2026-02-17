@@ -71,14 +71,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
+
     // Check active session
     const initializeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        await fetchProfile(session.user.id)
+      try {
+        // Set timeout to ensure loading always resolves
+        timeoutId = setTimeout(() => {
+          if (mounted && loading) {
+            console.warn('Auth initialization timeout - resolving loading state')
+            setLoading(false)
+          }
+        }, 5000) // 5 second timeout
+
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (!mounted) return
+
+        setUser(session?.user ?? null)
+        if (session?.user) {
+          await fetchProfile(session.user.id)
+        }
+      } catch (err) {
+        console.error('Error initializing auth:', err)
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+        if (timeoutId) clearTimeout(timeoutId)
       }
-      setLoading(false)
     }
 
     initializeAuth()
@@ -90,6 +112,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!mounted) return
+      
       setUser(session?.user ?? null)
       if (session?.user) {
         await fetchProfile(session.user.id)
@@ -97,10 +121,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(null)
         setCompanyId(null)
       }
-      setLoading(false)
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+      subscription.unsubscribe()
+    }
   }, [])
 
   const value = {

@@ -33,27 +33,48 @@ export default function DirectoryPage() {
   const [loadingProfile, setLoadingProfile] = useState(false)
 
   useEffect(() => {
-    fetchCompanies()
-  }, [])
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
 
-  const fetchCompanies = async () => {
-    try {
-      setLoading(true)
-      
-      const { data, error } = await supabase
-        .from('companies')
-        .select('id, name, city, postcode, phone, email, created_at')
-        .order('name', { ascending: true })
-      
-      if (error) throw error
-      
-      setCompanies(data || [])
-    } catch (err: any) {
-      console.error('Error fetching companies:', err)
-    } finally {
-      setLoading(false)
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        
+        // Set timeout to ensure loading always resolves
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn('Directory data fetch timeout - resolving loading state')
+            setLoading(false)
+          }
+        }, 10000) // 10 second timeout
+        
+        const { data, error } = await supabase
+          .from('companies')
+          .select('id, name, city, postcode, phone, email, created_at')
+          .order('name', { ascending: true })
+        
+        if (error) throw error
+        
+        if (!mounted) return
+        
+        setCompanies(data || [])
+      } catch (err: any) {
+        console.error('Error fetching companies:', err)
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+        if (timeoutId) clearTimeout(timeoutId)
+      }
     }
-  }
+
+    fetchData()
+
+    return () => {
+      mounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [])
 
   const fetchCompanyProfile = async (company: Company) => {
     try {

@@ -34,39 +34,61 @@ export default function DriversVehiclesPage() {
 
   useEffect(() => {
     if (!companyId) return
-    fetchData()
-  }, [companyId])
+    
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
 
-  const fetchData = async () => {
-    try {
-      setLoading(true)
-      
-      // Fetch drivers
-      const { data: driversData, error: driversError } = await supabase
-        .from('drivers')
-        .select('*')
-        .eq('company_id', companyId)
-        .order('created_at', { ascending: false })
-      
-      if (driversError) throw driversError
-      
-      // Fetch vehicles
-      const { data: vehiclesData, error: vehiclesError } = await supabase
-        .from('vehicles')
-        .select('*')
-        .eq('company_id', companyId)
-        .order('created_at', { ascending: false })
-      
-      if (vehiclesError) throw vehiclesError
-      
-      setDrivers(driversData || [])
-      setVehicles(vehiclesData || [])
-    } catch (err: any) {
-      console.error('Error fetching data:', err)
-    } finally {
-      setLoading(false)
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        
+        // Set timeout to ensure loading always resolves
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn('Drivers/Vehicles data fetch timeout - resolving loading state')
+            setLoading(false)
+          }
+        }, 10000) // 10 second timeout
+        
+        // Fetch drivers
+        const { data: driversData, error: driversError } = await supabase
+          .from('drivers')
+          .select('*')
+          .eq('company_id', companyId)
+          .order('created_at', { ascending: false })
+        
+        if (driversError) throw driversError
+        
+        // Fetch vehicles
+        const { data: vehiclesData, error: vehiclesError } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('company_id', companyId)
+          .order('created_at', { ascending: false })
+        
+        if (vehiclesError) throw vehiclesError
+        
+        if (!mounted) return
+        
+        setDrivers(driversData || [])
+        setVehicles(vehiclesData || [])
+      } catch (err: any) {
+        console.error('Error fetching data:', err)
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+        if (timeoutId) clearTimeout(timeoutId)
+      }
     }
-  }
+
+    fetchData()
+
+    return () => {
+      mounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [companyId])
 
   if (loading) {
     return (

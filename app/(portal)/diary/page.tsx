@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/lib/AuthContext'
 import Calendar from 'react-calendar'
 import { format, startOfMonth, endOfMonth, isSameDay, parseISO } from 'date-fns'
@@ -29,7 +29,6 @@ type FilterMode = 'all' | 'upcoming' | 'today' | 'week' | 'month'
 
 export default function DiaryPage() {
   const { companyId } = useAuth()
-  const supabase = useMemo(() => createClientComponentClient(), [])
   
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
@@ -40,9 +39,21 @@ export default function DiaryPage() {
   useEffect(() => {
     if (!companyId) return
     
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
+    
     const fetchJobs = async () => {
       try {
         setLoading(true)
+        
+        // Set timeout to ensure loading always resolves
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn('Diary data fetch timeout - resolving loading state')
+            setLoading(false)
+          }
+        }, 10000) // 10 second timeout
+        
         const { data, error } = await supabase
           .from('jobs')
           .select('*')
@@ -51,16 +62,27 @@ export default function DiaryPage() {
           .order('pickup_datetime', { ascending: true })
         
         if (error) throw error
+        
+        if (!mounted) return
+        
         setJobs(data || [])
       } catch (e) {
         console.error('Error fetching jobs:', e)
       } finally {
-        setLoading(false)
+        if (mounted) {
+          setLoading(false)
+        }
+        if (timeoutId) clearTimeout(timeoutId)
       }
     }
     
     fetchJobs()
-  }, [companyId, supabase])
+    
+    return () => {
+      mounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [companyId])
 
   // Filter jobs based on filter mode
   const filteredJobs = useMemo(() => {

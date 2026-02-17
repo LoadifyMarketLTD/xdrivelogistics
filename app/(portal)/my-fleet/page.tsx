@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/lib/AuthContext'
 import Panel from '@/components/portal/Panel'
 import StatCard from '@/components/portal/StatCard'
@@ -25,27 +25,57 @@ interface Vehicle {
 
 export default function MyFleetPage() {
   const { companyId } = useAuth()
-  const supabase = useMemo(() => createClientComponentClient(), [])
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
   
-  const fetchVehicles = async () => {
+  useEffect(() => {
     if (!companyId) return
-    try {
-      setLoading(true)
-      const { data, error } = await supabase.from('vehicles').select('*').eq('company_id', companyId).order('vehicle_type', { ascending: true })
-      if (error) throw error
-      setVehicles(data || [])
-    } catch (err: any) {
-      console.error('Error:', err)
-    } finally {
-      setLoading(false)
+    
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
+    
+    const fetchVehicles = async () => {
+      try {
+        setLoading(true)
+        
+        // Set timeout to ensure loading always resolves
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn('My Fleet data fetch timeout - resolving loading state')
+            setLoading(false)
+          }
+        }, 10000) // 10 second timeout
+        
+        const { data, error } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('company_id', companyId)
+          .order('vehicle_type', { ascending: true })
+          
+        if (error) throw error
+        
+        if (!mounted) return
+        
+        setVehicles(data || [])
+      } catch (err: any) {
+        console.error('Error:', err)
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+        if (timeoutId) clearTimeout(timeoutId)
+      }
     }
-  }
-  
-  useEffect(() => { fetchVehicles() }, [companyId])
+    
+    fetchVehicles()
+    
+    return () => {
+      mounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [companyId])
   
   const handleSave = async (data: any) => {
     if (!companyId) return
@@ -55,7 +85,17 @@ export default function MyFleetPage() {
       } else {
         await supabase.from('vehicles').insert([{ ...data, company_id: companyId }])
       }
-      await fetchVehicles()
+      
+      // Re-fetch vehicles after save
+      const { data: freshData, error } = await supabase
+        .from('vehicles')
+        .select('*')
+        .eq('company_id', companyId)
+        .order('vehicle_type', { ascending: true })
+      
+      if (error) throw error
+      setVehicles(freshData || [])
+      
       setShowForm(false)
       setEditingVehicle(null)
     } catch (err: any) {
@@ -67,7 +107,18 @@ export default function MyFleetPage() {
   const handleDelete = async (id: string) => {
     try {
       await supabase.from('vehicles').delete().eq('id', id)
-      await fetchVehicles()
+      
+      // Re-fetch vehicles after delete
+      if (companyId) {
+        const { data, error } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('company_id', companyId)
+          .order('vehicle_type', { ascending: true })
+        
+        if (error) throw error
+        setVehicles(data || [])
+      }
     } catch (err: any) {
       alert('Error: ' + err.message)
     }
