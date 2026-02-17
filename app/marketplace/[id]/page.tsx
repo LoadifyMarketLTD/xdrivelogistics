@@ -9,6 +9,8 @@ import PlatformNav from '@/components/PlatformNav'
 import JobTimeline from '@/components/marketplace/JobTimeline'
 import StatusBadge from '@/components/StatusBadge'
 import BidsList from '@/components/marketplace/BidsList'
+import CompanyInfoCard from '@/components/CompanyInfoCard'
+import QuickActions from '@/components/QuickActions'
 import '@/styles/dashboard.css'
 
 export const dynamic = 'force-dynamic'
@@ -221,14 +223,8 @@ export default function JobDetailPage() {
       <PlatformNav />
 
       <main className="container">
-        <div style={{ marginTop: '24px', marginBottom: '16px' }}>
-          <a href="/marketplace" style={{ color: 'var(--gold-premium)', fontSize: '14px' }}>
-            ← Back to Marketplace
-          </a>
-        </div>
-
         {/* Two-column layout for job details and timeline */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: '24px', marginBottom: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: '24px', marginBottom: '24px', marginTop: '24px' }}>
           {/* Main job details */}
           <div style={{
             backgroundColor: '#132433',
@@ -359,10 +355,30 @@ export default function JobDetailPage() {
           </div>
 
           {/* Timeline sidebar */}
-          <div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <JobTimeline job={job} />
+            {job.poster_company && (
+              <CompanyInfoCard 
+                company={job.poster_company} 
+                showContact={!isPostedByMe}
+              />
+            )}
           </div>
         </div>
+
+        {/* Quick Actions */}
+        <QuickActions
+          jobId={jobId}
+          isOwner={isPostedByMe}
+          canEdit={job.status === 'open'}
+          posterEmail={job.poster_company?.email || undefined}
+          onWithdrawBid={myBid && myBid.status === 'submitted' ? () => {
+            if (confirm('Are you sure you want to withdraw your bid?')) {
+              // Implement withdraw logic
+              alert('Withdraw functionality to be implemented')
+            }
+          } : undefined}
+        />
 
         {!isPostedByMe && job.status === 'open' && !myBid && (
           <div style={{
