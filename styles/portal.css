@@ -460,10 +460,49 @@ body {
   gap: 24px;
 }
 
+/* Two Column Grid (Drivers & Vehicles) */
+.two-column-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Table Grid Layouts */
+.drivers-grid {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr;
+  gap: 8px;
+}
+
+.vehicles-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 1fr;
+  gap: 8px;
+}
+
+/* Cell Styles */
+.cell-primary {
+  font-weight: 600;
+}
+
+.cell-secondary {
+  font-size: 12px;
+  color: var(--cx-text-secondary);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--cx-text-muted);
+  font-size: 13px;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .portal-grid-2,
-  .portal-grid-3 {
+  .portal-grid-3,
+  .two-column-grid {
     grid-template-columns: 1fr;
   }
   
@@ -794,12 +833,19 @@ body {
 
 /* Section Headers */
 .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.section-header h2 {
   font-size: 14px;
   font-weight: 700;
   color: #374151;
-  margin-bottom: 12px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  margin: 0;
 }
 
 .page-description {
