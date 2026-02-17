@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
+import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
 
@@ -174,28 +175,20 @@ export default function LoadsPage() {
   }, [loads, activeTab, statusFilter, fromPostcode, toPostcode, vehicleSize, dateFilter, sortBy])
 
   const getStatusBadge = (status: string) => {
-    const styles: Record<string, { bg: string; color: string; label: string }> = {
-      'open': { bg: '#dbeafe', color: '#1e40af', label: 'Live' },
-      'assigned': { bg: '#fef3c7', color: '#92400e', label: 'Allocated' },
-      'in-transit': { bg: '#fef3c7', color: '#92400e', label: 'Allocated' },
-      'completed': { bg: '#d1fae5', color: '#065f46', label: 'Delivered' },
-      'delivered': { bg: '#d1fae5', color: '#065f46', label: 'Delivered' },
-      'cancelled': { bg: '#fee2e2', color: '#991b1b', label: 'Cancelled' },
+    const statusMap: Record<string, { className: string; label: string }> = {
+      'open': { className: 'live', label: 'Live' },
+      'assigned': { className: 'allocated', label: 'Allocated' },
+      'in-transit': { className: 'allocated', label: 'Allocated' },
+      'completed': { className: 'delivered', label: 'Delivered' },
+      'delivered': { className: 'delivered', label: 'Delivered' },
+      'cancelled': { className: 'cancelled', label: 'Cancelled' },
     }
     
-    const style = styles[status] || { bg: '#f3f4f6', color: '#6b7280', label: status }
+    const statusInfo = statusMap[status] || { className: 'pending', label: status }
     
     return (
-      <span style={{
-        padding: '3px 10px',
-        background: style.bg,
-        color: style.color,
-        fontSize: '11px',
-        fontWeight: '700',
-        textTransform: 'uppercase',
-        letterSpacing: '0.5px',
-      }}>
-        {style.label}
+      <span className={`status-badge ${statusInfo.className}`}>
+        {statusInfo.label}
       </span>
     )
   }
@@ -259,81 +252,15 @@ export default function LoadsPage() {
 
   if (loading && loads.length === 0) {
     return (
-      <div>
-        {/* Loading Skeleton */}
-        <div style={{
-          background: '#ffffff',
-          border: '1px solid #e5e7eb',
-          padding: '16px',
-          marginBottom: '20px',
-        }}>
-          <div style={{
-            height: '40px',
-            background: '#f3f4f6',
-            marginBottom: '12px',
-            animation: 'pulse 1.5s ease-in-out infinite',
-          }} />
-          <div style={{
-            height: '20px',
-            background: '#f3f4f6',
-            width: '60%',
-            animation: 'pulse 1.5s ease-in-out infinite',
-          }} />
-        </div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '280px 1fr',
-          gap: '20px',
-        }}>
-          <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            padding: '16px',
-            height: '400px',
-          }}>
-            <div style={{
-              height: '20px',
-              background: '#f3f4f6',
-              marginBottom: '12px',
-              animation: 'pulse 1.5s ease-in-out infinite',
-            }} />
-            {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} style={{
-                height: '60px',
-                background: '#f3f4f6',
-                marginBottom: '12px',
-                animation: 'pulse 1.5s ease-in-out infinite',
-              }} />
-            ))}
-          </div>
-          <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            padding: '16px',
-          }}>
-            {[1, 2, 3].map(i => (
-              <div key={i} style={{
-                height: '80px',
-                background: '#f3f4f6',
-                marginBottom: '12px',
-                animation: 'pulse 1.5s ease-in-out infinite',
-              }} />
-            ))}
-          </div>
-        </div>
+      <div className="loading-screen">
+        Loading loads...
       </div>
     )
   }
 
   if (error) {
     return (
-      <div style={{ 
-        textAlign: 'center', 
-        padding: '40px', 
-        color: '#ef4444',
-        background: '#fef2f2',
-        border: '1px solid #fecaca',
-      }}>
+      <div className="alert alert-error">
         Error: {error}
       </div>
     )
@@ -343,95 +270,40 @@ export default function LoadsPage() {
     <>
       <div>
         {/* CX-Style Tabs Row */}
-        <div style={{
-          background: '#ffffff',
-          border: '1px solid #e5e7eb',
-          borderBottom: 'none',
-          display: 'flex',
-          gap: '0',
-          marginBottom: '0',
-        }}>
+        <div className="loads-tabs">
           {[
             { id: 'all-live' as LoadTab, label: 'All Live' },
             { id: 'on-demand' as LoadTab, label: 'On Demand' },
             { id: 'regular' as LoadTab, label: 'Regular Load' },
             { id: 'daily-hire' as LoadTab, label: 'Daily Hire' },
           ].map(tab => (
-            <div
+            <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              style={{
-                padding: '12px 24px',
-                cursor: 'pointer',
-                borderBottom: activeTab === tab.id ? '3px solid #d4af37' : '3px solid transparent',
-                background: activeTab === tab.id ? '#ffffff' : 'transparent',
-                color: activeTab === tab.id ? '#1f2937' : '#6b7280',
-                fontSize: '13px',
-                fontWeight: activeTab === tab.id ? '700' : '500',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                transition: 'all 0.15s',
-              }}
-              onMouseEnter={(e) => {
-                if (activeTab !== tab.id) {
-                  e.currentTarget.style.background = '#f9fafb'
-                  e.currentTarget.style.color = '#1f2937'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (activeTab !== tab.id) {
-                  e.currentTarget.style.background = 'transparent'
-                  e.currentTarget.style.color = '#6b7280'
-                }
-              }}
+              className={activeTab === tab.id ? 'loads-tab-active' : 'loads-tab'}
             >
               {tab.label}
-            </div>
+            </button>
           ))}
         </div>
 
         {/* Main Content */}
-        <div style={{ display: 'flex', gap: '20px', height: 'calc(100vh - 156px)' }}>
+        <div className="loads-container">
           {/* LEFT COLUMN - Filter Panel */}
-          <div style={{
-            width: '280px',
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            padding: '16px',
-            height: 'fit-content',
-          }}>
-            <h3 style={{
-              fontSize: '14px',
-              fontWeight: '700',
-              color: '#1f2937',
-              marginBottom: '16px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-            }}>
+          <div className="loads-sidebar">
+            <h3 className="loads-sidebar-title">
               Search Filters
             </h3>
 
             {/* Status Filter */}
-            <div style={{ marginBottom: '14px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '12px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '6px',
-              }}>
+            <div className="loads-filter-group">
+              <label className="loads-filter-label">
                 Status
               </label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '6px 8px',
-                  border: '1px solid #d1d5db',
-                  fontSize: '13px',
-                  color: '#1f2937',
-                }}
+                className="loads-filter-select"
               >
                 <option value="all">All Loads</option>
                 <option value="live">Live</option>
@@ -442,14 +314,8 @@ export default function LoadsPage() {
             </div>
 
             {/* From Postcode */}
-            <div style={{ marginBottom: '14px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '12px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '6px',
-              }}>
+            <div className="loads-filter-group">
+              <label className="loads-filter-label">
                 From Postcode
               </label>
               <input
@@ -457,25 +323,13 @@ export default function LoadsPage() {
                 value={fromPostcode}
                 onChange={(e) => setFromPostcode(e.target.value)}
                 placeholder="e.g. M1"
-                style={{
-                  width: '100%',
-                  padding: '6px 8px',
-                  border: '1px solid #d1d5db',
-                  fontSize: '13px',
-                  color: '#1f2937',
-                }}
+                className="loads-filter-input"
               />
             </div>
 
             {/* Radius */}
-            <div style={{ marginBottom: '14px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '12px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '6px',
-              }}>
+            <div className="loads-filter-group">
+              <label className="loads-filter-label">
                 Radius (miles)
               </label>
               <input
@@ -483,25 +337,13 @@ export default function LoadsPage() {
                 value={radius}
                 onChange={(e) => setRadius(e.target.value)}
                 placeholder="e.g. 50"
-                style={{
-                  width: '100%',
-                  padding: '6px 8px',
-                  border: '1px solid #d1d5db',
-                  fontSize: '13px',
-                  color: '#1f2937',
-                }}
+                className="loads-filter-input"
               />
             </div>
 
             {/* To Postcode */}
-            <div style={{ marginBottom: '14px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '12px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '6px',
-              }}>
+            <div className="loads-filter-group">
+              <label className="loads-filter-label">
                 To Postcode
               </label>
               <input
@@ -509,37 +351,19 @@ export default function LoadsPage() {
                 value={toPostcode}
                 onChange={(e) => setToPostcode(e.target.value)}
                 placeholder="e.g. B1"
-                style={{
-                  width: '100%',
-                  padding: '6px 8px',
-                  border: '1px solid #d1d5db',
-                  fontSize: '13px',
-                  color: '#1f2937',
-                }}
+                className="loads-filter-input"
               />
             </div>
 
             {/* Vehicle Size */}
-            <div style={{ marginBottom: '14px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '12px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '6px',
-              }}>
+            <div className="loads-filter-group">
+              <label className="loads-filter-label">
                 Vehicle Size
               </label>
               <select
                 value={vehicleSize}
                 onChange={(e) => setVehicleSize(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '6px 8px',
-                  border: '1px solid #d1d5db',
-                  fontSize: '13px',
-                  color: '#1f2937',
-                }}
+                className="loads-filter-select"
               >
                 <option value="">All Vehicles</option>
                 <option value="Small Van">Small Van</option>
@@ -553,51 +377,27 @@ export default function LoadsPage() {
             </div>
 
             {/* Date Filter */}
-            <div style={{ marginBottom: '14px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '12px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '6px',
-              }}>
+            <div className="loads-filter-group">
+              <label className="loads-filter-label">
                 Pickup Date
               </label>
               <input
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '6px 8px',
-                  border: '1px solid #d1d5db',
-                  fontSize: '13px',
-                  color: '#1f2937',
-                }}
+                className="loads-filter-input"
               />
             </div>
 
             {/* Sort By */}
-            <div style={{ marginBottom: '14px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '12px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '6px',
-              }}>
+            <div className="loads-filter-group">
+              <label className="loads-filter-label">
                 Sort By
               </label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortBy)}
-                style={{
-                  width: '100%',
-                  padding: '6px 8px',
-                  border: '1px solid #d1d5db',
-                  fontSize: '13px',
-                  color: '#1f2937',
-                }}
+                className="loads-filter-select"
               >
                 <option value="date">Date (Newest)</option>
                 <option value="distance">Distance</option>
@@ -616,81 +416,36 @@ export default function LoadsPage() {
                 setDateFilter('')
                 setSortBy('date')
               }}
-              style={{
-                width: '100%',
-                padding: '8px',
-                background: '#f3f4f6',
-                color: '#374151',
-                border: '1px solid #d1d5db',
-                fontSize: '12px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                marginTop: '8px',
-              }}
+              className="btn-clear-filters"
             >
               Clear Filters
             </button>
           </div>
 
           {/* RIGHT COLUMN - Results List */}
-          <div style={{
-            flex: 1,
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            overflowY: 'auto',
-          }}>
+          <div className="loads-results">
             {/* Header */}
-            <div style={{
-              padding: '12px 16px',
-              background: '#f9fafb',
-              borderBottom: '1px solid #e5e7eb',
-              position: 'sticky',
-              top: 0,
-              zIndex: 10,
-            }}>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-                <h2 style={{
-                  fontSize: '14px',
-                  fontWeight: '700',
-                  color: '#1f2937',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                }}>
-                  Available Loads ({filteredAndSortedLoads.length})
-                </h2>
-                <button
-                  onClick={fetchLoads}
-                  style={{
-                    padding: '4px 12px',
-                    background: '#ffffff',
-                    color: '#6b7280',
-                    border: '1px solid #d1d5db',
-                    fontSize: '11px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Refresh
-                </button>
-              </div>
+            <div className="loads-results-header">
+              <h2 className="loads-results-title">
+                Available Loads ({filteredAndSortedLoads.length})
+              </h2>
+              <button
+                onClick={fetchLoads}
+                className="loads-refresh-btn"
+              >
+                Refresh
+              </button>
             </div>
 
             {/* Loads List */}
             <div>
               {filteredAndSortedLoads.length === 0 ? (
-                <div style={{
-                  textAlign: 'center',
-                  padding: '60px 20px',
-                  color: '#9ca3af',
-                }}>
-                  <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>
+                <div className="loads-empty">
+                  <div className="loads-empty-icon">📦</div>
+                  <div className="loads-empty-title">
                     No loads found
                   </div>
-                  <div style={{ fontSize: '13px' }}>
+                  <div className="loads-empty-text">
                     {statusFilter !== 'all' || fromPostcode || toPostcode || vehicleSize || dateFilter
                       ? 'Try adjusting your filters'
                       : 'No available loads at the moment'}
@@ -701,52 +456,18 @@ export default function LoadsPage() {
                   <div key={load.id}>
                     {/* Load Row */}
                     <div
-                      style={{
-                        padding: '12px 16px',
-                        borderBottom: '1px solid #e5e7eb',
-                        cursor: 'pointer',
-                        background: expandedLoadId === load.id ? '#f9fafb' : '#ffffff',
-                        transition: 'background 0.15s',
-                      }}
+                      className={expandedLoadId === load.id ? 'load-item-expanded' : 'load-item'}
                       onClick={() => setExpandedLoadId(expandedLoadId === load.id ? null : load.id)}
-                      onMouseEnter={(e) => {
-                        if (expandedLoadId !== load.id) {
-                          e.currentTarget.style.background = '#fafafa'
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (expandedLoadId !== load.id) {
-                          e.currentTarget.style.background = '#ffffff'
-                        }
-                      }}
                     >
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                      }}>
-                        <div style={{ flex: 1 }}>
-                          <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '12px',
-                            marginBottom: '6px',
-                          }}>
-                            <div style={{
-                              fontSize: '14px',
-                              fontWeight: '600',
-                              color: '#1f2937',
-                            }}>
+                      <div className="load-item-header">
+                        <div className="load-item-content">
+                          <div className="load-item-title-row">
+                            <div className="load-item-title">
                               {load.pickup_location} → {load.delivery_location}
                             </div>
                             {getStatusBadge(load.status)}
                           </div>
-                          <div style={{
-                            fontSize: '12px',
-                            color: '#6b7280',
-                            display: 'flex',
-                            gap: '16px',
-                          }}>
+                          <div className="load-item-details">
                             {load.vehicle_type && <span>🚛 {load.vehicle_type}</span>}
                             {load.pickup_datetime && (
                               <span>📅 {new Date(load.pickup_datetime).toLocaleDateString()}</span>
@@ -761,22 +482,7 @@ export default function LoadsPage() {
                               e.stopPropagation()
                               handlePlaceBid(load)
                             }}
-                            style={{
-                              padding: '6px 16px',
-                              background: '#10b981',
-                              color: '#ffffff',
-                              border: 'none',
-                              fontSize: '12px',
-                              fontWeight: '700',
-                              cursor: 'pointer',
-                              textTransform: 'uppercase',
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.background = '#059669'
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.background = '#10b981'
-                            }}
+                            className="btn-quote"
                           >
                             Quote Now
                           </button>
@@ -786,19 +492,8 @@ export default function LoadsPage() {
 
                     {/* Expandable Details */}
                     {expandedLoadId === load.id && (
-                      <div style={{
-                        padding: '16px',
-                        background: '#f9fafb',
-                        borderBottom: '1px solid #e5e7eb',
-                        fontSize: '13px',
-                        color: '#374151',
-                      }}>
-                        <div style={{
-                          display: 'grid',
-                          gridTemplateColumns: '1fr 1fr',
-                          gap: '12px',
-                          marginBottom: '12px',
-                        }}>
+                      <div className="load-item-expanded-details">
+                        <div className="load-details-grid">
                           {load.pallets && (
                             <div>
                               <strong>Pallets:</strong> {load.pallets}
@@ -821,9 +516,9 @@ export default function LoadsPage() {
                           </div>
                         </div>
                         {load.load_details && (
-                          <div style={{ marginTop: '8px' }}>
+                          <div className="load-details-full">
                             <strong>Details:</strong>
-                            <div style={{ marginTop: '4px', color: '#6b7280' }}>
+                            <div className="load-details-text">
                               {load.load_details}
                             </div>
                           </div>
@@ -840,52 +535,23 @@ export default function LoadsPage() {
 
       {/* Bid Modal */}
       {showBidModal && selectedLoad && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-        }}>
-          <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            padding: '24px',
-            width: '500px',
-            maxWidth: '90%',
-          }}>
-            <h3 style={{
-              fontSize: '16px',
-              fontWeight: '700',
-              color: '#1f2937',
-              marginBottom: '16px',
-              textTransform: 'uppercase',
-            }}>
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3 className="modal-title">
               Place Bid
             </h3>
             
-            <div style={{ marginBottom: '16px', padding: '12px', background: '#f9fafb', border: '1px solid #e5e7eb' }}>
-              <div style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937', marginBottom: '4px' }}>
+            <div className="bid-modal-info">
+              <div className="bid-modal-info-title">
                 {selectedLoad.pickup_location} → {selectedLoad.delivery_location}
               </div>
-              <div style={{ fontSize: '12px', color: '#6b7280' }}>
+              <div className="bid-modal-info-text">
                 {selectedLoad.vehicle_type} • Budget: £{selectedLoad.budget?.toFixed(2) || 'N/A'}
               </div>
             </div>
 
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '13px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '6px',
-              }}>
+            <div className="form-field">
+              <label className="form-label">
                 Bid Amount (£) *
               </label>
               <input
@@ -893,73 +559,35 @@ export default function LoadsPage() {
                 value={bidAmount}
                 onChange={(e) => setBidAmount(e.target.value)}
                 step="0.01"
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  border: '1px solid #d1d5db',
-                  fontSize: '14px',
-                  color: '#1f2937',
-                }}
+                className="form-input"
               />
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '13px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '6px',
-              }}>
+            <div className="form-field">
+              <label className="form-label">
                 Message (Optional)
               </label>
               <textarea
                 value={bidMessage}
                 onChange={(e) => setBidMessage(e.target.value)}
                 rows={3}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  border: '1px solid #d1d5db',
-                  fontSize: '13px',
-                  color: '#1f2937',
-                  resize: 'vertical',
-                }}
+                className="form-input"
                 placeholder="Add any notes or details..."
               />
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <div className="btn-group">
               <button
                 onClick={() => setShowBidModal(false)}
                 disabled={submittingBid}
-                style={{
-                  padding: '8px 16px',
-                  background: '#f3f4f6',
-                  color: '#374151',
-                  border: '1px solid #d1d5db',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  cursor: submittingBid ? 'not-allowed' : 'pointer',
-                  opacity: submittingBid ? 0.5 : 1,
-                }}
+                className="btn-secondary"
               >
                 Cancel
               </button>
               <button
                 onClick={submitBid}
                 disabled={submittingBid}
-                style={{
-                  padding: '8px 16px',
-                  background: '#10b981',
-                  color: '#ffffff',
-                  border: 'none',
-                  fontSize: '13px',
-                  fontWeight: '700',
-                  cursor: submittingBid ? 'not-allowed' : 'pointer',
-                  textTransform: 'uppercase',
-                  opacity: submittingBid ? 0.5 : 1,
-                }}
+                className="btn-success"
               >
                 {submittingBid ? 'Submitting...' : 'Submit Bid'}
               </button>
