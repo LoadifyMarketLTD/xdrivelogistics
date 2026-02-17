@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
+import ErrorBanner from '@/components/ErrorBanner'
+import EmptyState from '@/components/EmptyState'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,6 +28,7 @@ export default function DashboardPage() {
     revenue: 0,
   })
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!companyId) return
@@ -36,6 +39,7 @@ export default function DashboardPage() {
     const fetchData = async () => {
       try {
         setLoading(true)
+        setError(null)
         
         // Set timeout to ensure loading always resolves
         timeoutId = setTimeout(() => {
@@ -97,6 +101,9 @@ export default function DashboardPage() {
         })
       } catch (err: any) {
         console.error('Error fetching dashboard data:', err)
+        if (mounted) {
+          setError(err.message || 'Failed to load dashboard data')
+        }
       } finally {
         if (mounted) {
           setLoading(false)
@@ -123,6 +130,14 @@ export default function DashboardPage() {
 
   return (
     <div style={{ maxWidth: '1400px' }}>
+      {error && (
+        <ErrorBanner 
+          error={error} 
+          onRetry={() => window.location.reload()}
+          onDismiss={() => setError(null)}
+        />
+      )}
+      
       <h1 style={{
         fontSize: '20px',
         fontWeight: '700',
@@ -317,13 +332,15 @@ export default function DashboardPage() {
 
           {/* Table Rows */}
           {recentJobs.length === 0 ? (
-            <div style={{
-              textAlign: 'center',
-              padding: '40px',
-              color: '#9ca3af',
-              fontSize: '14px',
-            }}>
-              No loads posted yet
+            <div style={{ padding: '20px' }}>
+              <EmptyState
+                icon="🏁"
+                title="Welcome to XDrive Logistics"
+                description="Get started by browsing available loads or posting your first job."
+                actionLabel="Browse Loads"
+                actionHref="/loads"
+                size="small"
+              />
             </div>
           ) : (
             recentJobs.map((job) => (
