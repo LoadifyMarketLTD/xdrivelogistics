@@ -63,28 +63,20 @@ export default function MyFleetPage() {
       } catch (err: any) {
         console.error('Error:', err)
       } finally {
-<<<<<<< copilot/complete-system-audit-verification
-        setLoading(false)
-=======
         if (mounted) {
           setLoading(false)
         }
         if (timeoutId) clearTimeout(timeoutId)
->>>>>>> main
       }
     }
     
     fetchVehicles()
-<<<<<<< copilot/complete-system-audit-verification
-  }, [companyId, refetchTrigger])
-=======
     
     return () => {
       mounted = false
       if (timeoutId) clearTimeout(timeoutId)
     }
-  }, [companyId])
->>>>>>> main
+  }, [companyId, refetchTrigger])
   
   const handleSave = async (data: any) => {
     if (!companyId) return

@@ -77,14 +77,11 @@ export default function DiaryPage() {
     }
     
     fetchJobs()
-<<<<<<< copilot/complete-system-audit-verification
-=======
     
     return () => {
       mounted = false
       if (timeoutId) clearTimeout(timeoutId)
     }
->>>>>>> main
   }, [companyId])
 
   // Filter jobs based on filter mode

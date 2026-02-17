@@ -86,7 +86,7 @@ export default function LoadsPage() {
         setLoading(false)
       }
     }
-  }, [])
+  }
 
   useEffect(() => {
     fetchLoads()
