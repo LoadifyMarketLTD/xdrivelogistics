@@ -36,19 +36,10 @@ export default function DriversVehiclesPage() {
     if (!companyId) return
     
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
 
     const fetchData = async () => {
       try {
         setLoading(true)
-        
-        // Set timeout to ensure loading always resolves
-        timeoutId = setTimeout(() => {
-          if (mounted) {
-            console.warn('Drivers/Vehicles data fetch timeout - resolving loading state')
-            setLoading(false)
-          }
-        }, 10000) // 10 second timeout
         
         // Fetch drivers
         const { data: driversData, error: driversError } = await supabase
@@ -78,7 +69,6 @@ export default function DriversVehiclesPage() {
         if (mounted) {
           setLoading(false)
         }
-        if (timeoutId) clearTimeout(timeoutId)
       }
     }
 
@@ -86,7 +76,6 @@ export default function DriversVehiclesPage() {
 
     return () => {
       mounted = false
-      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [companyId])
 

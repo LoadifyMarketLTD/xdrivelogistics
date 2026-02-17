@@ -41,19 +41,10 @@ export default function QuotesPage() {
     if (!companyId) return
     
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
     
     const fetchQuotes = async () => {
       try {
         setLoading(true)
-        
-        // Set timeout to ensure loading always resolves
-        timeoutId = setTimeout(() => {
-          if (mounted) {
-            console.warn('Quotes data fetch timeout - resolving loading state')
-            setLoading(false)
-          }
-        }, 10000) // 10 second timeout
         
         const { data, error: fetchError } = await supabase
           .from('job_bids')
@@ -96,7 +87,6 @@ export default function QuotesPage() {
         if (mounted) {
           setLoading(false)
         }
-        if (timeoutId) clearTimeout(timeoutId)
       }
     }
     
@@ -104,7 +94,6 @@ export default function QuotesPage() {
     
     return () => {
       mounted = false
-      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [companyId])
   

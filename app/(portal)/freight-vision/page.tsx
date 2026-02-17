@@ -17,19 +17,10 @@ export default function FreightVisionPage() {
     if (!companyId) return
     
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
     
     const fetch = async () => {
       try {
         setLoading(true)
-        
-        // Set timeout to ensure loading always resolves
-        timeoutId = setTimeout(() => {
-          if (mounted) {
-            console.warn('Freight Vision data fetch timeout - resolving loading state')
-            setLoading(false)
-          }
-        }, 10000) // 10 second timeout
         
         const { data: jobs } = await supabase.from('jobs').select('*').eq('posted_by_company_id', companyId)
         const { data: bids } = await supabase.from('job_bids').select('*').eq('bidder_company_id', companyId)
@@ -48,14 +39,12 @@ export default function FreightVisionPage() {
         if (mounted) {
           setLoading(false)
         }
-        if (timeoutId) clearTimeout(timeoutId)
       }
     }
     fetch()
     
     return () => {
       mounted = false
-      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [companyId])
   

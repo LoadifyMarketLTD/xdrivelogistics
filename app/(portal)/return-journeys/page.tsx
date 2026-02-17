@@ -12,19 +12,10 @@ export default function ReturnJourneysPage() {
   
   useEffect(() => {
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
     
     const fetch = async () => {
       try {
         setLoading(true)
-        
-        // Set timeout to ensure loading always resolves
-        timeoutId = setTimeout(() => {
-          if (mounted) {
-            console.warn('Return Journeys data fetch timeout - resolving loading state')
-            setLoading(false)
-          }
-        }, 10000) // 10 second timeout
         
         const { data } = await supabase.from('jobs').select('*').eq('status', 'completed').order('created_at', { ascending: false }).limit(10)
         
@@ -37,14 +28,12 @@ export default function ReturnJourneysPage() {
         if (mounted) {
           setLoading(false)
         }
-        if (timeoutId) clearTimeout(timeoutId)
       }
     }
     fetch()
     
     return () => {
       mounted = false
-      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [])
   

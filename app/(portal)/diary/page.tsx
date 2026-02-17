@@ -40,19 +40,10 @@ export default function DiaryPage() {
     if (!companyId) return
     
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
     
     const fetchJobs = async () => {
       try {
         setLoading(true)
-        
-        // Set timeout to ensure loading always resolves
-        timeoutId = setTimeout(() => {
-          if (mounted) {
-            console.warn('Diary data fetch timeout - resolving loading state')
-            setLoading(false)
-          }
-        }, 10000) // 10 second timeout
         
         const { data, error } = await supabase
           .from('jobs')
@@ -72,7 +63,6 @@ export default function DiaryPage() {
         if (mounted) {
           setLoading(false)
         }
-        if (timeoutId) clearTimeout(timeoutId)
       }
     }
     
@@ -80,7 +70,6 @@ export default function DiaryPage() {
     
     return () => {
       mounted = false
-      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [companyId])
 
