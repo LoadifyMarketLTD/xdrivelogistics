@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
@@ -55,8 +55,13 @@ export default function LoadsPage() {
   const [bidAmount, setBidAmount] = useState('')
   const [bidMessage, setBidMessage] = useState('')
   const [submittingBid, setSubmittingBid] = useState(false)
+  
+  // Use ref for mounted state so fetchLoads can access it
+  const mountedRef = useRef(true)
 
   const fetchLoads = async () => {
+    if (!mountedRef.current) return
+    
     try {
       setLoading(true)
       setError(null)
@@ -68,17 +73,23 @@ export default function LoadsPage() {
       
       if (fetchError) throw fetchError
       
+      if (!mountedRef.current) return
+      
       setLoads(data || [])
     } catch (err: any) {
       console.error('Error fetching loads:', err)
-      setError(err.message || 'Failed to load data')
+      if (mountedRef.current) {
+        setError(err.message || 'Failed to load data')
+      }
     } finally {
-      setLoading(false)
+      if (mountedRef.current) {
+        setLoading(false)
+      }
     }
   }
 
   useEffect(() => {
-    let mounted = true
+    mountedRef.current = true
     let timeoutId: NodeJS.Timeout | null = null
     
     const fetchData = async () => {
@@ -88,7 +99,7 @@ export default function LoadsPage() {
         
         // Set timeout to ensure loading always resolves
         timeoutId = setTimeout(() => {
-          if (mounted) {
+          if (mountedRef.current) {
             console.warn('Loads data fetch timeout - resolving loading state')
             setLoading(false)
           }
@@ -101,16 +112,16 @@ export default function LoadsPage() {
         
         if (fetchError) throw fetchError
         
-        if (!mounted) return
+        if (!mountedRef.current) return
         
         setLoads(data || [])
       } catch (err: any) {
         console.error('Error fetching loads:', err)
-        if (mounted) {
+        if (mountedRef.current) {
           setError(err.message || 'Failed to load data')
         }
       } finally {
-        if (mounted) {
+        if (mountedRef.current) {
           setLoading(false)
         }
         if (timeoutId) clearTimeout(timeoutId)
@@ -121,13 +132,13 @@ export default function LoadsPage() {
     
     // Set up polling for real-time updates (every 30s)
     const interval = setInterval(() => {
-      if (mounted) {
+      if (mountedRef.current) {
         fetchData()
       }
     }, 30000)
     
     return () => {
-      mounted = false
+      mountedRef.current = false
       if (timeoutId) clearTimeout(timeoutId)
       clearInterval(interval)
     }

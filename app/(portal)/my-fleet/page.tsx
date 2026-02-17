@@ -30,34 +30,51 @@ export default function MyFleetPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
   
-  const fetchVehicles = async () => {
+  useEffect(() => {
     if (!companyId) return
     
+    let mounted = true
     let timeoutId: NodeJS.Timeout | null = null
     
-    try {
-      setLoading(true)
-      
-      // Set timeout to ensure loading always resolves
-      timeoutId = setTimeout(() => {
-        console.warn('My Fleet data fetch timeout - resolving loading state')
-        setLoading(false)
-      }, 10000) // 10 second timeout
-      
-      const { data, error } = await supabase.from('vehicles').select('*').eq('company_id', companyId).order('vehicle_type', { ascending: true })
-      if (error) throw error
-      setVehicles(data || [])
-    } catch (err: any) {
-      console.error('Error:', err)
-    } finally {
-      setLoading(false)
+    const fetchVehicles = async () => {
+      try {
+        setLoading(true)
+        
+        // Set timeout to ensure loading always resolves
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn('My Fleet data fetch timeout - resolving loading state')
+            setLoading(false)
+          }
+        }, 10000) // 10 second timeout
+        
+        const { data, error } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('company_id', companyId)
+          .order('vehicle_type', { ascending: true })
+          
+        if (error) throw error
+        
+        if (!mounted) return
+        
+        setVehicles(data || [])
+      } catch (err: any) {
+        console.error('Error:', err)
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+        if (timeoutId) clearTimeout(timeoutId)
+      }
+    }
+    
+    fetchVehicles()
+    
+    return () => {
+      mounted = false
       if (timeoutId) clearTimeout(timeoutId)
     }
-  }
-  
-  useEffect(() => { 
-    if (!companyId) return
-    fetchVehicles() 
   }, [companyId])
   
   const handleSave = async (data: any) => {
@@ -68,7 +85,17 @@ export default function MyFleetPage() {
       } else {
         await supabase.from('vehicles').insert([{ ...data, company_id: companyId }])
       }
-      await fetchVehicles()
+      
+      // Re-fetch vehicles after save
+      const { data: freshData, error } = await supabase
+        .from('vehicles')
+        .select('*')
+        .eq('company_id', companyId)
+        .order('vehicle_type', { ascending: true })
+      
+      if (error) throw error
+      setVehicles(freshData || [])
+      
       setShowForm(false)
       setEditingVehicle(null)
     } catch (err: any) {
@@ -80,7 +107,18 @@ export default function MyFleetPage() {
   const handleDelete = async (id: string) => {
     try {
       await supabase.from('vehicles').delete().eq('id', id)
-      await fetchVehicles()
+      
+      // Re-fetch vehicles after delete
+      if (companyId) {
+        const { data, error } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('company_id', companyId)
+          .order('vehicle_type', { ascending: true })
+        
+        if (error) throw error
+        setVehicles(data || [])
+      }
     } catch (err: any) {
       alert('Error: ' + err.message)
     }
