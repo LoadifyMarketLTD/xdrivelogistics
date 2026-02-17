@@ -56,11 +56,12 @@ export default function DashboardPage() {
       setAssignedJobs(assigned || [])
 
       // Fetch my bids with job details
+      // Fix: Explicitly specify FK relationship to avoid ambiguity
       const { data: bids, error: bidsError } = await supabase
         .from('job_bids')
         .select(`
           *,
-          job:jobs(*)
+          job:jobs!job_bids_job_id_fkey(*)
         `)
         .eq('bidder_company_id', companyId)
         .order('created_at', { ascending: false })
