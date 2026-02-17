@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
 import { Job, Company } from '@/lib/types'
 import PlatformNav from '@/components/PlatformNav'
+import FilterPanel, { JobFilters } from '@/components/marketplace/FilterPanel'
 import '@/styles/dashboard.css'
 
 export const dynamic = 'force-dynamic'
@@ -14,20 +15,30 @@ interface JobWithCompany extends Job {
   poster_company?: Company
 }
 
+const defaultFilters: JobFilters = {
+  searchQuery: '',
+  vehicleType: '',
+  budgetMin: '',
+  budgetMax: '',
+  status: 'open',
+  sortBy: 'created_at',
+  sortOrder: 'desc'
+}
+
 export default function MarketplacePage() {
   const router = useRouter()
   const { user, companyId, loading: authLoading } = useAuth()
   
-  const [jobs, setJobs] = useState<JobWithCompany[]>([])
+  const [allJobs, setAllJobs] = useState<JobWithCompany[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [filter, setFilter] = useState<'all' | 'open' | 'assigned'>('open')
+  const [filters, setFilters] = useState<JobFilters>(defaultFilters)
 
   const fetchJobs = async () => {
     try {
       setLoading(true)
       
-      let query = supabase
+      const { data, error: jobsError } = await supabase
         .from('jobs')
         .select(`
           *,
@@ -35,17 +46,9 @@ export default function MarketplacePage() {
         `)
         .order('created_at', { ascending: false })
 
-      if (filter === 'open') {
-        query = query.eq('status', 'open')
-      } else if (filter === 'assigned') {
-        query = query.eq('status', 'assigned')
-      }
-
-      const { data, error: jobsError } = await query
-
       if (jobsError) throw jobsError
 
-      setJobs(data || [])
+      setAllJobs(data || [])
       setError(null)
     } catch (err: any) {
       console.error('Error fetching jobs:', err)
@@ -54,6 +57,75 @@ export default function MarketplacePage() {
       setLoading(false)
     }
   }
+
+  // Filter and sort jobs based on current filters
+  const filteredJobs = useMemo(() => {
+    let filtered = [...allJobs]
+
+    // Status filter
+    if (filters.status === 'open') {
+      filtered = filtered.filter(job => job.status === 'open')
+    } else if (filters.status === 'assigned') {
+      filtered = filtered.filter(job => job.status === 'assigned')
+    } else if (filters.status === 'urgent') {
+      // Consider jobs urgent if pickup is within 2 days
+      const twoDaysFromNow = new Date()
+      twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 2)
+      filtered = filtered.filter(job => {
+        if (!job.pickup_datetime) return false
+        return new Date(job.pickup_datetime) <= twoDaysFromNow && job.status === 'open'
+      })
+    }
+
+    // Search query filter (location)
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase()
+      filtered = filtered.filter(job =>
+        job.pickup_location?.toLowerCase().includes(query) ||
+        job.delivery_location?.toLowerCase().includes(query)
+      )
+    }
+
+    // Vehicle type filter
+    if (filters.vehicleType) {
+      filtered = filtered.filter(job => job.vehicle_type === filters.vehicleType)
+    }
+
+    // Budget filters
+    if (filters.budgetMin) {
+      const minBudget = parseFloat(filters.budgetMin)
+      filtered = filtered.filter(job => job.budget && job.budget >= minBudget)
+    }
+    if (filters.budgetMax) {
+      const maxBudget = parseFloat(filters.budgetMax)
+      filtered = filtered.filter(job => job.budget && job.budget <= maxBudget)
+    }
+
+    // Sorting
+    filtered.sort((a, b) => {
+      let aVal, bVal
+      
+      switch (filters.sortBy) {
+        case 'budget':
+          aVal = a.budget || 0
+          bVal = b.budget || 0
+          break
+        case 'pickup_datetime':
+          aVal = a.pickup_datetime ? new Date(a.pickup_datetime).getTime() : 0
+          bVal = b.pickup_datetime ? new Date(b.pickup_datetime).getTime() : 0
+          break
+        case 'created_at':
+        default:
+          aVal = new Date(a.created_at).getTime()
+          bVal = new Date(b.created_at).getTime()
+          break
+      }
+
+      return filters.sortOrder === 'desc' ? bVal - aVal : aVal - bVal
+    })
+
+    return filtered
+  }, [allJobs, filters])
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -64,7 +136,15 @@ export default function MarketplacePage() {
     if (user) {
       fetchJobs()
     }
-  }, [authLoading, user, router, filter])
+  }, [authLoading, user, router])
+
+  const handleFilterChange = (newFilters: JobFilters) => {
+    setFilters(newFilters)
+  }
+
+  const handleClearFilters = () => {
+    setFilters(defaultFilters)
+  }
 
   if (authLoading || loading) {
     return (
@@ -117,70 +197,23 @@ export default function MarketplacePage() {
         {/* Page Header */}
         <section style={{ marginTop: '32px', marginBottom: '24px' }}>
           <h1 className="section-title" style={{ fontSize: '28px', marginBottom: '8px' }}>
-            📦 Public Job Board
+            📦 Job Marketplace
           </h1>
           <p style={{ color: '#94a3b8', fontSize: '15px' }}>
             Browse available transport jobs and submit your quotes
           </p>
         </section>
 
-        {/* Filter Tabs */}
-        <div style={{
-          display: 'flex',
-          gap: '12px',
-          marginBottom: '24px',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
-          paddingBottom: '12px'
-        }}>
-          <button
-            onClick={() => setFilter('open')}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: filter === 'open' ? 'var(--gold-premium)' : 'transparent',
-              color: filter === 'open' ? '#0B1623' : '#fff',
-              border: 'none',
-              borderRadius: '6px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-          >
-            🟢 Open ({jobs.filter(j => j.status === 'open').length})
-          </button>
-          <button
-            onClick={() => setFilter('assigned')}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: filter === 'assigned' ? 'var(--gold-premium)' : 'transparent',
-              color: filter === 'assigned' ? '#0B1623' : '#fff',
-              border: 'none',
-              borderRadius: '6px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-          >
-            ✅ Assigned ({jobs.filter(j => j.status === 'assigned').length})
-          </button>
-          <button
-            onClick={() => setFilter('all')}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: filter === 'all' ? 'var(--gold-premium)' : 'transparent',
-              color: filter === 'all' ? '#0B1623' : '#fff',
-              border: 'none',
-              borderRadius: '6px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-          >
-            📋 All ({jobs.length})
-          </button>
-        </div>
+        {/* Filter Panel */}
+        <FilterPanel
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onClear={handleClearFilters}
+          jobCount={filteredJobs.length}
+        />
 
         {/* Jobs List */}
-        {jobs.length === 0 ? (
+        {filteredJobs.length === 0 ? (
           <div style={{
             backgroundColor: '#132433',
             borderRadius: '12px',
@@ -191,17 +224,37 @@ export default function MarketplacePage() {
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
             <h3 style={{ marginBottom: '12px', color: '#fff' }}>No jobs found</h3>
             <p style={{ color: '#94a3b8', marginBottom: '24px' }}>
-              {filter === 'open' ? 'There are no open jobs at the moment. Check back soon!' : 
-               filter === 'assigned' ? 'No assigned jobs to display.' :
-               'No jobs in the marketplace yet.'}
+              {filters.searchQuery || filters.vehicleType || filters.budgetMin || filters.budgetMax
+                ? 'Try adjusting your filters to see more results.'
+                : filters.status === 'open' ? 'There are no open jobs at the moment. Check back soon!' : 
+                  filters.status === 'urgent' ? 'No urgent jobs at the moment.' :
+                  filters.status === 'assigned' ? 'No assigned jobs to display.' :
+                  'No jobs in the marketplace yet.'}
             </p>
+            {(filters.searchQuery || filters.vehicleType || filters.budgetMin || filters.budgetMax || filters.status !== 'open') && (
+              <button
+                onClick={handleClearFilters}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: 'var(--gold-premium)',
+                  color: '#0B1623',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  marginRight: '12px'
+                }}
+              >
+                Clear Filters
+              </button>
+            )}
             <a href="/jobs/new" className="action-btn primary">
               Post Your First Job
             </a>
           </div>
         ) : (
           <div style={{ display: 'grid', gap: '16px' }}>
-            {jobs.map((job) => (
+            {filteredJobs.map((job) => (
               <div
                 key={job.id}
                 onClick={() => router.push(`/marketplace/${job.id}`)}
@@ -224,13 +277,29 @@ export default function MarketplacePage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                   <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
                       <span className={`status-badge ${job.status}`}>
-                        {job.status === 'open' ? '🟢 Open' : '✅ Assigned'}
+                        {job.status === 'open' ? '🟢 Open' : 
+                         job.status === 'assigned' ? '✅ Assigned' :
+                         job.status === 'in-transit' ? '🚚 In Transit' :
+                         job.status === 'completed' ? '✔️ Completed' :
+                         job.status}
                       </span>
                       <span style={{ fontSize: '13px', color: '#94a3b8' }}>
                         Posted by {job.poster_company?.name || 'Unknown'}
                       </span>
+                      {job.pickup_datetime && new Date(job.pickup_datetime) <= new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) && job.status === 'open' && (
+                        <span style={{
+                          backgroundColor: 'rgba(255, 107, 107, 0.2)',
+                          color: '#ff6b6b',
+                          padding: '4px 10px',
+                          borderRadius: '12px',
+                          fontSize: '12px',
+                          fontWeight: '600'
+                        }}>
+                          🔥 URGENT
+                        </span>
+                      )}
                     </div>
                     <h3 style={{ fontSize: '20px', marginBottom: '12px', color: '#fff' }}>
                       {job.pickup_location} → {job.delivery_location}
@@ -246,7 +315,9 @@ export default function MarketplacePage() {
                         <div>⚖️ {job.weight_kg} kg</div>
                       )}
                       {job.budget && (
-                        <div>💰 Budget: £{job.budget.toFixed(2)}</div>
+                        <div style={{ fontWeight: '600', color: 'var(--gold-premium)' }}>
+                          💰 £{job.budget.toFixed(2)}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -257,8 +328,15 @@ export default function MarketplacePage() {
                     {job.load_details.substring(0, 150)}{job.load_details.length > 150 ? '...' : ''}
                   </p>
                 )}
-                <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '13px', color: '#94a3b8' }}>
-                  Posted {new Date(job.created_at).toLocaleDateString()} at {new Date(job.created_at).toLocaleTimeString()}
+                <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '13px', color: '#94a3b8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>
+                    Posted {new Date(job.created_at).toLocaleDateString()} at {new Date(job.created_at).toLocaleTimeString()}
+                  </span>
+                  {job.pickup_datetime && (
+                    <span style={{ color: '#fff', fontWeight: '600' }}>
+                      📅 Pickup: {new Date(job.pickup_datetime).toLocaleDateString()}
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
