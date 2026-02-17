@@ -28,6 +28,21 @@ interface Activity {
   statusVariant: 'success' | 'warning' | 'info' | 'error'
 }
 
+interface RecentBid {
+  id: string
+  jobTitle: string
+  quoteAmount: number
+  status: string
+  createdAt: string
+}
+
+interface UrgentJob {
+  id: string
+  route: string
+  pickupDate: string
+  budget: number
+}
+
 export default function DashboardPage() {
   const { companyId } = useAuth()
   const supabase = useMemo(() => createClientComponentClient(), [])
@@ -39,6 +54,8 @@ export default function DashboardPage() {
     completedLoads: 0
   })
   const [activities, setActivities] = useState<Activity[]>([])
+  const [recentBids, setRecentBids] = useState<RecentBid[]>([])
+  const [urgentJobs, setUrgentJobs] = useState<UrgentJob[]>([])
   const [loading, setLoading] = useState(true)
   
   useEffect(() => {
@@ -104,6 +121,59 @@ export default function DashboardPage() {
         
         setActivities(activityData)
         
+        // Fetch recent bids for this company
+        const { data: bidsData, error: bidsError } = await supabase
+          .from('job_bids')
+          .select(`
+            *,
+            jobs:job_id (
+              id,
+              pickup_location,
+              delivery_location
+            )
+          `)
+          .eq('bidder_company_id', companyId)
+          .order('created_at', { ascending: false })
+          .limit(5)
+        
+        if (!bidsError && bidsData) {
+          const bids: RecentBid[] = bidsData.map(bid => ({
+            id: bid.id,
+            jobTitle: bid.jobs ? `${bid.jobs.pickup_location} → ${bid.jobs.delivery_location}` : 'Job',
+            quoteAmount: bid.quote_amount,
+            status: bid.status,
+            createdAt: new Date(bid.created_at).toLocaleDateString('en-GB')
+          }))
+          setRecentBids(bids)
+        }
+        
+        // Fetch urgent jobs (pickup within 2 days, status open)
+        const twoDaysFromNow = new Date()
+        twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 2)
+        
+        const { data: urgentData, error: urgentError } = await supabase
+          .from('jobs')
+          .select('*')
+          .eq('status', 'open')
+          .lte('pickup_datetime', twoDaysFromNow.toISOString())
+          .gte('pickup_datetime', new Date().toISOString())
+          .order('pickup_datetime', { ascending: true })
+          .limit(5)
+        
+        if (!urgentError && urgentData) {
+          const urgent: UrgentJob[] = urgentData.map(job => ({
+            id: job.id,
+            route: `${job.pickup_location} → ${job.delivery_location}`,
+            pickupDate: new Date(job.pickup_datetime).toLocaleDateString('en-GB', {
+              weekday: 'short',
+              day: 'numeric',
+              month: 'short'
+            }),
+            budget: job.budget || 0
+          }))
+          setUrgentJobs(urgent)
+        }
+        
       } catch (err: any) {
         console.error('Error fetching dashboard data:', err)
       } finally {
@@ -143,6 +213,160 @@ export default function DashboardPage() {
           />
         </div>
       </Panel>
+      
+      {/* Recent Bids & Urgent Jobs */}
+      <div className="portal-grid-2">
+        <Panel title="Recent Bids" subtitle="Your latest bid submissions">
+          {recentBids.length === 0 ? (
+            <div style={{ padding: '20px', textAlign: 'center', color: 'var(--portal-text-secondary)' }}>
+              No recent bids
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {recentBids.map((bid) => (
+                <div
+                  key={bid.id}
+                  style={{
+                    padding: '16px',
+                    backgroundColor: 'var(--portal-bg-secondary)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--portal-border)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--portal-card)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--portal-bg-secondary)'
+                  }}
+                >
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'flex-start',
+                    marginBottom: '8px'
+                  }}>
+                    <div style={{ 
+                      fontSize: '14px', 
+                      fontWeight: '600',
+                      color: 'var(--portal-text-primary)',
+                      flex: 1
+                    }}>
+                      {bid.jobTitle}
+                    </div>
+                    <div style={{
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      color: 'var(--portal-accent)'
+                    }}>
+                      £{bid.quoteAmount.toFixed(2)}
+                    </div>
+                  </div>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center'
+                  }}>
+                    <span style={{ 
+                      fontSize: '12px', 
+                      color: 'var(--portal-text-muted)' 
+                    }}>
+                      {bid.createdAt}
+                    </span>
+                    <span style={{
+                      padding: '4px 8px',
+                      borderRadius: '12px',
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      backgroundColor: bid.status === 'accepted' ? 'var(--portal-success-bg)' :
+                                     bid.status === 'rejected' ? 'var(--portal-error-bg)' :
+                                     'var(--portal-info-bg)',
+                      color: bid.status === 'accepted' ? 'var(--portal-success)' :
+                            bid.status === 'rejected' ? 'var(--portal-error)' :
+                            'var(--portal-info)'
+                    }}>
+                      {bid.status.toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Panel>
+        
+        <Panel title="Urgent Jobs" subtitle="Pickup within 2 days">
+          {urgentJobs.length === 0 ? (
+            <div style={{ padding: '20px', textAlign: 'center', color: 'var(--portal-text-secondary)' }}>
+              No urgent jobs at the moment
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {urgentJobs.map((job) => (
+                <div
+                  key={job.id}
+                  onClick={() => window.location.href = `/marketplace/${job.id}`}
+                  style={{
+                    padding: '16px',
+                    backgroundColor: 'var(--portal-bg-secondary)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--portal-border)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--portal-card)'
+                    e.currentTarget.style.borderColor = 'var(--portal-accent)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--portal-bg-secondary)'
+                    e.currentTarget.style.borderColor = 'var(--portal-border)'
+                  }}
+                >
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '8px'
+                  }}>
+                    <span style={{ fontSize: '16px' }}>🔥</span>
+                    <div style={{ 
+                      fontSize: '14px', 
+                      fontWeight: '600',
+                      color: 'var(--portal-text-primary)',
+                      flex: 1
+                    }}>
+                      {job.route}
+                    </div>
+                  </div>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center'
+                  }}>
+                    <span style={{ 
+                      fontSize: '12px', 
+                      color: 'var(--portal-text-muted)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}>
+                      📅 {job.pickupDate}
+                    </span>
+                    <span style={{
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: 'var(--portal-accent)'
+                    }}>
+                      £{job.budget.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Panel>
+      </div>
       
       {/* Accounts Payable & Reports */}
       <div className="portal-grid-2">
