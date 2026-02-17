@@ -101,14 +101,11 @@ export default function QuotesPage() {
     }
     
     fetchQuotes()
-<<<<<<< copilot/complete-system-audit-verification
-=======
     
     return () => {
       mounted = false
       if (timeoutId) clearTimeout(timeoutId)
     }
->>>>>>> main
   }, [companyId])
   
   const handleWithdraw = async (quoteId: string) => {
