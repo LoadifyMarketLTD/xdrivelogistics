@@ -1,21 +1,57 @@
 'use client'
 
+import { useEffect, useState, useMemo } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Panel from '@/components/portal/Panel'
 
+export const dynamic = 'force-dynamic'
+
 export default function ReturnJourneysPage() {
+  const supabase = useMemo(() => createClientComponentClient(), [])
+  const [jobs, setJobs] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const { data } = await supabase.from('jobs').select('*').eq('status', 'completed').order('created_at', { ascending: false }).limit(10)
+        setJobs(data || [])
+      } catch (e) {} finally { setLoading(false) }
+    }
+    fetch()
+  }, [])
+  
+  if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
+  
   return (
-    <div>
-      <Panel title="Return Journeys" subtitle="Optimize empty return trips">
-        <div style={{ padding: '40px', textAlign: 'center' }}>
+    <Panel title="Return Journeys" subtitle="Optimize empty return trips">
+      {jobs.length === 0 ? (
+        <div style={{ padding: '60px 20px', textAlign: 'center' }}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔄</div>
-          <h2 style={{ fontSize: '20px', color: 'var(--portal-text-primary)', marginBottom: '12px' }}>
-            Return Journeys Coming Soon
-          </h2>
-          <p style={{ color: 'var(--portal-text-secondary)', marginBottom: '24px' }}>
-            Find and optimize return loads to maximize vehicle utilization and reduce empty miles.
+          <p>No completed journeys available</p>
+          <p style={{ fontSize: '14px', color: 'var(--portal-text-muted)', marginTop: '8px' }}>
+            Return journey suggestions will appear here after deliveries are completed
           </p>
         </div>
-      </Panel>
-    </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {jobs.map(job => (
+            <div key={job.id} style={{ padding: '16px', background: 'var(--portal-bg-secondary)', borderRadius: '6px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                <div>
+                  <div style={{ fontWeight: '500', marginBottom: '4px' }}>Return: {job.delivery_location} → {job.pickup_location}</div>
+                  <div style={{ fontSize: '13px', color: 'var(--portal-text-secondary)' }}>
+                    Potential savings: {((job.budget || 0) * 0.4).toFixed(0)} GBP
+                  </div>
+                </div>
+                <button className="portal-btn portal-btn-outline" style={{ padding: '4px 12px', fontSize: '12px' }}>
+                  View Route
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </Panel>
   )
 }
