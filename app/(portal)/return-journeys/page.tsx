@@ -37,37 +37,57 @@ export default function ReturnJourneysPage() {
     }
   }, [])
   
-  if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
+  if (loading) return <div className="portal-container" style={{ textAlign: 'center' }}>Loading...</div>
   
   return (
-    <Panel title="Return Journeys" subtitle="Optimize empty return trips">
-      {jobs.length === 0 ? (
-        <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔄</div>
-          <p>No completed journeys available</p>
-          <p style={{ fontSize: '14px', color: 'var(--portal-text-muted)', marginTop: '8px' }}>
-            Return journey suggestions will appear here after deliveries are completed
+    <div className="portal-container">
+      <div className="portal-section">
+        <div>
+          <h1 style={{
+            fontSize: '20px',
+            fontWeight: '700',
+            color: '#1f2937',
+            marginBottom: '8px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+          }}>
+            Return Journeys
+          </h1>
+          <p style={{ fontSize: '14px', color: '#6b7280' }}>
+            Optimize empty return trips
           </p>
         </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {jobs.map(job => (
-            <div key={job.id} style={{ padding: '16px', background: 'var(--portal-bg-secondary)', borderRadius: '6px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                <div>
-                  <div style={{ fontWeight: '500', marginBottom: '4px' }}>Return: {job.delivery_location} → {job.pickup_location}</div>
-                  <div style={{ fontSize: '13px', color: 'var(--portal-text-secondary)' }}>
-                    Potential savings: {((job.budget || 0) * 0.4).toFixed(0)} GBP
+
+        <Panel title="Return Journeys" subtitle="Optimize empty return trips">
+          {jobs.length === 0 ? (
+            <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔄</div>
+              <p>No completed journeys available</p>
+              <p style={{ fontSize: '14px', color: 'var(--portal-text-muted)', marginTop: '8px' }}>
+                Return journey suggestions will appear here after deliveries are completed
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {jobs.map(job => (
+                <div key={job.id} style={{ padding: '16px', background: 'var(--portal-bg-secondary)', borderRadius: '6px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                    <div>
+                      <div style={{ fontWeight: '500', marginBottom: '4px' }}>Return: {job.delivery_location} → {job.pickup_location}</div>
+                      <div style={{ fontSize: '13px', color: 'var(--portal-text-secondary)' }}>
+                        Potential savings: {((job.budget || 0) * 0.4).toFixed(0)} GBP
+                      </div>
+                    </div>
+                    <button className="portal-btn portal-btn-outline" style={{ padding: '4px 12px', fontSize: '12px' }}>
+                      View Route
+                    </button>
                   </div>
                 </div>
-                <button className="portal-btn portal-btn-outline" style={{ padding: '4px 12px', fontSize: '12px' }}>
-                  View Route
-                </button>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
-    </Panel>
+          )}
+        </Panel>
+      </div>
+    </div>
   )
 }
