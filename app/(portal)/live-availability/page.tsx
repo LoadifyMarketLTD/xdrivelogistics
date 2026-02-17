@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/lib/AuthContext'
 import Panel from '@/components/portal/Panel'
 import StatusPill from '@/components/portal/StatusPill'
+import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,41 +39,30 @@ export default function LiveAvailabilityPage() {
     }
   }, [companyId])
   
-  if (loading) return <div className="portal-container" style={{ textAlign: 'center' }}>Loading...</div>
+  if (loading) return <div className="loading-screen"><div>Loading...</div></div>
   
   return (
-    <div className="portal-container">
-      <div className="portal-section">
-        <div>
-          <h1 style={{
-            fontSize: '20px',
-            fontWeight: '700',
-            color: '#1f2937',
-            marginBottom: '8px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}>
-            Live Availability
-          </h1>
-          <p style={{ fontSize: '14px', color: '#6b7280' }}>
-            {vehicles.length} available vehicles
-          </p>
-        </div>
+    <div className="portal-layout">
+      <div className="portal-header">
+        <h1 className="portal-title">Live Availability</h1>
+        <p className="page-description">{vehicles.length} available vehicles</p>
+      </div>
 
+      <div className="portal-main">
         <Panel title="Live Availability" subtitle={`${vehicles.length} available vehicles`}>
           {vehicles.length === 0 ? (
-            <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔴</div>
+            <div className="portal-card">
+              <div className="section-header">🔴</div>
               <p>No available vehicles</p>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+            <div className="portal-grid-3">
               {vehicles.map(v => (
-                <div key={v.id} className="portal-panel" style={{ padding: '20px' }}>
-                  <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>{v.vehicle_type}</h3>
-                  <div style={{ fontSize: '14px', color: 'var(--portal-text-secondary)', marginBottom: '12px' }}>{v.registration}</div>
-                  {v.make && v.model && <div style={{ fontSize: '13px', marginBottom: '8px' }}>{v.make} {v.model}</div>}
-                  {v.capacity_kg && <div style={{ fontSize: '13px', marginBottom: '8px' }}>Capacity: {v.capacity_kg} kg</div>}
+                <div key={v.id} className="portal-card">
+                  <h3 className="section-header">{v.vehicle_type}</h3>
+                  <p className="page-description">{v.registration}</p>
+                  {v.make && v.model && <p>{v.make} {v.model}</p>}
+                  {v.capacity_kg && <p>Capacity: {v.capacity_kg} kg</p>}
                   <StatusPill status="Available" variant="success" />
                 </div>
               ))}

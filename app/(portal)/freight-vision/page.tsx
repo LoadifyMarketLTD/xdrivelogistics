@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/lib/AuthContext'
 import Panel from '@/components/portal/Panel'
 import StatCard from '@/components/portal/StatCard'
+import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,27 +49,16 @@ export default function FreightVisionPage() {
     }
   }, [companyId])
   
-  if (loading) return <div className="portal-container" style={{ textAlign: 'center' }}>Loading...</div>
+  if (loading) return <div className="loading-screen"><div>Loading...</div></div>
   
   return (
-    <div className="portal-container">
-      <div className="portal-section">
-        <div>
-          <h1 style={{
-            fontSize: '20px',
-            fontWeight: '700',
-            color: '#1f2937',
-            marginBottom: '8px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}>
-            Freight Vision
-          </h1>
-          <p style={{ fontSize: '14px', color: '#6b7280' }}>
-            Performance metrics and analytics
-          </p>
-        </div>
+    <div className="portal-layout">
+      <div className="portal-header">
+        <h1 className="portal-title">Freight Vision</h1>
+        <p className="page-description">Performance metrics and analytics</p>
+      </div>
 
+      <div className="portal-main">
         <div className="portal-grid-2">
           <StatCard label="Total Jobs Posted" value={stats.totalJobs} change={`${stats.completedJobs} completed`} />
           <StatCard label="Total Revenue" value={`£${(stats.totalRevenue/1000).toFixed(1)}k`} />
@@ -80,10 +70,10 @@ export default function FreightVisionPage() {
         </div>
         
         <Panel title="Analytics Overview" subtitle="Performance metrics and insights">
-          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--portal-text-secondary)' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📊</div>
-            <p style={{ fontSize: '16px', marginBottom: '8px' }}>Advanced Analytics</p>
-            <p style={{ fontSize: '14px' }}>Detailed charts and visualizations coming soon</p>
+          <div className="portal-card">
+            <div className="section-header">📊</div>
+            <p>Advanced Analytics</p>
+            <p className="page-description">Detailed charts and visualizations coming soon</p>
           </div>
         </Panel>
       </div>

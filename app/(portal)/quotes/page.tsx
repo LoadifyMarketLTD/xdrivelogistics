@@ -7,6 +7,7 @@ import Panel from '@/components/portal/Panel'
 import QuotesStats from '@/components/portal/quotes/QuotesStats'
 import QuotesFilters from '@/components/portal/quotes/QuotesFilters'
 import QuotesTable from '@/components/portal/quotes/QuotesTable'
+import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
 
@@ -156,25 +157,19 @@ export default function QuotesPage() {
   
   if (loading) {
     return (
-      <div className="portal-container" style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '16px', color: 'var(--portal-text-secondary)' }}>
-          Loading quotes...
-        </div>
+      <div className="loading-screen">
+        <div>Loading quotes...</div>
       </div>
     )
   }
   
   if (error) {
     return (
-      <div className="portal-container">
+      <div className="portal-layout">
         <Panel title="Quotes" subtitle="Manage your quotes and bids">
-          <div style={{ 
-            padding: '40px', 
-            textAlign: 'center',
-            color: 'var(--portal-error)'
-          }}>
-            <p style={{ fontSize: '16px', marginBottom: '12px' }}>Error loading quotes</p>
-            <p style={{ fontSize: '14px' }}>{error}</p>
+          <div className="portal-card">
+            <p>Error loading quotes</p>
+            <p className="page-description">{error}</p>
           </div>
         </Panel>
       </div>
@@ -182,24 +177,13 @@ export default function QuotesPage() {
   }
   
   return (
-    <div className="portal-container">
-      <div className="portal-section">
-        <div>
-          <h1 style={{
-            fontSize: '20px',
-            fontWeight: '700',
-            color: '#1f2937',
-            marginBottom: '8px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}>
-            Quotes
-          </h1>
-          <p style={{ fontSize: '14px', color: '#6b7280' }}>
-            Manage your quotes and bids
-          </p>
-        </div>
+    <div className="portal-layout">
+      <div className="portal-header">
+        <h1 className="portal-title">Quotes</h1>
+        <p className="page-description">Manage your quotes and bids</p>
+      </div>
 
+      <div className="portal-main">
         {/* Stats */}
         {quotes.length > 0 && (
           <QuotesStats 
