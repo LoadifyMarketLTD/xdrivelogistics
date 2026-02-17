@@ -56,6 +56,27 @@ export default function LoadsPage() {
   const [bidMessage, setBidMessage] = useState('')
   const [submittingBid, setSubmittingBid] = useState(false)
 
+  const fetchLoads = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      const { data, error: fetchError } = await supabase
+        .from('jobs')
+        .select('*')
+        .order('created_at', { ascending: false })
+      
+      if (fetchError) throw fetchError
+      
+      setLoads(data || [])
+    } catch (err: any) {
+      console.error('Error fetching loads:', err)
+      setError(err.message || 'Failed to load data')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
     let mounted = true
     let timeoutId: NodeJS.Timeout | null = null
