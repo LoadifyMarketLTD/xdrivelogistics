@@ -17,10 +17,10 @@ export default function Home() {
       justifyContent: 'center', 
       alignItems: 'center', 
       height: '100vh',
-      background: '#f3f4f6'
+      background: '#f4f5f7'
     }}>
       <div style={{ textAlign: 'center', color: '#6b7280' }}>
-        <div style={{ fontSize: '16px' }}>Loading...</div>
+        <div style={{ fontSize: '16px' }}>Redirecting to portal...</div>
       </div>
     </div>
   );
