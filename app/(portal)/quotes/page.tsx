@@ -156,7 +156,7 @@ export default function QuotesPage() {
   
   if (loading) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center' }}>
+      <div className="portal-container" style={{ textAlign: 'center' }}>
         <div style={{ fontSize: '16px', color: 'var(--portal-text-secondary)' }}>
           Loading quotes...
         </div>
@@ -166,7 +166,7 @@ export default function QuotesPage() {
   
   if (error) {
     return (
-      <div>
+      <div className="portal-container">
         <Panel title="Quotes" subtitle="Manage your quotes and bids">
           <div style={{ 
             padding: '40px', 
@@ -182,36 +182,54 @@ export default function QuotesPage() {
   }
   
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Stats */}
-      {quotes.length > 0 && (
-        <QuotesStats 
-          totalQuotes={stats.totalQuotes}
-          acceptedQuotes={stats.acceptedQuotes}
-          totalValue={stats.totalValue}
-          acceptanceRate={stats.acceptanceRate}
-        />
-      )}
-      
-      {/* Quotes List */}
-      <Panel 
-        title="All Quotes" 
-        subtitle={`${filteredQuotes.length} ${filteredQuotes.length === 1 ? 'quote' : 'quotes'} found`}
-      >
+    <div className="portal-container">
+      <div className="portal-section">
+        <div>
+          <h1 style={{
+            fontSize: '20px',
+            fontWeight: '700',
+            color: '#1f2937',
+            marginBottom: '8px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+          }}>
+            Quotes
+          </h1>
+          <p style={{ fontSize: '14px', color: '#6b7280' }}>
+            Manage your quotes and bids
+          </p>
+        </div>
+
+        {/* Stats */}
         {quotes.length > 0 && (
-          <QuotesFilters 
-            statusFilter={statusFilter}
-            onStatusChange={setStatusFilter}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
+          <QuotesStats 
+            totalQuotes={stats.totalQuotes}
+            acceptedQuotes={stats.acceptedQuotes}
+            totalValue={stats.totalValue}
+            acceptanceRate={stats.acceptanceRate}
           />
         )}
         
-        <QuotesTable 
-          quotes={filteredQuotes}
-          onWithdraw={handleWithdraw}
-        />
-      </Panel>
+        {/* Quotes List */}
+        <Panel 
+          title="All Quotes" 
+          subtitle={`${filteredQuotes.length} ${filteredQuotes.length === 1 ? 'quote' : 'quotes'} found`}
+        >
+          {quotes.length > 0 && (
+            <QuotesFilters 
+              statusFilter={statusFilter}
+              onStatusChange={setStatusFilter}
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+            />
+          )}
+          
+          <QuotesTable 
+            quotes={filteredQuotes}
+            onWithdraw={handleWithdraw}
+          />
+        </Panel>
+      </div>
     </div>
   )
 }
