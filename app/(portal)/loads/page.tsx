@@ -86,7 +86,7 @@ export default function LoadsPage() {
     }, 30000)
     
     return () => clearInterval(interval)
-  }, [fetchLoads])
+  }, [fetchLoads, companyId])
 
   const filteredAndSortedLoads = useMemo(() => {
     let filtered = loads.filter(load => {
