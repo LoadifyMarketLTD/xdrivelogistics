@@ -29,67 +29,89 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!companyId) return
-    fetchDashboardData()
-  }, [companyId])
+    
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
 
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true)
-      
-      // Fetch all jobs for total loads
-      const { data: allJobs, error: allJobsError } = await supabase
-        .from('jobs')
-        .select('*')
-      
-      if (allJobsError) throw allJobsError
-      
-      // Fetch active bids for this company
-      const { data: bids, error: bidsError } = await supabase
-        .from('job_bids')
-        .select('*')
-        .eq('bidder_company_id', companyId)
-        .eq('status', 'submitted')
-      
-      if (bidsError) throw bidsError
-      
-      // Fetch accepted bids/loads
-      const { data: acceptedBids, error: acceptedError } = await supabase
-        .from('job_bids')
-        .select('*, job:jobs(*)')
-        .eq('bidder_company_id', companyId)
-        .eq('status', 'accepted')
-      
-      if (acceptedError) throw acceptedError
-      
-      // Calculate revenue from accepted loads
-      const revenue = acceptedBids?.reduce((sum, bid) => {
-        return sum + (bid.quote_amount || 0)
-      }, 0) || 0
-      
-      // Fetch recent jobs posted by this company
-      const { data: myJobs, error: myJobsError } = await supabase
-        .from('jobs')
-        .select('*')
-        .eq('posted_by_company_id', companyId)
-        .order('created_at', { ascending: false })
-        .limit(10)
-      
-      if (myJobsError) throw myJobsError
-      
-      setRecentJobs(myJobs || [])
-      
-      setStats({
-        totalLoads: allJobs?.length || 0,
-        activeBids: bids?.length || 0,
-        acceptedLoads: acceptedBids?.length || 0,
-        revenue: revenue,
-      })
-    } catch (err: any) {
-      console.error('Error fetching dashboard data:', err)
-    } finally {
-      setLoading(false)
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        
+        // Set timeout to ensure loading always resolves
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn('Dashboard data fetch timeout - resolving loading state')
+            setLoading(false)
+          }
+        }, 10000) // 10 second timeout
+        
+        // Fetch all jobs for total loads
+        const { data: allJobs, error: allJobsError } = await supabase
+          .from('jobs')
+          .select('*')
+        
+        if (allJobsError) throw allJobsError
+        
+        // Fetch active bids for this company
+        const { data: bids, error: bidsError } = await supabase
+          .from('job_bids')
+          .select('*')
+          .eq('bidder_company_id', companyId)
+          .eq('status', 'submitted')
+        
+        if (bidsError) throw bidsError
+        
+        // Fetch accepted bids/loads
+        const { data: acceptedBids, error: acceptedError } = await supabase
+          .from('job_bids')
+          .select('*, job:jobs(*)')
+          .eq('bidder_company_id', companyId)
+          .eq('status', 'accepted')
+        
+        if (acceptedError) throw acceptedError
+        
+        // Calculate revenue from accepted loads
+        const revenue = acceptedBids?.reduce((sum, bid) => {
+          return sum + (bid.quote_amount || 0)
+        }, 0) || 0
+        
+        // Fetch recent jobs posted by this company
+        const { data: myJobs, error: myJobsError } = await supabase
+          .from('jobs')
+          .select('*')
+          .eq('posted_by_company_id', companyId)
+          .order('created_at', { ascending: false })
+          .limit(10)
+        
+        if (myJobsError) throw myJobsError
+        
+        if (!mounted) return
+        
+        setRecentJobs(myJobs || [])
+        
+        setStats({
+          totalLoads: allJobs?.length || 0,
+          activeBids: bids?.length || 0,
+          acceptedLoads: acceptedBids?.length || 0,
+          revenue: revenue,
+        })
+      } catch (err: any) {
+        console.error('Error fetching dashboard data:', err)
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+        if (timeoutId) clearTimeout(timeoutId)
+      }
     }
-  }
+
+    fetchData()
+
+    return () => {
+      mounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [companyId])
 
   if (loading) {
     return (

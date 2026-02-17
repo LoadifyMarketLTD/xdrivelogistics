@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/lib/AuthContext'
 import Panel from '@/components/portal/Panel'
 import StatCard from '@/components/portal/StatCard'
@@ -25,7 +25,6 @@ interface Vehicle {
 
 export default function MyFleetPage() {
   const { companyId } = useAuth()
-  const supabase = useMemo(() => createClientComponentClient(), [])
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -33,8 +32,18 @@ export default function MyFleetPage() {
   
   const fetchVehicles = async () => {
     if (!companyId) return
+    
+    let timeoutId: NodeJS.Timeout | null = null
+    
     try {
       setLoading(true)
+      
+      // Set timeout to ensure loading always resolves
+      timeoutId = setTimeout(() => {
+        console.warn('My Fleet data fetch timeout - resolving loading state')
+        setLoading(false)
+      }, 10000) // 10 second timeout
+      
       const { data, error } = await supabase.from('vehicles').select('*').eq('company_id', companyId).order('vehicle_type', { ascending: true })
       if (error) throw error
       setVehicles(data || [])
@@ -42,10 +51,14 @@ export default function MyFleetPage() {
       console.error('Error:', err)
     } finally {
       setLoading(false)
+      if (timeoutId) clearTimeout(timeoutId)
     }
   }
   
-  useEffect(() => { fetchVehicles() }, [companyId])
+  useEffect(() => { 
+    if (!companyId) return
+    fetchVehicles() 
+  }, [companyId])
   
   const handleSave = async (data: any) => {
     if (!companyId) return

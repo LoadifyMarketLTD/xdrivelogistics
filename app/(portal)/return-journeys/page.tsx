@@ -1,24 +1,51 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabaseClient'
 import Panel from '@/components/portal/Panel'
 
 export const dynamic = 'force-dynamic'
 
 export default function ReturnJourneysPage() {
-  const supabase = useMemo(() => createClientComponentClient(), [])
   const [jobs, setJobs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   
   useEffect(() => {
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
+    
     const fetch = async () => {
       try {
+        setLoading(true)
+        
+        // Set timeout to ensure loading always resolves
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn('Return Journeys data fetch timeout - resolving loading state')
+            setLoading(false)
+          }
+        }, 10000) // 10 second timeout
+        
         const { data } = await supabase.from('jobs').select('*').eq('status', 'completed').order('created_at', { ascending: false }).limit(10)
+        
+        if (!mounted) return
+        
         setJobs(data || [])
-      } catch (e) {} finally { setLoading(false) }
+      } catch (e) {
+        console.error('Error fetching return journeys:', e)
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+        if (timeoutId) clearTimeout(timeoutId)
+      }
     }
     fetch()
+    
+    return () => {
+      mounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
   }, [])
   
   if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>

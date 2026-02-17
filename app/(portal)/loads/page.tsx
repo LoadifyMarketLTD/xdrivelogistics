@@ -57,36 +57,60 @@ export default function LoadsPage() {
   const [submittingBid, setSubmittingBid] = useState(false)
 
   useEffect(() => {
-    fetchLoads()
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
+    
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        
+        // Set timeout to ensure loading always resolves
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn('Loads data fetch timeout - resolving loading state')
+            setLoading(false)
+          }
+        }, 10000) // 10 second timeout
+        
+        const { data, error: fetchError } = await supabase
+          .from('jobs')
+          .select('*')
+          .order('created_at', { ascending: false })
+        
+        if (fetchError) throw fetchError
+        
+        if (!mounted) return
+        
+        setLoads(data || [])
+      } catch (err: any) {
+        console.error('Error fetching loads:', err)
+        if (mounted) {
+          setError(err.message || 'Failed to load data')
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+        if (timeoutId) clearTimeout(timeoutId)
+      }
+    }
+    
+    fetchData()
     
     // Set up polling for real-time updates (every 30s)
     const interval = setInterval(() => {
-      fetchLoads()
+      if (mounted) {
+        fetchData()
+      }
     }, 30000)
     
-    return () => clearInterval(interval)
-  }, [companyId])
-
-  const fetchLoads = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      
-      const { data, error: fetchError } = await supabase
-        .from('jobs')
-        .select('*')
-        .order('created_at', { ascending: false })
-      
-      if (fetchError) throw fetchError
-      
-      setLoads(data || [])
-    } catch (err: any) {
-      console.error('Error fetching loads:', err)
-      setError(err.message || 'Failed to load data')
-    } finally {
-      setLoading(false)
+    return () => {
+      mounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+      clearInterval(interval)
     }
-  }
+  }, [])
 
   const filteredAndSortedLoads = useMemo(() => {
     let filtered = loads.filter(load => {
