@@ -4,7 +4,7 @@
 
 /* Enterprise Global Styles */
 body {
-  background: #f3f4f6;
+  background: #F4F6F8;
   font-size: 14px;
   line-height: 1.4;
   margin: 0;
@@ -56,4 +56,98 @@ body {
 [class*="gradient"] {
   background: #ffffff !important;
   background-image: none !important;
+}
+
+/* Portal Layout Utilities */
+.portal-container {
+  max-width: 1280px; /* max-w-7xl */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem; /* px-6 */
+  padding-right: 1.5rem;
+  padding-top: 2rem; /* py-8 */
+  padding-bottom: 2rem;
+}
+
+.portal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* space-y-6 */
+}
+
+/* Premium Card Styles */
+.premium-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+}
+
+.premium-card-header {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.premium-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.premium-card-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+/* Grid Layouts */
+.portal-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .portal-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.portal-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .portal-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .portal-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.portal-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .portal-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .portal-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }

@@ -3,7 +3,7 @@
 
 :root {
   /* CX-Style Backgrounds */
-  --cx-bg: #f4f5f7;
+  --cx-bg: #F4F6F8;
   --cx-sidebar: #1f2937;
   --cx-sidebar-hover: #2d3748;
   --cx-sidebar-active: #374151;
@@ -33,7 +33,7 @@
   --cx-orange: #f59e0b;
   
   /* Legacy variables for compatibility */
-  --portal-bg: #f4f5f7;
+  --portal-bg: #F4F6F8;
   --portal-bg-secondary: #FAFAFA;
   --portal-card: #FFFFFF;
   --portal-text-primary: #2C3E50;
