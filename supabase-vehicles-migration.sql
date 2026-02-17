@@ -3,6 +3,15 @@
 -- Add fleet management for Phase 2
 -- ============================================================
 
+-- Create utility function for updating timestamps (if not exists)
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TABLE IF NOT EXISTS public.vehicles (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,

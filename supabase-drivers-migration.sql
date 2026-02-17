@@ -4,6 +4,15 @@
 -- Run this in Supabase SQL Editor
 -- ============================================================
 
+-- Create utility function for updating timestamps (if not exists)
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Create drivers table
 CREATE TABLE IF NOT EXISTS public.drivers (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

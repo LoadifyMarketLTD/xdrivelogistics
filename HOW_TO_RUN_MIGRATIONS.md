@@ -39,6 +39,15 @@ You need to copy the **contents** of each file and run them in Supabase SQL Edit
 -- Run this in Supabase SQL Editor
 -- ============================================================
 
+-- Create utility function for updating timestamps (if not exists)
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Create drivers table
 CREATE TABLE IF NOT EXISTS public.drivers (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -133,6 +142,15 @@ GRANT ALL ON public.drivers TO service_role;
 -- VEHICLES TABLE MIGRATION
 -- Add fleet management for Phase 2
 -- ============================================================
+
+-- Create utility function for updating timestamps (if not exists)
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS public.vehicles (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -244,7 +262,9 @@ Expected: Both should have `rowsecurity = true`
 
 ### Error: "function update_updated_at_column() does not exist"
 
-**Solution:** Create the function first:
+**Status:** ✅ **FIXED** - The function is now included in both migration files.
+
+The migrations now create the function automatically:
 ```sql
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -255,7 +275,9 @@ END;
 $$ LANGUAGE plpgsql;
 ```
 
-Then re-run the migrations.
+**If you still see this error:**
+- Make sure you're copying the **complete** SQL from the updated migration files
+- The function definition should appear at the top, before the CREATE TABLE statements
 
 ### Error: "relation public.companies does not exist"
 
