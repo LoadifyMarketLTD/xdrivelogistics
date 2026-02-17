@@ -3,11 +3,6 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-export const metadata = {
-  title: 'XDrive Logistics - Enterprise Exchange',
-  description: 'B2B logistics exchange platform',
-};
-
 export default function Home() {
   const router = useRouter()
   

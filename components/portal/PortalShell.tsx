@@ -20,7 +20,9 @@ export default function PortalShell({ children }: { children: React.ReactNode })
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
-      }}>
+      }}
+      className="portal-main-content"
+      >
         {/* Compact Header */}
         <EnterpriseHeader />
         
@@ -33,6 +35,15 @@ export default function PortalShell({ children }: { children: React.ReactNode })
           {children}
         </div>
       </div>
+
+      {/* Mobile responsive styles */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .portal-main-content {
+            margin-left: 70px !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }
