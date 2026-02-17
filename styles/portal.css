@@ -680,6 +680,134 @@ body {
   font-weight: 500;
 }
 
+/* Stats Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: #FFFFFF;
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6B7280;
+  margin-bottom: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1F2937;
+  margin-bottom: 4px;
+}
+
+.stat-value.blue {
+  color: #3B82F6;
+}
+
+.stat-value.green {
+  color: #10B981;
+}
+
+.stat-description {
+  font-size: 11px;
+  color: #9CA3AF;
+}
+
+/* Tables */
+.table-container {
+  background: #FFFFFF;
+  border-radius: 8px;
+  border: 1px solid #E5E7EB;
+  overflow: hidden;
+}
+
+.table-header {
+  display: grid;
+  padding: 12px 16px;
+  background: #F9FAFB;
+  border-bottom: 1px solid #E5E7EB;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6B7280;
+  text-transform: uppercase;
+}
+
+.table-row {
+  display: grid;
+  padding: 12px 16px;
+  border-bottom: 1px solid #F3F4F6;
+  font-size: 13px;
+  color: #374151;
+  cursor: pointer;
+}
+
+.table-row:hover {
+  background: #F9FAFB;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-empty {
+  text-align: center;
+  padding: 40px;
+  color: #9CA3AF;
+  font-size: 14px;
+}
+
+/* Status Badge */
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.status-badge.open {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.status-badge.completed {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.status-badge.pending {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+/* Section Headers */
+.section-header {
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.page-description {
+  font-size: 14px;
+  color: #6B7280;
+  margin-bottom: 24px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .form-grid-2,
@@ -698,5 +826,9 @@ body {
   .btn-primary,
   .btn-secondary {
     width: 100%;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 }
