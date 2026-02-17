@@ -20,10 +20,10 @@ export default function DashboardPage() {
   const { companyId } = useAuth()
   const [recentJobs, setRecentJobs] = useState<Job[]>([])
   const [stats, setStats] = useState({
-    totalJobs: 0,
-    openJobs: 0,
-    completedJobs: 0,
-    totalRevenue: 0,
+    totalLoads: 0,
+    activeBids: 0,
+    acceptedLoads: 0,
+    revenue: 0,
   })
   const [loading, setLoading] = useState(true)
 
@@ -36,29 +36,53 @@ export default function DashboardPage() {
     try {
       setLoading(true)
       
-      // Fetch jobs
-      const { data: jobs, error: jobsError } = await supabase
+      // Fetch all jobs for total loads
+      const { data: allJobs, error: allJobsError } = await supabase
+        .from('jobs')
+        .select('*')
+      
+      if (allJobsError) throw allJobsError
+      
+      // Fetch active bids for this company
+      const { data: bids, error: bidsError } = await supabase
+        .from('job_bids')
+        .select('*')
+        .eq('bidder_company_id', companyId)
+        .eq('status', 'submitted')
+      
+      if (bidsError) throw bidsError
+      
+      // Fetch accepted bids/loads
+      const { data: acceptedBids, error: acceptedError } = await supabase
+        .from('job_bids')
+        .select('*, job:jobs(*)')
+        .eq('bidder_company_id', companyId)
+        .eq('status', 'accepted')
+      
+      if (acceptedError) throw acceptedError
+      
+      // Calculate revenue from accepted loads
+      const revenue = acceptedBids?.reduce((sum, bid) => {
+        return sum + (bid.quote_amount || 0)
+      }, 0) || 0
+      
+      // Fetch recent jobs posted by this company
+      const { data: myJobs, error: myJobsError } = await supabase
         .from('jobs')
         .select('*')
         .eq('posted_by_company_id', companyId)
         .order('created_at', { ascending: false })
         .limit(10)
       
-      if (jobsError) throw jobsError
+      if (myJobsError) throw myJobsError
       
-      setRecentJobs(jobs || [])
-      
-      // Calculate stats
-      const totalJobs = jobs?.length || 0
-      const openJobs = jobs?.filter(j => j.status === 'open').length || 0
-      const completedJobs = jobs?.filter(j => j.status === 'completed' || j.status === 'delivered').length || 0
-      const totalRevenue = jobs?.reduce((sum, j) => sum + (j.budget || 0), 0) || 0
+      setRecentJobs(myJobs || [])
       
       setStats({
-        totalJobs,
-        openJobs,
-        completedJobs,
-        totalRevenue,
+        totalLoads: allJobs?.length || 0,
+        activeBids: bids?.length || 0,
+        acceptedLoads: acceptedBids?.length || 0,
+        revenue: revenue,
       })
     } catch (err: any) {
       console.error('Error fetching dashboard data:', err)
@@ -106,7 +130,7 @@ export default function DashboardPage() {
           gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
           gap: '16px',
         }}>
-          {/* Gross Margin Panel */}
+          {/* Total Loads */}
           <div style={{
             background: '#ffffff',
             border: '1px solid #e5e7eb',
@@ -119,25 +143,25 @@ export default function DashboardPage() {
               fontWeight: '600',
               textTransform: 'uppercase',
             }}>
-              Total Revenue
+              Total Loads (System)
             </div>
             <div style={{
               fontSize: '28px',
               fontWeight: '700',
               color: '#1f2937',
             }}>
-              £{stats.totalRevenue.toFixed(2)}
+              {stats.totalLoads}
             </div>
             <div style={{
               fontSize: '11px',
               color: '#9ca3af',
               marginTop: '4px',
             }}>
-              From {stats.totalJobs} jobs
+              All available loads
             </div>
           </div>
 
-          {/* Sub-contract Spend Panel */}
+          {/* Active Bids */}
           <div style={{
             background: '#ffffff',
             border: '1px solid #e5e7eb',
@@ -150,25 +174,25 @@ export default function DashboardPage() {
               fontWeight: '600',
               textTransform: 'uppercase',
             }}>
-              Open Jobs
+              Active Bids
             </div>
             <div style={{
               fontSize: '28px',
               fontWeight: '700',
-              color: '#1f2937',
+              color: '#3b82f6',
             }}>
-              {stats.openJobs}
+              {stats.activeBids}
             </div>
             <div style={{
               fontSize: '11px',
               color: '#9ca3af',
               marginTop: '4px',
             }}>
-              Awaiting assignment
+              Pending responses
             </div>
           </div>
 
-          {/* Completed Jobs */}
+          {/* Accepted Loads */}
           <div style={{
             background: '#ffffff',
             border: '1px solid #e5e7eb',
@@ -181,99 +205,52 @@ export default function DashboardPage() {
               fontWeight: '600',
               textTransform: 'uppercase',
             }}>
-              Completed Jobs
+              Accepted Loads
             </div>
             <div style={{
               fontSize: '28px',
               fontWeight: '700',
               color: '#10b981',
             }}>
-              {stats.completedJobs}
+              {stats.acceptedLoads}
             </div>
             <div style={{
               fontSize: '11px',
               color: '#9ca3af',
               marginTop: '4px',
             }}>
-              Successfully delivered
+              Won bids
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Accounts Section */}
-      <div style={{ marginBottom: '24px' }}>
-        <h2 style={{
-          fontSize: '14px',
-          fontWeight: '700',
-          color: '#374151',
-          marginBottom: '12px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.3px',
-        }}>
-          Accounts
-        </h2>
-        
-        <div style={{
-          background: '#ffffff',
-          border: '1px solid #e5e7eb',
-          padding: '20px',
-        }}>
+          {/* Revenue */}
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '20px',
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
+            padding: '16px',
           }}>
-            <div>
-              <div style={{
-                fontSize: '12px',
-                color: '#6b7280',
-                marginBottom: '6px',
-                fontWeight: '600',
-              }}>
-                Invoices Received
-              </div>
-              <div style={{
-                fontSize: '20px',
-                fontWeight: '600',
-                color: '#1f2937',
-              }}>
-                {recentJobs.length > 0 ? recentJobs.length : '—'}
-              </div>
+            <div style={{
+              fontSize: '12px',
+              color: '#6b7280',
+              marginBottom: '8px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+            }}>
+              Revenue (Accepted)
             </div>
-            <div>
-              <div style={{
-                fontSize: '12px',
-                color: '#6b7280',
-                marginBottom: '6px',
-                fontWeight: '600',
-              }}>
-                Awaiting Payment
-              </div>
-              <div style={{
-                fontSize: '20px',
-                fontWeight: '600',
-                color: '#f59e0b',
-              }}>
-                £{(stats.totalRevenue * 0.3).toFixed(2)}
-              </div>
+            <div style={{
+              fontSize: '28px',
+              fontWeight: '700',
+              color: '#10b981',
+            }}>
+              £{stats.revenue.toFixed(2)}
             </div>
-            <div>
-              <div style={{
-                fontSize: '12px',
-                color: '#6b7280',
-                marginBottom: '6px',
-                fontWeight: '600',
-              }}>
-                Monthly Total
-              </div>
-              <div style={{
-                fontSize: '20px',
-                fontWeight: '600',
-                color: '#1f2937',
-              }}>
-                £{stats.totalRevenue.toFixed(2)}
-              </div>
+            <div style={{
+              fontSize: '11px',
+              color: '#9ca3af',
+              marginTop: '4px',
+            }}>
+              From accepted bids
             </div>
           </div>
         </div>
@@ -289,7 +266,7 @@ export default function DashboardPage() {
           textTransform: 'uppercase',
           letterSpacing: '0.3px',
         }}>
-          Activity at a Glance
+          My Posted Loads
         </h2>
         
         <div style={{
@@ -324,7 +301,7 @@ export default function DashboardPage() {
               color: '#9ca3af',
               fontSize: '14px',
             }}>
-              No recent activity
+              No loads posted yet
             </div>
           ) : (
             recentJobs.map((job) => (
