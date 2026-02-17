@@ -29,6 +29,19 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   const { user, companyId } = useAuth()
   const [newLoadsCount, setNewLoadsCount] = useState(0)
   const [acceptedBidsCount, setAcceptedBidsCount] = useState(0)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -79,6 +92,43 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
       minHeight: '100vh',
       background: '#f4f5f7',
     }}>
+      {/* Mobile Menu Toggle */}
+      {isMobile && (
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          style={{
+            position: 'fixed',
+            top: '10px',
+            left: '10px',
+            zIndex: 100,
+            background: '#1f2937',
+            color: '#ffffff',
+            border: 'none',
+            padding: '8px 12px',
+            cursor: 'pointer',
+            fontSize: '20px',
+          }}
+        >
+          ☰
+        </button>
+      )}
+
+      {/* Mobile Overlay */}
+      {isMobile && isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 40,
+          }}
+        />
+      )}
+
       {/* Left Sidebar - CX Style */}
       <div style={{
         width: '220px',
@@ -88,6 +138,8 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         display: 'flex',
         flexDirection: 'column',
         zIndex: 50,
+        left: isMobile ? (isMobileMenuOpen ? '0' : '-220px') : '0',
+        transition: 'left 0.3s ease',
       }}>
         {/* Logo/Brand */}
         <div style={{
@@ -124,7 +176,10 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             return (
               <div
                 key={item.path}
-                onClick={() => router.push(item.path)}
+                onClick={() => {
+                  router.push(item.path)
+                  if (isMobile) setIsMobileMenuOpen(false)
+                }}
                 style={{
                   padding: '10px 16px',
                   cursor: 'pointer',
@@ -169,28 +224,34 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
       {/* Main Content Area */}
       <div style={{
         flex: 1,
-        marginLeft: '220px',
+        marginLeft: isMobile ? '0' : '220px',
         display: 'flex',
         flexDirection: 'column',
       }}>
         {/* Top Navigation Bar */}
         <div style={{
-          height: '56px',
+          height: isMobile ? 'auto' : '56px',
+          minHeight: '56px',
           background: '#ffffff',
           borderBottom: '1px solid #e5e7eb',
           display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 24px',
+          padding: isMobile ? '10px 50px 10px 50px' : '0 24px',
           position: 'sticky',
           top: 0,
           zIndex: 40,
+          gap: isMobile ? '10px' : '0',
         }}>
           {/* Left side - Action buttons */}
           <div style={{
             display: 'flex',
             gap: '12px',
             alignItems: 'center',
+            flexWrap: 'wrap',
+            justifyContent: isMobile ? 'center' : 'flex-start',
+            width: isMobile ? '100%' : 'auto',
           }}>
             <button
               onClick={() => router.push('/jobs/new')}
@@ -244,6 +305,9 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             display: 'flex',
             gap: '16px',
             alignItems: 'center',
+            flexWrap: 'wrap',
+            justifyContent: isMobile ? 'center' : 'flex-end',
+            width: isMobile ? '100%' : 'auto',
           }}>
             {/* Notifications */}
             {totalNotifications > 0 && (
