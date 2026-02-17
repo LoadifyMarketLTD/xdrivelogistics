@@ -331,7 +331,6 @@ export default function DiaryPage() {
                           backgroundColor: 'rgba(255,255,255,0.02)',
                           borderRadius: '8px',
                           border: '1px solid rgba(255,255,255,0.05)',
-                          transition: 'all 0.2s',
                           display: 'block'
                         }}
                       >
@@ -384,8 +383,7 @@ export default function DiaryPage() {
                               border: '1px solid rgba(255,255,255,0.05)',
                               display: 'flex',
                               justifyContent: 'space-between',
-                              alignItems: 'center',
-                              transition: 'all 0.2s'
+                              alignItems: 'center'
                             }}
                           >
                             <div>
