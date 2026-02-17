@@ -19,6 +19,7 @@ interface AuthContextType {
   profile: Profile | null
   companyId: string | null
   loading: boolean
+  profileLoading: boolean
   error: string | null
   refreshProfile: () => Promise<void>
   signOut: () => Promise<void>
@@ -31,10 +32,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [companyId, setCompanyId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [profileLoading, setProfileLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const fetchProfile = async (userId: string) => {
     try {
+      setProfileLoading(true)
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -54,6 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err: any) {
       console.error('Error fetching profile:', err)
       setError(err.message)
+    } finally {
+      setProfileLoading(false)
     }
   }
 
@@ -72,51 +77,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
 
-    // Check active session
+    // Event-driven auth initialization - no timeouts
     const initializeAuth = async () => {
       try {
-        // Set timeout to ensure loading always resolves
-        timeoutId = setTimeout(() => {
-          if (mounted && loading) {
-            console.warn('Auth initialization timeout - resolving loading state')
-            setLoading(false)
-          }
-        }, 5000) // 5 second timeout
-
-        const { data: { session } } = await supabase.auth.getSession()
+        // Get current session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError) {
+          console.error('Error getting session:', sessionError)
+        }
         
         if (!mounted) return
 
+        // Set user immediately once we know auth status
         setUser(session?.user ?? null)
+        
+        // Set loading=false as soon as auth status is known
+        // Profile fetch runs async and doesn't block
+        setLoading(false)
+
+        // Fetch profile async without blocking
         if (session?.user) {
-          await fetchProfile(session.user.id)
+          fetchProfile(session.user.id)
         }
       } catch (err) {
         console.error('Error initializing auth:', err)
-      } finally {
         if (mounted) {
           setLoading(false)
         }
-        if (timeoutId) clearTimeout(timeoutId)
       }
     }
 
     initializeAuth()
 
-    // Listen for auth changes
-    // Note: We don't set loading=true here to avoid showing loading screens
-    // during normal auth state changes. The profile fetch is fast and pages
-    // handle the transition gracefully with their own loading states.
+    // Subscribe to auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return
       
       setUser(session?.user ?? null)
+      
       if (session?.user) {
-        await fetchProfile(session.user.id)
+        // Fetch profile without blocking
+        fetchProfile(session.user.id)
       } else {
         setProfile(null)
         setCompanyId(null)
@@ -125,7 +130,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       mounted = false
-      if (timeoutId) clearTimeout(timeoutId)
       subscription.unsubscribe()
     }
   }, [])
@@ -135,6 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profile,
     companyId,
     loading,
+    profileLoading,
     error,
     refreshProfile,
     signOut,

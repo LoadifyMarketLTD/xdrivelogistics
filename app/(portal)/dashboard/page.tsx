@@ -31,19 +31,10 @@ export default function DashboardPage() {
     if (!companyId) return
     
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
 
     const fetchData = async () => {
       try {
         setLoading(true)
-        
-        // Set timeout to ensure loading always resolves
-        timeoutId = setTimeout(() => {
-          if (mounted) {
-            console.warn('Dashboard data fetch timeout - resolving loading state')
-            setLoading(false)
-          }
-        }, 10000) // 10 second timeout
         
         // Fetch all jobs for total loads
         const { data: allJobs, error: allJobsError } = await supabase
@@ -101,7 +92,6 @@ export default function DashboardPage() {
         if (mounted) {
           setLoading(false)
         }
-        if (timeoutId) clearTimeout(timeoutId)
       }
     }
 
@@ -109,7 +99,6 @@ export default function DashboardPage() {
 
     return () => {
       mounted = false
-      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [companyId])
 

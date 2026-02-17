@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo, useRef } from 'react'
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
@@ -58,23 +58,14 @@ export default function LoadsPage() {
   
   // Use ref for mounted state to prevent updates after unmount
   const mountedRef = useRef(true)
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   
-  // Define fetchLoads using useCallback to make it stable for refresh button
-  const fetchLoads = async () => {
+  // Define fetchLoads using useCallback to make it stable
+  const fetchLoads = useCallback(async () => {
     if (!mountedRef.current) return
     
     try {
       setLoading(true)
       setError(null)
-      
-      // Set timeout to ensure loading always resolves
-      timeoutRef.current = setTimeout(() => {
-        if (mountedRef.current) {
-          console.warn('Loads data fetch timeout - resolving loading state')
-          setLoading(false)
-        }
-      }, 10000) // 10 second timeout
       
       const { data, error: fetchError } = await supabase
         .from('jobs')
@@ -96,12 +87,8 @@ export default function LoadsPage() {
       if (mountedRef.current) {
         setLoading(false)
       }
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-        timeoutRef.current = null
-      }
     }
-  }
+  }, [])
 
   useEffect(() => {
     mountedRef.current = true
@@ -118,10 +105,9 @@ export default function LoadsPage() {
     
     return () => {
       mountedRef.current = false
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
       clearInterval(interval)
     }
-  }, [])
+  }, [fetchLoads])
 
   const filteredAndSortedLoads = useMemo(() => {
     let filtered = loads.filter(load => {
