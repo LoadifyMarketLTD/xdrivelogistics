@@ -8,11 +8,6 @@ import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
 
-// Shared input class for consistent styling
-const inputClass =
-  "w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-slate-900 placeholder:text-slate-400 shadow-sm " +
-  "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition";
-
 interface CompanyData {
   id: string
   name: string
@@ -159,53 +154,51 @@ export default function CompanySettingsPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-slate-900 text-white">
-        <div className="text-center">
-          <div className="text-lg">Loading...</div>
-        </div>
+      <div className="loading-screen">
+        <div className="loading-text">Loading...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <div className="h-16 bg-white border-b border-slate-200 flex items-center px-6 shadow-sm">
-        <h1 className="text-lg font-semibold text-slate-800">Company Settings</h1>
+    <div className="portal-layout">
+      <div className="portal-header">
+        <h1 className="portal-title">Company Settings</h1>
       </div>
 
-      <main className="py-10 px-5 max-w-4xl mx-auto">
-        <div className="mx-auto w-full max-w-3xl rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-xl backdrop-blur-sm md:p-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2 text-slate-900">
+      <main className="portal-main">
+        <div className="portal-card">
+          <div>
+            <h1 className="section-title">
               Company Settings
             </h1>
-            <p className="text-sm text-slate-600">
+            <p className="section-subtitle">
               Manage your company details and information.
             </p>
           </div>
 
           {error && (
-            <div className="px-4 py-3 bg-red-50 border border-red-300 rounded-lg mb-6 text-red-600 text-sm">
+            <div className="alert alert-error">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="px-4 py-3 bg-green-50 border border-green-300 rounded-lg mb-6 text-green-600 text-sm">
+            <div className="alert alert-success">
               ✓ Company details updated successfully!
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit}>
             {/* Basic Information */}
-            <div>
-              <h2 className="text-lg font-semibold text-slate-800 mb-4">
+            <div className="form-section">
+              <h2 className="form-section-title">
                 Basic Information
               </h2>
               
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-700">
+              <div className="form-grid-2">
+                <div className="form-field">
+                  <label className="form-label">
                     Company Name *
                   </label>
                   <input
@@ -213,68 +206,68 @@ export default function CompanySettingsPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className={inputClass}
+                    className="form-input"
                     placeholder="Your Company Ltd"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-700">
+                <div className="form-field">
+                  <label className="form-label">
                     Phone Number
                   </label>
                   <input
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className={inputClass}
+                    className="form-input"
                     placeholder="+44 7xxx xxx xxx"
                   />
                 </div>
               </div>
 
-              <div className="mt-4 space-y-2">
-                <label className="block text-sm font-medium text-slate-700">
+              <div className="form-field">
+                <label className="form-label">
                   Email Address
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={inputClass}
+                  className="form-input"
                   placeholder="contact@company.com"
                 />
               </div>
             </div>
 
             {/* Company Registration */}
-            <div>
-              <h2 className="text-lg font-semibold text-slate-800 mb-4">
+            <div className="form-section">
+              <h2 className="form-section-title">
                 Company Registration
               </h2>
               
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-700">
+              <div className="form-grid-2">
+                <div className="form-field">
+                  <label className="form-label">
                     VAT Number
                   </label>
                   <input
                     type="text"
                     value={vatNumber}
                     onChange={(e) => setVatNumber(e.target.value)}
-                    className={inputClass}
+                    className="form-input"
                     placeholder="GB123456789"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-700">
+                <div className="form-field">
+                  <label className="form-label">
                     Company Number
                   </label>
                   <input
                     type="text"
                     value={companyNumber}
                     onChange={(e) => setCompanyNumber(e.target.value)}
-                    className={inputClass}
+                    className="form-input"
                     placeholder="12345678"
                   />
                 </div>
@@ -282,74 +275,74 @@ export default function CompanySettingsPage() {
             </div>
 
             {/* Address Information */}
-            <div>
-              <h2 className="text-lg font-semibold text-slate-800 mb-4">
+            <div className="form-section">
+              <h2 className="form-section-title">
                 Address Information
               </h2>
               
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-700">
+              <div className="form-grid">
+                <div className="form-field">
+                  <label className="form-label">
                     Address Line 1
                   </label>
                   <input
                     type="text"
                     value={addressLine1}
                     onChange={(e) => setAddressLine1(e.target.value)}
-                    className={inputClass}
+                    className="form-input"
                     placeholder="123 Business Street"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-700">
+                <div className="form-field">
+                  <label className="form-label">
                     Address Line 2
                   </label>
                   <input
                     type="text"
                     value={addressLine2}
                     onChange={(e) => setAddressLine2(e.target.value)}
-                    className={inputClass}
+                    className="form-input"
                     placeholder="Suite 100"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-slate-700">
+                <div className="form-grid-3">
+                  <div className="form-field">
+                    <label className="form-label">
                       City
                     </label>
                     <input
                       type="text"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      className={inputClass}
+                      className="form-input"
                       placeholder="London"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-slate-700">
+                  <div className="form-field">
+                    <label className="form-label">
                       Postcode
                     </label>
                     <input
                       type="text"
                       value={postcode}
                       onChange={(e) => setPostcode(e.target.value)}
-                      className={inputClass}
+                      className="form-input"
                       placeholder="SW1A 1AA"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-slate-700">
+                  <div className="form-field">
+                    <label className="form-label">
                       Country
                     </label>
                     <input
                       type="text"
                       value={country}
                       onChange={(e) => setCountry(e.target.value)}
-                      className={inputClass}
+                      className="form-input"
                       placeholder="United Kingdom"
                     />
                   </div>
@@ -358,18 +351,18 @@ export default function CompanySettingsPage() {
             </div>
 
             {/* Submit Button */}
-            <div className="flex gap-3 justify-end pt-4 border-t border-slate-200">
+            <div className="btn-group">
               <button
                 type="button"
                 onClick={() => router.push('/dashboard')}
-                className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-slate-800 font-semibold hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300 transition"
+                className="btn-secondary"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-2.5 text-white font-semibold shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 disabled:cursor-not-allowed transition"
+                className="btn-primary"
               >
                 {submitting ? 'Saving...' : 'Save Changes'}
               </button>
