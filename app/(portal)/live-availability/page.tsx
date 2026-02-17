@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/lib/AuthContext'
 import Panel from '@/components/portal/Panel'
 import StatusPill from '@/components/portal/StatusPill'
@@ -10,7 +10,6 @@ export const dynamic = 'force-dynamic'
 
 export default function LiveAvailabilityPage() {
   const { companyId } = useAuth()
-  const supabase = useMemo(() => createClientComponentClient(), [])
   const [vehicles, setVehicles] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   
@@ -28,7 +27,7 @@ export default function LiveAvailabilityPage() {
       }
     }
     fetch()
-  }, [companyId, supabase])
+  }, [companyId])
   
   if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
   

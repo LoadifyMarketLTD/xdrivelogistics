@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/lib/AuthContext'
 import Panel from '@/components/portal/Panel'
 import QuotesStats from '@/components/portal/quotes/QuotesStats'
@@ -28,7 +28,6 @@ interface Quote {
 
 export default function QuotesPage() {
   const { companyId } = useAuth()
-  const supabase = useMemo(() => createClientComponentClient(), [])
   
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [loading, setLoading] = useState(true)
@@ -84,7 +83,7 @@ export default function QuotesPage() {
     }
     
     fetchQuotes()
-  }, [companyId, supabase])
+  }, [companyId])
   
   const handleWithdraw = async (quoteId: string) => {
     if (!confirm('Are you sure you want to withdraw this quote?')) return

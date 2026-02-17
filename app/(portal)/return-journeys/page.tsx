@@ -1,13 +1,12 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabaseClient'
 import Panel from '@/components/portal/Panel'
 
 export const dynamic = 'force-dynamic'
 
 export default function ReturnJourneysPage() {
-  const supabase = useMemo(() => createClientComponentClient(), [])
   const [jobs, setJobs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   
@@ -24,7 +23,7 @@ export default function ReturnJourneysPage() {
       }
     }
     fetch()
-  }, [supabase])
+  }, [])
   
   if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
   

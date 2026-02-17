@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/lib/AuthContext'
 import Panel from '@/components/portal/Panel'
 import StatCard from '@/components/portal/StatCard'
@@ -25,7 +25,6 @@ interface Vehicle {
 
 export default function MyFleetPage() {
   const { companyId } = useAuth()
-  const supabase = useMemo(() => createClientComponentClient(), [])
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)

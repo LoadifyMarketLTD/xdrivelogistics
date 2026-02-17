@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/lib/AuthContext'
 import Panel from '@/components/portal/Panel'
 import StatCard from '@/components/portal/StatCard'
@@ -10,7 +10,6 @@ export const dynamic = 'force-dynamic'
 
 export default function FreightVisionPage() {
   const { companyId } = useAuth()
-  const supabase = useMemo(() => createClientComponentClient(), [])
   const [stats, setStats] = useState({ totalJobs: 0, completedJobs: 0, totalRevenue: 0, activeBids: 0 })
   const [loading, setLoading] = useState(true)
   
@@ -37,7 +36,7 @@ export default function FreightVisionPage() {
       }
     }
     fetch()
-  }, [companyId, supabase])
+  }, [companyId])
   
   if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
   
