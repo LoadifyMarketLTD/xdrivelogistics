@@ -3,9 +3,9 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
-import PortalShell from '@/components/portal/PortalShell'
+import PortalLayout from '@/components/layout/PortalLayout'
 
-export default function PortalLayout({ children }: { children: React.ReactNode }) {
+export default function PortalLayoutWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { user, companyId, loading } = useAuth()
   
@@ -28,7 +28,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         justifyContent: 'center', 
         alignItems: 'center', 
         height: '100vh',
-        background: '#F5F5F5',
+        background: '#f4f5f7',
         color: '#2C3E50'
       }}>
         <div style={{ textAlign: 'center' }}>
@@ -42,5 +42,5 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
     return null
   }
   
-  return <PortalShell>{children}</PortalShell>
+  return <PortalLayout>{children}</PortalLayout>
 }

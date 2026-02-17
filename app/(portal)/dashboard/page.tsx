@@ -1,308 +1,352 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/AuthContext'
+import { supabase } from '@/lib/supabaseClient'
 
 export const dynamic = 'force-dynamic'
 
-// Business constants
-const GROSS_MARGIN_RATE = 0.22 // 22% margin
-const ACCOUNTS_PAYABLE_RATE = 0.15 // 15% of revenue
-const SUBCONTRACT_SPEND_RATE = 0.65 // 65% of revenue
-
-interface DashboardStats {
-  totalLoads: number
-  activeDrivers: number
-  totalRevenue: number
-  completedLoads: number
-  grossMargin: number
-  accountsPayable: number
-  monthlyTotal: number
-  subcontractSpend: number
+interface Job {
+  id: string
+  pickup_location: string
+  delivery_location: string
+  status: string
+  budget: number | null
+  created_at: string
+  vehicle_type: string | null
 }
 
 export default function DashboardPage() {
   const { companyId } = useAuth()
-  const supabase = useMemo(() => createClientComponentClient(), [])
-  
-  const [stats, setStats] = useState<DashboardStats>({
+  const [recentJobs, setRecentJobs] = useState<Job[]>([])
+  const [stats, setStats] = useState({
     totalLoads: 0,
-    activeDrivers: 0,
-    totalRevenue: 0,
-    completedLoads: 0,
-    grossMargin: 0,
-    accountsPayable: 0,
-    monthlyTotal: 0,
-    subcontractSpend: 0,
+    activeBids: 0,
+    acceptedLoads: 0,
+    revenue: 0,
   })
   const [loading, setLoading] = useState(true)
-  
+
   useEffect(() => {
     if (!companyId) return
-    
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true)
-        
-        // Fetch jobs stats
-        const { data: jobs, error: jobsError } = await supabase
-          .from('jobs')
-          .select('*')
-          .eq('posted_by_company_id', companyId)
-        
-        if (jobsError) throw jobsError
-        
-        // Calculate stats
-        const totalLoads = jobs?.length || 0
-        const completedLoads = jobs?.filter(j => j.status === 'completed' || j.status === 'delivered').length || 0
-        const totalRevenue = jobs?.reduce((sum, j) => sum + (j.budget || 0), 0) || 0
-        const grossMargin = totalRevenue * GROSS_MARGIN_RATE
-        const accountsPayable = totalRevenue * ACCOUNTS_PAYABLE_RATE
-        const monthlyTotal = totalRevenue
-        const subcontractSpend = totalRevenue * SUBCONTRACT_SPEND_RATE
-        
-        setStats({
-          totalLoads,
-          activeDrivers: 12, // Placeholder
-          totalRevenue,
-          completedLoads,
-          grossMargin,
-          accountsPayable,
-          monthlyTotal,
-          subcontractSpend,
-        })
-        
-      } catch (err: any) {
-        console.error('Error fetching dashboard data:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    
     fetchDashboardData()
-  }, [companyId, supabase])
-  
+  }, [companyId])
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true)
+      
+      // Fetch all jobs for total loads
+      const { data: allJobs, error: allJobsError } = await supabase
+        .from('jobs')
+        .select('*')
+      
+      if (allJobsError) throw allJobsError
+      
+      // Fetch active bids for this company
+      const { data: bids, error: bidsError } = await supabase
+        .from('job_bids')
+        .select('*')
+        .eq('bidder_company_id', companyId)
+        .eq('status', 'submitted')
+      
+      if (bidsError) throw bidsError
+      
+      // Fetch accepted bids/loads
+      const { data: acceptedBids, error: acceptedError } = await supabase
+        .from('job_bids')
+        .select('*, job:jobs(*)')
+        .eq('bidder_company_id', companyId)
+        .eq('status', 'accepted')
+      
+      if (acceptedError) throw acceptedError
+      
+      // Calculate revenue from accepted loads
+      const revenue = acceptedBids?.reduce((sum, bid) => {
+        return sum + (bid.quote_amount || 0)
+      }, 0) || 0
+      
+      // Fetch recent jobs posted by this company
+      const { data: myJobs, error: myJobsError } = await supabase
+        .from('jobs')
+        .select('*')
+        .eq('posted_by_company_id', companyId)
+        .order('created_at', { ascending: false })
+        .limit(10)
+      
+      if (myJobsError) throw myJobsError
+      
+      setRecentJobs(myJobs || [])
+      
+      setStats({
+        totalLoads: allJobs?.length || 0,
+        activeBids: bids?.length || 0,
+        acceptedLoads: acceptedBids?.length || 0,
+        revenue: revenue,
+      })
+    } catch (err: any) {
+      console.error('Error fetching dashboard data:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (loading) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center' }}>
-        <div style={{ fontSize: '16px', color: '#6b7280' }}>
-          Loading dashboard...
-        </div>
+      <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+        Loading dashboard...
       </div>
     )
   }
 
-  const StatPanel = ({ title, value, subtitle }: { title: string; value: string; subtitle?: string }) => (
-    <div style={{
-      background: '#ffffff',
-      border: '1px solid #e5e7eb',
-      borderRadius: '4px',
-      padding: '16px',
-    }}>
-      <div style={{
-        fontSize: '11px',
-        fontWeight: '600',
-        color: '#6b7280',
+  return (
+    <div style={{ maxWidth: '1400px' }}>
+      <h1 style={{
+        fontSize: '20px',
+        fontWeight: '700',
+        color: '#1f2937',
+        marginBottom: '20px',
         textTransform: 'uppercase',
         letterSpacing: '0.5px',
-        marginBottom: '8px',
       }}>
-        {title}
-      </div>
-      <div style={{
-        fontSize: '24px',
-        fontWeight: '700',
-        color: '#111827',
-        marginBottom: '4px',
-      }}>
-        {value}
-      </div>
-      {subtitle && (
-        <div style={{
-          fontSize: '12px',
-          color: '#6b7280',
-        }}>
-          {subtitle}
-        </div>
-      )}
-    </div>
-  )
+        Dashboard
+      </h1>
 
-  const ActivityRow = ({ label, value, time }: { label: string; value: string; time: string }) => (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '10px 0',
-      borderBottom: '1px solid #f3f4f6',
-      fontSize: '13px',
-    }}>
-      <div style={{ flex: 1, color: '#374151' }}>{label}</div>
-      <div style={{ fontWeight: '600', color: '#111827', marginRight: '12px' }}>{value}</div>
-      <div style={{ fontSize: '11px', color: '#9ca3af', minWidth: '60px', textAlign: 'right' }}>{time}</div>
-    </div>
-  )
-  
-  return (
-    <div style={{
-      maxWidth: '1600px',
-      margin: '0 auto',
-    }}>
-      {/* Header */}
-      <div style={{
-        marginBottom: '16px',
-      }}>
-        <h1 style={{
-          fontSize: '20px',
-          fontWeight: '600',
-          color: '#111827',
-          margin: '0 0 4px 0',
+      {/* Reports & Statistics Section */}
+      <div style={{ marginBottom: '24px' }}>
+        <h2 style={{
+          fontSize: '14px',
+          fontWeight: '700',
+          color: '#374151',
+          marginBottom: '12px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.3px',
         }}>
-          Dashboard
-        </h1>
+          Reports & Statistics
+        </h2>
+        
         <div style={{
-          fontSize: '13px',
-          color: '#6b7280',
-        }}>
-          Enterprise logistics operations overview
-        </div>
-      </div>
-
-      {/* Two Column Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '16px',
-      }}>
-        {/* LEFT COLUMN */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
           gap: '16px',
         }}>
-          {/* Gross Margin */}
-          <StatPanel 
-            title="Gross Margin"
-            value={`£${(stats.grossMargin / 1000).toFixed(1)}k`}
-            subtitle="+12% vs last month"
-          />
-
-          {/* Accounts Payable */}
-          <StatPanel 
-            title="Accounts Payable"
-            value={`£${(stats.accountsPayable / 1000).toFixed(1)}k`}
-            subtitle="3 invoices pending"
-          />
-
-          {/* Monthly Totals */}
+          {/* Total Loads */}
           <div style={{
             background: '#ffffff',
             border: '1px solid #e5e7eb',
-            borderRadius: '4px',
             padding: '16px',
           }}>
             <div style={{
-              fontSize: '11px',
-              fontWeight: '600',
+              fontSize: '12px',
               color: '#6b7280',
+              marginBottom: '8px',
+              fontWeight: '600',
               textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              marginBottom: '12px',
             }}>
-              Monthly Totals
+              Total Loads (System)
             </div>
             <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '12px',
+              fontSize: '28px',
+              fontWeight: '700',
+              color: '#1f2937',
             }}>
-              <div>
-                <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Revenue</div>
-                <div style={{ fontSize: '18px', fontWeight: '700', color: '#111827' }}>
-                  £{(stats.monthlyTotal / 1000).toFixed(1)}k
-                </div>
-              </div>
-              <div>
-                <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Loads</div>
-                <div style={{ fontSize: '18px', fontWeight: '700', color: '#111827' }}>
-                  {stats.totalLoads}
-                </div>
-              </div>
+              {stats.totalLoads}
+            </div>
+            <div style={{
+              fontSize: '11px',
+              color: '#9ca3af',
+              marginTop: '4px',
+            }}>
+              All available loads
+            </div>
+          </div>
+
+          {/* Active Bids */}
+          <div style={{
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
+            padding: '16px',
+          }}>
+            <div style={{
+              fontSize: '12px',
+              color: '#6b7280',
+              marginBottom: '8px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+            }}>
+              Active Bids
+            </div>
+            <div style={{
+              fontSize: '28px',
+              fontWeight: '700',
+              color: '#3b82f6',
+            }}>
+              {stats.activeBids}
+            </div>
+            <div style={{
+              fontSize: '11px',
+              color: '#9ca3af',
+              marginTop: '4px',
+            }}>
+              Pending responses
+            </div>
+          </div>
+
+          {/* Accepted Loads */}
+          <div style={{
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
+            padding: '16px',
+          }}>
+            <div style={{
+              fontSize: '12px',
+              color: '#6b7280',
+              marginBottom: '8px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+            }}>
+              Accepted Loads
+            </div>
+            <div style={{
+              fontSize: '28px',
+              fontWeight: '700',
+              color: '#10b981',
+            }}>
+              {stats.acceptedLoads}
+            </div>
+            <div style={{
+              fontSize: '11px',
+              color: '#9ca3af',
+              marginTop: '4px',
+            }}>
+              Won bids
+            </div>
+          </div>
+
+          {/* Revenue */}
+          <div style={{
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
+            padding: '16px',
+          }}>
+            <div style={{
+              fontSize: '12px',
+              color: '#6b7280',
+              marginBottom: '8px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+            }}>
+              Revenue (Accepted)
+            </div>
+            <div style={{
+              fontSize: '28px',
+              fontWeight: '700',
+              color: '#10b981',
+            }}>
+              £{stats.revenue.toFixed(2)}
+            </div>
+            <div style={{
+              fontSize: '11px',
+              color: '#9ca3af',
+              marginTop: '4px',
+            }}>
+              From accepted bids
             </div>
           </div>
         </div>
+      </div>
 
-        {/* RIGHT COLUMN */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
+      {/* Activity at a Glance Section */}
+      <div>
+        <h2 style={{
+          fontSize: '14px',
+          fontWeight: '700',
+          color: '#374151',
+          marginBottom: '12px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.3px',
         }}>
-          {/* Subcontract Spend */}
-          <StatPanel 
-            title="Subcontract Spend"
-            value={`£${(stats.subcontractSpend / 1000).toFixed(1)}k`}
-            subtitle="65% of revenue"
-          />
-
-          {/* Reports */}
+          My Posted Loads
+        </h2>
+        
+        <div style={{
+          background: '#ffffff',
+          border: '1px solid #e5e7eb',
+        }}>
+          {/* Table Header */}
           <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            borderRadius: '4px',
-            padding: '16px',
+            display: 'grid',
+            gridTemplateColumns: '2fr 2fr 1fr 1fr 100px',
+            gap: '12px',
+            padding: '12px 16px',
+            background: '#f9fafb',
+            borderBottom: '1px solid #e5e7eb',
+            fontSize: '12px',
+            fontWeight: '700',
+            color: '#6b7280',
+            textTransform: 'uppercase',
           }}>
-            <div style={{
-              fontSize: '11px',
-              fontWeight: '600',
-              color: '#6b7280',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              marginBottom: '12px',
-            }}>
-              Reports
-            </div>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '12px',
-            }}>
-              <div>
-                <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Daily</div>
-                <div style={{ fontSize: '18px', fontWeight: '700', color: '#111827' }}>5</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Weekly</div>
-                <div style={{ fontSize: '18px', fontWeight: '700', color: '#111827' }}>2</div>
-              </div>
-            </div>
+            <div>From</div>
+            <div>To</div>
+            <div>Vehicle</div>
+            <div>Status</div>
+            <div>Budget</div>
           </div>
 
-          {/* Activity */}
-          <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            borderRadius: '4px',
-            padding: '16px',
-          }}>
+          {/* Table Rows */}
+          {recentJobs.length === 0 ? (
             <div style={{
-              fontSize: '11px',
-              fontWeight: '600',
-              color: '#6b7280',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              marginBottom: '12px',
+              textAlign: 'center',
+              padding: '40px',
+              color: '#9ca3af',
+              fontSize: '14px',
             }}>
-              Recent Activity
+              No loads posted yet
             </div>
-            <div>
-              <ActivityRow label="Load #1234 completed" value="£450" time="2h ago" />
-              <ActivityRow label="New load posted" value="£320" time="4h ago" />
-              <ActivityRow label="Quote accepted" value="£580" time="6h ago" />
-              <ActivityRow label="Driver assigned" value="-" time="8h ago" />
-            </div>
-          </div>
+          ) : (
+            recentJobs.map((job) => (
+              <div
+                key={job.id}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '2fr 2fr 1fr 1fr 100px',
+                  gap: '12px',
+                  padding: '12px 16px',
+                  borderBottom: '1px solid #f3f4f6',
+                  fontSize: '13px',
+                  color: '#374151',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f9fafb'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent'
+                }}
+              >
+                <div>{job.pickup_location || '—'}</div>
+                <div>{job.delivery_location || '—'}</div>
+                <div>{job.vehicle_type || '—'}</div>
+                <div>
+                  <span style={{
+                    padding: '2px 8px',
+                    background: job.status === 'open' ? '#dbeafe' : 
+                               job.status === 'completed' ? '#d1fae5' : '#fef3c7',
+                    color: job.status === 'open' ? '#1e40af' :
+                           job.status === 'completed' ? '#065f46' : '#92400e',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                  }}>
+                    {job.status}
+                  </span>
+                </div>
+                <div style={{ fontWeight: '600' }}>
+                  {job.budget ? `£${job.budget.toFixed(2)}` : '—'}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

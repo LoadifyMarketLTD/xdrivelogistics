@@ -328,7 +328,7 @@ export default function DiaryPage() {
                     {selectedDateJobs.map(job => (
                       <a
                         key={job.id}
-                        href={`/marketplace/${job.id}`}
+                        href={`/loads/${job.id}`}
                         style={{
                           padding: '16px',
                           backgroundColor: 'rgba(255,255,255,0.02)',
@@ -389,7 +389,7 @@ export default function DiaryPage() {
                         {dateJobs.map(job => (
                           <a
                             key={job.id}
-                            href={`/marketplace/${job.id}`}
+                            href={`/loads/${job.id}`}
                             style={{
                               padding: '16px',
                               backgroundColor: 'rgba(255,255,255,0.02)',

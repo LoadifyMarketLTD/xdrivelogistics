@@ -1,28 +1,50 @@
-/* Light Enterprise Portal Theme */
-/* For protected portal pages only */
+/* CX-Style Enterprise Portal Theme */
+/* Flat business design - NO rounded cards, NO modern SaaS look */
 
 :root {
-  /* Light Backgrounds */
-  --portal-bg: #F5F5F5;
+  /* CX-Style Backgrounds */
+  --cx-bg: #f4f5f7;
+  --cx-sidebar: #1f2937;
+  --cx-sidebar-hover: #2d3748;
+  --cx-sidebar-active: #374151;
+  --cx-card: #ffffff;
+  
+  /* CX-Style Text Colors */
+  --cx-text-primary: #1f2937;
+  --cx-text-secondary: #6b7280;
+  --cx-text-muted: #9ca3af;
+  --cx-text-light: #d1d5db;
+  
+  /* CX-Style Borders */
+  --cx-border: #e5e7eb;
+  --cx-border-dark: #d1d5db;
+  
+  /* CX-Style Accent */
+  --cx-gold: #d4af37;
+  --cx-gold-hover: #c29d2f;
+  --cx-dark-btn: #1f2937;
+  --cx-dark-btn-hover: #111827;
+  
+  /* CX-Style Status Colors */
+  --cx-green: #10b981;
+  --cx-green-hover: #059669;
+  --cx-blue: #3b82f6;
+  --cx-red: #ef4444;
+  --cx-orange: #f59e0b;
+  
+  /* Legacy variables for compatibility */
+  --portal-bg: #f4f5f7;
   --portal-bg-secondary: #FAFAFA;
   --portal-card: #FFFFFF;
-  
-  /* Text Colors */
   --portal-text-primary: #2C3E50;
   --portal-text-secondary: #64748B;
   --portal-text-muted: #94A3B8;
-  
-  /* Borders & Lines */
   --portal-border: #E5E7EB;
   --portal-border-hover: #D1D5DB;
   --portal-divider: #F3F4F6;
-  
-  /* Accent Colors */
-  --portal-accent: #C8A64D; /* Gold for primary actions */
+  --portal-accent: #C8A64D;
   --portal-accent-hover: #B39543;
-  --portal-dark-action: #1E293B; /* Dark button */
-  
-  /* Status Colors */
+  --portal-dark-action: #1E293B;
   --portal-success: #10B981;
   --portal-success-bg: #D1FAE5;
   --portal-warning: #F59E0B;
@@ -31,12 +53,22 @@
   --portal-info-bg: #DBEAFE;
   --portal-error: #EF4444;
   --portal-error-bg: #FEE2E2;
-  
-  /* Shadows */
   --portal-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --portal-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   --portal-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --portal-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Global Portal Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--cx-bg);
+  color: var(--cx-text-primary);
 }
 
 /* Portal Shell Layout */

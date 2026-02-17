@@ -57,7 +57,7 @@ export default function EnterpriseHeader() {
         </button>
         
         <button
-          onClick={() => router.push('/marketplace')}
+          onClick={() => router.push('/loads')}
           style={{
             background: 'transparent',
             color: '#6b7280',
@@ -79,7 +79,7 @@ export default function EnterpriseHeader() {
             e.currentTarget.style.color = '#6b7280'
           }}
         >
-          Browse Exchange
+          View Loads
         </button>
       </div>
 

@@ -20,7 +20,7 @@ export default function QuickActions({
   posterEmail
 }: QuickActionsProps) {
   const shareJob = () => {
-    const url = `${window.location.origin}/marketplace/${jobId}`
+    const url = `${window.location.origin}/loads/${jobId}`
     navigator.clipboard.writeText(url)
     
     // Show temporary toast (simple implementation)
@@ -199,9 +199,9 @@ export default function QuickActions({
           </button>
         )}
 
-        {/* Back to Marketplace */}
+        {/* Back to Loads */}
         <a
-          href="/marketplace"
+          href="/loads"
           style={{
             padding: '10px 20px',
             backgroundColor: 'transparent',
@@ -227,7 +227,7 @@ export default function QuickActions({
           }}
         >
           <span style={{ fontSize: '16px' }}>←</span>
-          Back to Marketplace
+          Back to Loads
         </a>
       </div>
     </div>

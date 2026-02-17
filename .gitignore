@@ -27,3 +27,7 @@ npm-debug.log*
 # Temporary files
 /tmp/
 *.tmp
+
+# Screenshots (generated, not committed by default)
+# Uncomment the line below if you want to include screenshots in git
+# docs/screenshots/*.png
