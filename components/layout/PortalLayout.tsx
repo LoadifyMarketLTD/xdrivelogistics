@@ -1,0 +1,263 @@
+'use client'
+
+import { usePathname, useRouter } from 'next/navigation'
+import { useAuth } from '@/lib/AuthContext'
+import { supabase } from '@/lib/supabaseClient'
+
+interface MenuItem {
+  label: string
+  path: string
+}
+
+const menuItems: MenuItem[] = [
+  { label: 'Dashboard', path: '/dashboard' },
+  { label: 'Directory', path: '/directory' },
+  { label: 'Live Availability', path: '/live-availability' },
+  { label: 'Loads', path: '/loads' },
+  { label: 'Quotes', path: '/quotes' },
+  { label: 'Diary', path: '/diary' },
+  { label: 'Return Journeys', path: '/return-journeys' },
+  { label: 'Freight Vision', path: '/freight-vision' },
+  { label: 'Drivers & Vehicles', path: '/drivers-vehicles' },
+  { label: 'Company Settings', path: '/company/settings' },
+]
+
+export default function PortalLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const router = useRouter()
+  const { user } = useAuth()
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
+
+  return (
+    <div style={{
+      display: 'flex',
+      minHeight: '100vh',
+      background: '#f4f5f7',
+    }}>
+      {/* Left Sidebar - CX Style */}
+      <div style={{
+        width: '220px',
+        background: '#1f2937',
+        position: 'fixed',
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        zIndex: 50,
+      }}>
+        {/* Logo/Brand */}
+        <div style={{
+          padding: '20px 16px',
+          borderBottom: '1px solid #374151',
+        }}>
+          <div style={{
+            fontSize: '16px',
+            fontWeight: '700',
+            color: '#d4af37',
+            letterSpacing: '0.5px',
+          }}>
+            XDRIVE LOGISTICS
+          </div>
+          <div style={{
+            fontSize: '11px',
+            color: '#9ca3af',
+            marginTop: '4px',
+            letterSpacing: '0.3px',
+          }}>
+            Transport Exchange
+          </div>
+        </div>
+
+        {/* Menu Items */}
+        <nav style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '12px 0',
+        }}>
+          {menuItems.map((item) => {
+            const isActive = pathname === item.path || pathname.startsWith(item.path + '/')
+            
+            return (
+              <div
+                key={item.path}
+                onClick={() => router.push(item.path)}
+                style={{
+                  padding: '10px 16px',
+                  cursor: 'pointer',
+                  color: isActive ? '#ffffff' : '#d1d5db',
+                  background: isActive ? '#374151' : 'transparent',
+                  borderLeft: isActive ? '3px solid #d4af37' : '3px solid transparent',
+                  fontSize: '13px',
+                  fontWeight: isActive ? '600' : '500',
+                  transition: 'all 0.15s',
+                  marginBottom: '1px',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = '#2d3748'
+                    e.currentTarget.style.color = '#ffffff'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = 'transparent'
+                    e.currentTarget.style.color = '#d1d5db'
+                  }
+                }}
+              >
+                {item.label}
+              </div>
+            )
+          })}
+        </nav>
+
+        {/* Footer */}
+        <div style={{
+          padding: '16px',
+          borderTop: '1px solid #374151',
+          fontSize: '11px',
+          color: '#9ca3af',
+        }}>
+          <div>© 2026 XDrive Logistics</div>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div style={{
+        flex: 1,
+        marginLeft: '220px',
+        display: 'flex',
+        flexDirection: 'column',
+      }}>
+        {/* Top Navigation Bar */}
+        <div style={{
+          height: '56px',
+          background: '#ffffff',
+          borderBottom: '1px solid #e5e7eb',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 24px',
+          position: 'sticky',
+          top: 0,
+          zIndex: 40,
+        }}>
+          {/* Left side - Action buttons */}
+          <div style={{
+            display: 'flex',
+            gap: '12px',
+            alignItems: 'center',
+          }}>
+            <button
+              onClick={() => router.push('/jobs/new')}
+              style={{
+                background: '#d4af37',
+                color: '#ffffff',
+                border: 'none',
+                padding: '8px 16px',
+                fontSize: '12px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#c29d2f'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#d4af37'
+              }}
+            >
+              POST LOAD
+            </button>
+            
+            <button
+              onClick={() => router.push('/loads')}
+              style={{
+                background: '#1f2937',
+                color: '#ffffff',
+                border: 'none',
+                padding: '8px 16px',
+                fontSize: '12px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#111827'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#1f2937'
+              }}
+            >
+              BOOK DIRECT
+            </button>
+          </div>
+
+          {/* Right side - User info and actions */}
+          <div style={{
+            display: 'flex',
+            gap: '16px',
+            alignItems: 'center',
+          }}>
+            <div style={{
+              fontSize: '13px',
+              color: '#6b7280',
+            }}>
+              {user?.email || 'User'}
+            </div>
+            
+            <button
+              onClick={() => router.push('/company/settings')}
+              style={{
+                background: 'transparent',
+                color: '#6b7280',
+                border: 'none',
+                padding: '6px',
+                fontSize: '16px',
+                cursor: 'pointer',
+              }}
+              title="Settings"
+            >
+              ⚙️
+            </button>
+            
+            <button
+              onClick={handleLogout}
+              style={{
+                background: 'transparent',
+                color: '#6b7280',
+                border: 'none',
+                padding: '6px 12px',
+                fontSize: '12px',
+                fontWeight: '500',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#ef4444'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#6b7280'
+              }}
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+
+        {/* Scrollable Content Area */}
+        <div style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '20px',
+        }}>
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}

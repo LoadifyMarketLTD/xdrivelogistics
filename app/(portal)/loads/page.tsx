@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
@@ -11,15 +11,17 @@ interface Load {
   id: string
   pickup_location: string
   delivery_location: string
-  pickup_datetime: string
-  delivery_datetime: string
-  vehicle_type: string
-  distance_miles?: number
+  pickup_datetime: string | null
+  delivery_datetime: string | null
+  vehicle_type: string | null
   status: string
-  budget?: number
+  budget: number | null
+  load_details: string | null
+  pallets: number | null
+  weight_kg: number | null
+  posted_by_company_id: string
+  created_at: string
 }
-
-type FilterTab = 'all' | 'live' | 'allocated' | 'delivered'
 
 export default function LoadsPage() {
   const router = useRouter()
@@ -27,288 +29,429 @@ export default function LoadsPage() {
   
   const [loads, setLoads] = useState<Load[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeFilter, setActiveFilter] = useState<FilterTab>('all')
+  const [error, setError] = useState<string | null>(null)
+  const [expandedLoadId, setExpandedLoadId] = useState<string | null>(null)
+  
+  // Filter states
+  const [fromPostcode, setFromPostcode] = useState('')
+  const [toPostcode, setToPostcode] = useState('')
+  const [vehicleSize, setVehicleSize] = useState('')
+  const [dateFilter, setDateFilter] = useState('')
 
   useEffect(() => {
-    if (!companyId) return
-    
-    const fetchLoads = async () => {
-      try {
-        setLoading(true)
-        
-        const { data, error } = await supabase
-          .from('jobs')
-          .select('*')
-          .order('created_at', { ascending: false })
-        
-        if (error) throw error
-        
-        setLoads(data || [])
-      } catch (err: any) {
-        console.error('Error fetching loads:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    
     fetchLoads()
   }, [companyId])
 
-  // Filter loads based on active tab
-  const filteredLoads = useMemo(() => {
-    if (activeFilter === 'all') return loads
-    if (activeFilter === 'live') return loads.filter(l => l.status === 'open')
-    if (activeFilter === 'allocated') return loads.filter(l => l.status === 'assigned' || l.status === 'in-transit')
-    if (activeFilter === 'delivered') return loads.filter(l => l.status === 'completed' || l.status === 'delivered')
-    return loads
-  }, [loads, activeFilter])
-
-  const getStatusBadge = (status: string) => {
-    let bgColor = '#DBEAFE'
-    let textColor = '#1E40AF'
-    let label = status
-
-    if (status === 'open') {
-      bgColor = '#DBEAFE'
-      textColor = '#1E40AF'
-      label = 'Live'
-    } else if (status === 'assigned' || status === 'in-transit') {
-      bgColor = '#FED7AA'
-      textColor = '#C2410C'
-      label = 'Allocated'
-    } else if (status === 'completed' || status === 'delivered') {
-      bgColor = '#D1FAE5'
-      textColor = '#065F46'
-      label = 'Delivered'
+  const fetchLoads = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      const { data, error: fetchError } = await supabase
+        .from('jobs')
+        .select('*')
+        .eq('status', 'open')
+        .order('created_at', { ascending: false })
+      
+      if (fetchError) throw fetchError
+      
+      setLoads(data || [])
+    } catch (err: any) {
+      console.error('Error fetching loads:', err)
+      setError(err.message || 'Failed to load data')
+    } finally {
+      setLoading(false)
     }
+  }
 
+  const filteredLoads = loads.filter(load => {
+    if (fromPostcode && !load.pickup_location?.toLowerCase().includes(fromPostcode.toLowerCase())) {
+      return false
+    }
+    if (toPostcode && !load.delivery_location?.toLowerCase().includes(toPostcode.toLowerCase())) {
+      return false
+    }
+    if (vehicleSize && load.vehicle_type !== vehicleSize) {
+      return false
+    }
+    if (dateFilter && load.pickup_datetime) {
+      const loadDate = new Date(load.pickup_datetime).toISOString().split('T')[0]
+      if (loadDate !== dateFilter) {
+        return false
+      }
+    }
+    return true
+  })
+
+  const handleQuoteNow = (loadId: string) => {
+    router.push(`/loads/${loadId}`)
+  }
+
+  if (loading) {
     return (
-      <span style={{
-        display: 'inline-block',
-        padding: '4px 10px',
-        fontSize: '11px',
-        fontWeight: '600',
-        borderRadius: '2px',
-        backgroundColor: bgColor,
-        color: textColor,
-        textTransform: 'uppercase',
-        letterSpacing: '0.5px',
-      }}>
-        {label}
-      </span>
+      <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+        Loading loads...
+      </div>
     )
   }
 
-  const formatDateTime = (dateStr: string) => {
-    if (!dateStr) return '-'
-    const date = new Date(dateStr)
-    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
+  if (error) {
+    return (
+      <div style={{ 
+        textAlign: 'center', 
+        padding: '40px', 
+        color: '#ef4444',
+        background: '#fef2f2',
+        border: '1px solid #fecaca',
+        borderRadius: '4px'
+      }}>
+        Error: {error}
+      </div>
+    )
   }
 
-  const filterTabs: { key: FilterTab; label: string; count: number }[] = [
-    { key: 'all', label: 'All', count: loads.length },
-    { key: 'live', label: 'Live', count: loads.filter(l => l.status === 'open').length },
-    { key: 'allocated', label: 'Allocated', count: loads.filter(l => l.status === 'assigned' || l.status === 'in-transit').length },
-    { key: 'delivered', label: 'Delivered', count: loads.filter(l => l.status === 'completed' || l.status === 'delivered').length },
-  ]
-
   return (
-    <div style={{
-      maxWidth: '1600px',
-      margin: '0 auto',
-    }}>
-      {/* Header */}
+    <div style={{ display: 'flex', gap: '20px', height: 'calc(100vh - 96px)' }}>
+      {/* LEFT COLUMN - Filter Panel */}
       <div style={{
-        marginBottom: '16px',
-      }}>
-        <h1 style={{
-          fontSize: '20px',
-          fontWeight: '600',
-          color: '#111827',
-          margin: '0 0 4px 0',
-        }}>
-          Loads
-        </h1>
-        <div style={{
-          fontSize: '13px',
-          color: '#6b7280',
-        }}>
-          Manage and track all transport loads
-        </div>
-      </div>
-
-      {/* Filter Tabs */}
-      <div style={{
-        display: 'flex',
-        gap: '4px',
-        marginBottom: '16px',
-        borderBottom: '1px solid #e5e7eb',
-      }}>
-        {filterTabs.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveFilter(tab.key)}
-            style={{
-              background: activeFilter === tab.key ? '#ffffff' : 'transparent',
-              border: 'none',
-              borderBottom: activeFilter === tab.key ? '2px solid #d4af37' : '2px solid transparent',
-              padding: '10px 16px',
-              fontSize: '12px',
-              fontWeight: '600',
-              color: activeFilter === tab.key ? '#111827' : '#6b7280',
-              cursor: 'pointer',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              marginBottom: '-1px',
-            }}
-            onMouseEnter={(e) => {
-              if (activeFilter !== tab.key) {
-                e.currentTarget.style.color = '#111827'
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeFilter !== tab.key) {
-                e.currentTarget.style.color = '#6b7280'
-              }
-            }}
-          >
-            {tab.label} ({tab.count})
-          </button>
-        ))}
-      </div>
-
-      {/* Table */}
-      <div style={{
+        width: '280px',
         background: '#ffffff',
         border: '1px solid #e5e7eb',
-        borderRadius: '4px',
+        padding: '16px',
+        height: 'fit-content',
       }}>
-        {/* Table Header */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1.5fr 1.5fr 1fr 1fr 1fr 0.8fr 0.8fr 0.8fr',
-          gap: '12px',
-          padding: '12px 16px',
-          background: '#f9fafb',
-          borderBottom: '1px solid #e5e7eb',
-          fontSize: '11px',
-          fontWeight: '600',
-          color: '#6b7280',
+        <h3 style={{
+          fontSize: '14px',
+          fontWeight: '700',
+          color: '#1f2937',
+          marginBottom: '16px',
           textTransform: 'uppercase',
           letterSpacing: '0.5px',
         }}>
-          <div>From</div>
-          <div>To</div>
-          <div>Pickup</div>
-          <div>Delivery</div>
-          <div>Vehicle</div>
-          <div>Distance</div>
-          <div>Status</div>
-          <div>Action</div>
+          Search Filters
+        </h3>
+
+        {/* From Postcode */}
+        <div style={{ marginBottom: '14px' }}>
+          <label style={{
+            display: 'block',
+            fontSize: '12px',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '6px',
+          }}>
+            From Postcode
+          </label>
+          <input
+            type="text"
+            value={fromPostcode}
+            onChange={(e) => setFromPostcode(e.target.value)}
+            placeholder="e.g. M1"
+            style={{
+              width: '100%',
+              padding: '6px 8px',
+              border: '1px solid #d1d5db',
+              fontSize: '13px',
+              color: '#1f2937',
+            }}
+          />
         </div>
 
-        {/* Table Body */}
-        {loading ? (
-          <div style={{
-            padding: '40px',
-            textAlign: 'center',
-            color: '#6b7280',
-            fontSize: '13px',
+        {/* To Postcode */}
+        <div style={{ marginBottom: '14px' }}>
+          <label style={{
+            display: 'block',
+            fontSize: '12px',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '6px',
           }}>
-            Loading loads...
-          </div>
-        ) : filteredLoads.length === 0 ? (
-          <div style={{
-            padding: '40px',
-            textAlign: 'center',
-            color: '#6b7280',
-            fontSize: '13px',
+            To Postcode
+          </label>
+          <input
+            type="text"
+            value={toPostcode}
+            onChange={(e) => setToPostcode(e.target.value)}
+            placeholder="e.g. B1"
+            style={{
+              width: '100%',
+              padding: '6px 8px',
+              border: '1px solid #d1d5db',
+              fontSize: '13px',
+              color: '#1f2937',
+            }}
+          />
+        </div>
+
+        {/* Vehicle Size */}
+        <div style={{ marginBottom: '14px' }}>
+          <label style={{
+            display: 'block',
+            fontSize: '12px',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '6px',
           }}>
-            No loads found
-          </div>
-        ) : (
-          filteredLoads.map((load, index) => (
-            <div
-              key={load.id}
+            Vehicle Size
+          </label>
+          <select
+            value={vehicleSize}
+            onChange={(e) => setVehicleSize(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '6px 8px',
+              border: '1px solid #d1d5db',
+              fontSize: '13px',
+              color: '#1f2937',
+            }}
+          >
+            <option value="">All Vehicles</option>
+            <option value="Small Van">Small Van</option>
+            <option value="Medium Van">Medium Van</option>
+            <option value="Large Van">Large Van</option>
+            <option value="Luton Van">Luton Van</option>
+            <option value="7.5 Tonne">7.5 Tonne</option>
+            <option value="18 Tonne">18 Tonne</option>
+            <option value="Artic">Artic</option>
+          </select>
+        </div>
+
+        {/* Date Filter */}
+        <div style={{ marginBottom: '14px' }}>
+          <label style={{
+            display: 'block',
+            fontSize: '12px',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '6px',
+          }}>
+            Pickup Date
+          </label>
+          <input
+            type="date"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '6px 8px',
+              border: '1px solid #d1d5db',
+              fontSize: '13px',
+              color: '#1f2937',
+            }}
+          />
+        </div>
+
+        {/* Clear Filters Button */}
+        <button
+          onClick={() => {
+            setFromPostcode('')
+            setToPostcode('')
+            setVehicleSize('')
+            setDateFilter('')
+          }}
+          style={{
+            width: '100%',
+            padding: '8px',
+            background: '#f3f4f6',
+            color: '#374151',
+            border: '1px solid #d1d5db',
+            fontSize: '12px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            marginTop: '8px',
+          }}
+        >
+          Clear Filters
+        </button>
+      </div>
+
+      {/* RIGHT COLUMN - Results List */}
+      <div style={{
+        flex: 1,
+        background: '#ffffff',
+        border: '1px solid #e5e7eb',
+        overflowY: 'auto',
+      }}>
+        {/* Header */}
+        <div style={{
+          padding: '12px 16px',
+          background: '#f9fafb',
+          borderBottom: '1px solid #e5e7eb',
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
+            <h2 style={{
+              fontSize: '14px',
+              fontWeight: '700',
+              color: '#1f2937',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+            }}>
+              Available Loads ({filteredLoads.length})
+            </h2>
+            <button
+              onClick={fetchLoads}
               style={{
-                display: 'grid',
-                gridTemplateColumns: '1.5fr 1.5fr 1fr 1fr 1fr 0.8fr 0.8fr 0.8fr',
-                gap: '12px',
-                padding: '12px 16px',
-                borderBottom: index < filteredLoads.length - 1 ? '1px solid #f3f4f6' : 'none',
-                fontSize: '13px',
-                color: '#374151',
-                alignItems: 'center',
-                maxHeight: '56px',
-                minHeight: '56px',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#f9fafb'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent'
+                padding: '4px 12px',
+                background: '#ffffff',
+                color: '#6b7280',
+                border: '1px solid #d1d5db',
+                fontSize: '11px',
+                cursor: 'pointer',
               }}
             >
-              <div style={{
-                fontWeight: '500',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}>
-                {load.pickup_location || 'N/A'}
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        {/* Loads List */}
+        <div>
+          {filteredLoads.length === 0 ? (
+            <div style={{
+              textAlign: 'center',
+              padding: '60px 20px',
+              color: '#9ca3af',
+            }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
+              <div style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>
+                No loads found
               </div>
-              <div style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}>
-                {load.delivery_location || 'N/A'}
-              </div>
-              <div style={{ fontSize: '12px' }}>
-                {formatDateTime(load.pickup_datetime)}
-              </div>
-              <div style={{ fontSize: '12px' }}>
-                {formatDateTime(load.delivery_datetime)}
-              </div>
-              <div style={{ fontSize: '12px' }}>
-                {load.vehicle_type || 'Van'}
-              </div>
-              <div style={{ fontSize: '12px' }}>
-                {load.distance_miles ? `${load.distance_miles}mi` : '-'}
-              </div>
-              <div>
-                {getStatusBadge(load.status)}
-              </div>
-              <div>
-                <button
-                  onClick={() => router.push(`/loads/${load.id}`)}
-                  style={{
-                    background: 'transparent',
-                    border: '1px solid #d1d5db',
-                    padding: '4px 10px',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    color: '#374151',
-                    cursor: 'pointer',
-                    borderRadius: '2px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = '#9ca3af'
-                    e.currentTarget.style.background = '#f9fafb'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = '#d1d5db'
-                    e.currentTarget.style.background = 'transparent'
-                  }}
-                >
-                  View
-                </button>
+              <div style={{ fontSize: '13px' }}>
+                {fromPostcode || toPostcode || vehicleSize || dateFilter
+                  ? 'Try adjusting your filters'
+                  : 'No available loads at the moment'}
               </div>
             </div>
-          ))
-        )}
+          ) : (
+            filteredLoads.map((load) => (
+              <div key={load.id}>
+                {/* Load Row - Flat list style */}
+                <div
+                  style={{
+                    padding: '12px 16px',
+                    borderBottom: '1px solid #e5e7eb',
+                    cursor: 'pointer',
+                    background: expandedLoadId === load.id ? '#f9fafb' : '#ffffff',
+                  }}
+                  onClick={() => setExpandedLoadId(expandedLoadId === load.id ? null : load.id)}
+                  onMouseEnter={(e) => {
+                    if (expandedLoadId !== load.id) {
+                      e.currentTarget.style.background = '#fafafa'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (expandedLoadId !== load.id) {
+                      e.currentTarget.style.background = '#ffffff'
+                    }
+                  }}
+                >
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#1f2937',
+                        marginBottom: '6px',
+                      }}>
+                        {load.pickup_location} → {load.delivery_location}
+                      </div>
+                      <div style={{
+                        fontSize: '12px',
+                        color: '#6b7280',
+                        display: 'flex',
+                        gap: '16px',
+                      }}>
+                        {load.vehicle_type && <span>🚛 {load.vehicle_type}</span>}
+                        {load.pickup_datetime && (
+                          <span>📅 {new Date(load.pickup_datetime).toLocaleDateString()}</span>
+                        )}
+                        {load.budget && <span>💰 £{load.budget.toFixed(2)}</span>}
+                      </div>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleQuoteNow(load.id)
+                      }}
+                      style={{
+                        padding: '6px 16px',
+                        background: '#10b981',
+                        color: '#ffffff',
+                        border: 'none',
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        textTransform: 'uppercase',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#059669'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = '#10b981'
+                      }}
+                    >
+                      Quote Now
+                    </button>
+                  </div>
+                </div>
+
+                {/* Expandable Details Section */}
+                {expandedLoadId === load.id && (
+                  <div style={{
+                    padding: '16px',
+                    background: '#f9fafb',
+                    borderBottom: '1px solid #e5e7eb',
+                    fontSize: '13px',
+                    color: '#374151',
+                  }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '12px',
+                      marginBottom: '12px',
+                    }}>
+                      {load.pallets && (
+                        <div>
+                          <strong>Pallets:</strong> {load.pallets}
+                        </div>
+                      )}
+                      {load.weight_kg && (
+                        <div>
+                          <strong>Weight:</strong> {load.weight_kg} kg
+                        </div>
+                      )}
+                      {load.delivery_datetime && (
+                        <div>
+                          <strong>Delivery:</strong>{' '}
+                          {new Date(load.delivery_datetime).toLocaleDateString()}
+                        </div>
+                      )}
+                    </div>
+                    {load.load_details && (
+                      <div style={{ marginTop: '8px' }}>
+                        <strong>Details:</strong>
+                        <div style={{ marginTop: '4px', color: '#6b7280' }}>
+                          {load.load_details}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   )
