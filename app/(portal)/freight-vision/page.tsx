@@ -15,13 +15,34 @@ export default function FreightVisionPage() {
   
   useEffect(() => {
     if (!companyId) return
+    
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
+    
     const fetch = async () => {
       try {
+<<<<<<< copilot/complete-system-audit-verification
         const { data: jobs, error: jobsError } = await supabase.from('jobs').select('*').eq('posted_by_company_id', companyId)
         if (jobsError) throw jobsError
         
         const { data: bids, error: bidsError } = await supabase.from('job_bids').select('*').eq('bidder_company_id', companyId)
         if (bidsError) throw bidsError
+=======
+        setLoading(true)
+        
+        // Set timeout to ensure loading always resolves
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn('Freight Vision data fetch timeout - resolving loading state')
+            setLoading(false)
+          }
+        }, 10000) // 10 second timeout
+        
+        const { data: jobs } = await supabase.from('jobs').select('*').eq('posted_by_company_id', companyId)
+        const { data: bids } = await supabase.from('job_bids').select('*').eq('bidder_company_id', companyId)
+>>>>>>> main
+        
+        if (!mounted) return
         
         setStats({
           totalJobs: jobs?.length || 0,
@@ -30,12 +51,26 @@ export default function FreightVisionPage() {
           activeBids: bids?.filter(b => b.status === 'submitted').length || 0
         })
       } catch (e) {
+<<<<<<< copilot/complete-system-audit-verification
         console.error('Error fetching freight vision stats:', e)
       } finally { 
         setLoading(false) 
+=======
+        console.error('Error fetching freight vision data:', e)
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+        if (timeoutId) clearTimeout(timeoutId)
+>>>>>>> main
       }
     }
     fetch()
+    
+    return () => {
+      mounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
   }, [companyId])
   
   if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>

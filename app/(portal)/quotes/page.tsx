@@ -40,9 +40,20 @@ export default function QuotesPage() {
   useEffect(() => {
     if (!companyId) return
     
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
+    
     const fetchQuotes = async () => {
       try {
         setLoading(true)
+        
+        // Set timeout to ensure loading always resolves
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn('Quotes data fetch timeout - resolving loading state')
+            setLoading(false)
+          }
+        }, 10000) // 10 second timeout
         
         const { data, error: fetchError } = await supabase
           .from('job_bids')
@@ -66,6 +77,8 @@ export default function QuotesPage() {
         
         if (fetchError) throw fetchError
         
+        if (!mounted) return
+        
         // Transform the data - job comes as array, we need first element
         const transformedData = (data || []).map((item: any) => ({
           ...item,
@@ -76,13 +89,26 @@ export default function QuotesPage() {
         setError(null)
       } catch (err: any) {
         console.error('Error fetching quotes:', err)
-        setError(err.message)
+        if (mounted) {
+          setError(err.message)
+        }
       } finally {
-        setLoading(false)
+        if (mounted) {
+          setLoading(false)
+        }
+        if (timeoutId) clearTimeout(timeoutId)
       }
     }
     
     fetchQuotes()
+<<<<<<< copilot/complete-system-audit-verification
+=======
+    
+    return () => {
+      mounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+>>>>>>> main
   }, [companyId])
   
   const handleWithdraw = async (quoteId: string) => {

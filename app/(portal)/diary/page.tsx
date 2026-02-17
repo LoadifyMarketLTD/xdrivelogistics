@@ -39,9 +39,21 @@ export default function DiaryPage() {
   useEffect(() => {
     if (!companyId) return
     
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
+    
     const fetchJobs = async () => {
       try {
         setLoading(true)
+        
+        // Set timeout to ensure loading always resolves
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn('Diary data fetch timeout - resolving loading state')
+            setLoading(false)
+          }
+        }, 10000) // 10 second timeout
+        
         const { data, error } = await supabase
           .from('jobs')
           .select('*')
@@ -50,15 +62,29 @@ export default function DiaryPage() {
           .order('pickup_datetime', { ascending: true })
         
         if (error) throw error
+        
+        if (!mounted) return
+        
         setJobs(data || [])
       } catch (e) {
         console.error('Error fetching jobs:', e)
       } finally {
-        setLoading(false)
+        if (mounted) {
+          setLoading(false)
+        }
+        if (timeoutId) clearTimeout(timeoutId)
       }
     }
     
     fetchJobs()
+<<<<<<< copilot/complete-system-audit-verification
+=======
+    
+    return () => {
+      mounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+>>>>>>> main
   }, [companyId])
 
   // Filter jobs based on filter mode

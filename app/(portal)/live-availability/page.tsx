@@ -15,6 +15,10 @@ export default function LiveAvailabilityPage() {
   
   useEffect(() => {
     if (!companyId) return
+    
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
+    
     const fetch = async () => {
       try {
         const { data, error } = await supabase.from('vehicles').select('*').eq('company_id', companyId).eq('is_available', true)
@@ -27,6 +31,11 @@ export default function LiveAvailabilityPage() {
       }
     }
     fetch()
+    
+    return () => {
+      mounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
   }, [companyId])
   
   if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>

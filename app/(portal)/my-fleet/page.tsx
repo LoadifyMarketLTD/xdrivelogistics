@@ -34,21 +34,57 @@ export default function MyFleetPage() {
   useEffect(() => {
     if (!companyId) return
     
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
+    
     const fetchVehicles = async () => {
       try {
         setLoading(true)
-        const { data, error } = await supabase.from('vehicles').select('*').eq('company_id', companyId).order('vehicle_type', { ascending: true })
+        
+        // Set timeout to ensure loading always resolves
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn('My Fleet data fetch timeout - resolving loading state')
+            setLoading(false)
+          }
+        }, 10000) // 10 second timeout
+        
+        const { data, error } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('company_id', companyId)
+          .order('vehicle_type', { ascending: true })
+          
         if (error) throw error
+        
+        if (!mounted) return
+        
         setVehicles(data || [])
       } catch (err: any) {
         console.error('Error:', err)
       } finally {
+<<<<<<< copilot/complete-system-audit-verification
         setLoading(false)
+=======
+        if (mounted) {
+          setLoading(false)
+        }
+        if (timeoutId) clearTimeout(timeoutId)
+>>>>>>> main
       }
     }
     
     fetchVehicles()
+<<<<<<< copilot/complete-system-audit-verification
   }, [companyId, refetchTrigger])
+=======
+    
+    return () => {
+      mounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [companyId])
+>>>>>>> main
   
   const handleSave = async (data: any) => {
     if (!companyId) return
@@ -58,7 +94,21 @@ export default function MyFleetPage() {
       } else {
         await supabase.from('vehicles').insert([{ ...data, company_id: companyId }])
       }
+<<<<<<< copilot/complete-system-audit-verification
       setRefetchTrigger(prev => prev + 1)
+=======
+      
+      // Re-fetch vehicles after save
+      const { data: freshData, error } = await supabase
+        .from('vehicles')
+        .select('*')
+        .eq('company_id', companyId)
+        .order('vehicle_type', { ascending: true })
+      
+      if (error) throw error
+      setVehicles(freshData || [])
+      
+>>>>>>> main
       setShowForm(false)
       setEditingVehicle(null)
     } catch (err: any) {
@@ -70,7 +120,22 @@ export default function MyFleetPage() {
   const handleDelete = async (id: string) => {
     try {
       await supabase.from('vehicles').delete().eq('id', id)
+<<<<<<< copilot/complete-system-audit-verification
       setRefetchTrigger(prev => prev + 1)
+=======
+      
+      // Re-fetch vehicles after delete
+      if (companyId) {
+        const { data, error } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('company_id', companyId)
+          .order('vehicle_type', { ascending: true })
+        
+        if (error) throw error
+        setVehicles(data || [])
+      }
+>>>>>>> main
     } catch (err: any) {
       alert('Error: ' + err.message)
     }

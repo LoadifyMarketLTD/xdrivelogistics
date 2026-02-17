@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
@@ -55,8 +55,13 @@ export default function LoadsPage() {
   const [bidAmount, setBidAmount] = useState('')
   const [bidMessage, setBidMessage] = useState('')
   const [submittingBid, setSubmittingBid] = useState(false)
+  
+  // Use ref for mounted state so fetchLoads can access it
+  const mountedRef = useRef(true)
 
-  const fetchLoads = useCallback(async () => {
+  const fetchLoads = async () => {
+    if (!mountedRef.current) return
+    
     try {
       setLoading(true)
       setError(null)
@@ -68,12 +73,18 @@ export default function LoadsPage() {
       
       if (fetchError) throw fetchError
       
+      if (!mountedRef.current) return
+      
       setLoads(data || [])
     } catch (err: any) {
       console.error('Error fetching loads:', err)
-      setError(err.message || 'Failed to load data')
+      if (mountedRef.current) {
+        setError(err.message || 'Failed to load data')
+      }
     } finally {
-      setLoading(false)
+      if (mountedRef.current) {
+        setLoading(false)
+      }
     }
   }, [])
 
@@ -87,6 +98,62 @@ export default function LoadsPage() {
     
     return () => clearInterval(interval)
   }, [fetchLoads, companyId])
+
+  useEffect(() => {
+    mountedRef.current = true
+    let timeoutId: NodeJS.Timeout | null = null
+    
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        
+        // Set timeout to ensure loading always resolves
+        timeoutId = setTimeout(() => {
+          if (mountedRef.current) {
+            console.warn('Loads data fetch timeout - resolving loading state')
+            setLoading(false)
+          }
+        }, 10000) // 10 second timeout
+        
+        const { data, error: fetchError } = await supabase
+          .from('jobs')
+          .select('*')
+          .order('created_at', { ascending: false })
+        
+        if (fetchError) throw fetchError
+        
+        if (!mountedRef.current) return
+        
+        setLoads(data || [])
+      } catch (err: any) {
+        console.error('Error fetching loads:', err)
+        if (mountedRef.current) {
+          setError(err.message || 'Failed to load data')
+        }
+      } finally {
+        if (mountedRef.current) {
+          setLoading(false)
+        }
+        if (timeoutId) clearTimeout(timeoutId)
+      }
+    }
+    
+    fetchData()
+    
+    // Set up polling for real-time updates (every 30s)
+    const interval = setInterval(() => {
+      if (mountedRef.current) {
+        fetchData()
+      }
+    }, 30000)
+    
+    return () => {
+      mountedRef.current = false
+      if (timeoutId) clearTimeout(timeoutId)
+      clearInterval(interval)
+    }
+  }, [])
 
   const filteredAndSortedLoads = useMemo(() => {
     let filtered = loads.filter(load => {
