@@ -17,9 +17,6 @@ export default function LeftIconRail() {
   ]
   
   const isActive = (path: string) => {
-    if (path === '/loads') {
-      return pathname.startsWith('/marketplace') || pathname.startsWith('/loads')
-    }
     return pathname === path || pathname.startsWith(path + '/')
   }
   

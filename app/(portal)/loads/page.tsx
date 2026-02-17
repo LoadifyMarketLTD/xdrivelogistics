@@ -281,7 +281,9 @@ export default function LoadsPage() {
               </div>
               <div>
                 <button
-                  onClick={() => router.push(`/marketplace/${load.id}`)}
+                  onClick={() => {
+                    alert(`Load details view will be implemented in the new Exchange architecture`)
+                  }}
                   style={{
                     background: 'transparent',
                     border: '1px solid #d1d5db',

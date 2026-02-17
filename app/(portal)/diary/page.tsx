@@ -228,8 +228,6 @@ export default function DiaryPage() {
           description={filterMode === 'all' 
             ? "You don't have any jobs with scheduled pickup dates yet." 
             : `No jobs found for ${filterMode}.`}
-          actionLabel="Post a Job"
-          actionHref="/jobs/new"
           size="large"
         />
       ) : (
@@ -326,25 +324,15 @@ export default function DiaryPage() {
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {selectedDateJobs.map(job => (
-                      <a
+                      <div
                         key={job.id}
-                        href={`/marketplace/${job.id}`}
                         style={{
                           padding: '16px',
                           backgroundColor: 'rgba(255,255,255,0.02)',
                           borderRadius: '8px',
                           border: '1px solid rgba(255,255,255,0.05)',
-                          textDecoration: 'none',
                           transition: 'all 0.2s',
                           display: 'block'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'
-                          e.currentTarget.style.borderColor = 'var(--gold-premium)'
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'
                         }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
@@ -358,7 +346,7 @@ export default function DiaryPage() {
                           {job.vehicle_type && ` • 🚚 ${job.vehicle_type}`}
                           {job.budget && ` • 💰 £${job.budget.toFixed(2)}`}
                         </div>
-                      </a>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -387,9 +375,8 @@ export default function DiaryPage() {
                       </h3>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {dateJobs.map(job => (
-                          <a
+                          <div
                             key={job.id}
-                            href={`/marketplace/${job.id}`}
                             style={{
                               padding: '16px',
                               backgroundColor: 'rgba(255,255,255,0.02)',
@@ -398,16 +385,7 @@ export default function DiaryPage() {
                               display: 'flex',
                               justifyContent: 'space-between',
                               alignItems: 'center',
-                              textDecoration: 'none',
                               transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'
-                              e.currentTarget.style.borderColor = 'var(--gold-premium)'
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'
-                              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'
                             }}
                           >
                             <div>
@@ -421,7 +399,7 @@ export default function DiaryPage() {
                               </div>
                             </div>
                             <StatusBadge status={job.status} size="small" />
-                          </a>
+                          </div>
                         ))}
                       </div>
                     </div>

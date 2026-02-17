@@ -26,61 +26,20 @@ export default function EnterpriseHeader() {
       top: 0,
       zIndex: 40,
     }}>
-      {/* Left side - Quick actions */}
+      {/* Left side - Branding */}
       <div style={{
         display: 'flex',
         gap: '12px',
         alignItems: 'center',
       }}>
-        <button
-          onClick={() => router.push('/jobs/new')}
-          style={{
-            background: '#d4af37',
-            color: '#ffffff',
-            border: 'none',
-            padding: '6px 14px',
-            fontSize: '12px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            borderRadius: '2px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = '#c29d2f'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = '#d4af37'
-          }}
-        >
-          + New Load
-        </button>
-        
-        <button
-          onClick={() => router.push('/marketplace')}
-          style={{
-            background: 'transparent',
-            color: '#6b7280',
-            border: '1px solid #d1d5db',
-            padding: '6px 14px',
-            fontSize: '12px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            borderRadius: '2px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = '#9ca3af'
-            e.currentTarget.style.color = '#374151'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = '#d1d5db'
-            e.currentTarget.style.color = '#6b7280'
-          }}
-        >
-          Browse Exchange
-        </button>
+        <div style={{
+          fontSize: '14px',
+          fontWeight: '700',
+          color: '#2C3E50',
+          letterSpacing: '0.5px',
+        }}>
+          <span style={{ color: '#C8A64D' }}>XDRIVE</span> LOGISTICS
+        </div>
       </div>
 
       {/* Right side - User info */}

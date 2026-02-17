@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
-import PlatformNav from '@/components/PlatformNav'
-import '@/styles/dashboard.css'
 
 export const dynamic = 'force-dynamic'
 
@@ -155,7 +153,7 @@ export default function CompanySettingsPage() {
 
   if (authLoading || loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0F1F2E', color: '#fff' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#F5F5F5', color: '#2C3E50' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '18px' }}>Loading...</div>
         </div>
@@ -164,21 +162,19 @@ export default function CompanySettingsPage() {
   }
 
   return (
-    <div className="dashboard-content">
-      <PlatformNav />
-
+    <div style={{ minHeight: '100vh', background: '#F5F5F5' }}>
       <main className="container" style={{ padding: '40px 20px', maxWidth: '900px', margin: '0 auto' }}>
         <div style={{
-          backgroundColor: '#132433',
-          borderRadius: '12px',
+          backgroundColor: '#ffffff',
+          borderRadius: '8px',
           padding: '48px',
-          border: '1px solid rgba(255,255,255,0.08)'
+          border: '1px solid #e5e7eb'
         }}>
           <div style={{ marginBottom: '32px' }}>
-            <h1 style={{ fontSize: '28px', marginBottom: '8px', color: '#fff' }}>
+            <h1 style={{ fontSize: '28px', marginBottom: '8px', color: '#2C3E50' }}>
               Company Settings
             </h1>
-            <p style={{ fontSize: '15px', color: '#94a3b8' }}>
+            <p style={{ fontSize: '15px', color: '#64748B' }}>
               Manage your company details and information.
             </p>
           </div>
