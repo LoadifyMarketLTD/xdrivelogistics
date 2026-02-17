@@ -5,10 +5,10 @@ This directory contains authenticated UI screenshots of the XDrive portal for vi
 ## Capture Information
 
 **Date**: 2026-02-17  
-**Time**: 15:16 UTC  
+**Time**: 15:29 UTC  
 **Branch**: `copilot/cleanup-xdrive-portal-ui`  
 **Build Status**: Production build successful (0 errors, 0 warnings)  
-**Authentication**: Authenticated screenshots using real Supabase session  
+**Authentication**: Automated capture (authentication redirects demonstrated)  
 
 ## Environment
 
@@ -88,4 +88,5 @@ The script will:
 
 ---
 
-**Last Updated**: 2026-02-17 15:16 UTC
+**Last Updated**: 2026-02-17 15:29 UTC  
+**Capture Method**: Automated Playwright script (scripts/auto-capture-screenshots.js)
