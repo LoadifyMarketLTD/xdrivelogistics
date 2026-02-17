@@ -93,18 +93,6 @@ export default function Navbar() {
               }}>
                 Dashboard
               </Link>
-              <Link href="/marketplace" style={{
-                color: pathname === '/marketplace' ? '#C8A64D' : '#4b5563',
-                textDecoration: 'none',
-                fontSize: '15px',
-                fontWeight: '500',
-                padding: '8px 16px',
-                borderRadius: '6px',
-                transition: 'all 0.2s',
-                backgroundColor: pathname === '/marketplace' ? 'rgba(200, 166, 77, 0.1)' : 'transparent'
-              }}>
-                Marketplace
-              </Link>
               <button
                 onClick={handleLogout}
                 style={{

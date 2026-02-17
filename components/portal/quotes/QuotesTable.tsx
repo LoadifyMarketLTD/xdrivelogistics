@@ -145,7 +145,7 @@ export default function QuotesTable({ quotes, onWithdraw }: QuotesTableProps) {
               <td style={{ padding: '12px 8px', textAlign: 'center' }}>
                 <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                   <button
-                    onClick={() => router.push(`/marketplace/${quote.job.id}`)}
+                    onClick={() => router.push(`/loads/${quote.job.id}`)}
                     className="portal-btn portal-btn-outline"
                     style={{ 
                       padding: '4px 12px',

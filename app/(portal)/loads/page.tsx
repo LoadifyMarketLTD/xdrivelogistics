@@ -281,7 +281,7 @@ export default function LoadsPage() {
               </div>
               <div>
                 <button
-                  onClick={() => router.push(`/marketplace/${load.id}`)}
+                  onClick={() => router.push(`/loads/${load.id}`)}
                   style={{
                     background: 'transparent',
                     border: '1px solid #d1d5db',

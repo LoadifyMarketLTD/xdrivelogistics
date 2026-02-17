@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
-import PlatformNav from '@/components/PlatformNav'
-import '@/styles/dashboard.css'
+import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
 
@@ -86,7 +85,7 @@ export default function PostJobPage() {
 
       console.log('Job posted successfully:', data)
       alert('Job posted successfully!')
-      router.push(`/marketplace/${data.id}`)
+      router.push(`/loads/${data.id}`)
     } catch (err: any) {
       console.error('Error posting job:', err)
       alert(`Error posting job: ${err.message}`)
@@ -97,7 +96,7 @@ export default function PostJobPage() {
 
   if (authLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0F1F2E', color: '#fff' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#F5F5F5', color: '#2C3E50' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '18px' }}>Loading...</div>
         </div>
@@ -106,30 +105,40 @@ export default function PostJobPage() {
   }
 
   return (
-    <div className="dashboard-content">
-      <PlatformNav />
+    <div style={{ minHeight: '100vh', backgroundColor: '#F5F5F5' }}>
+      <div style={{ 
+        height: '64px', 
+        backgroundColor: '#FFFFFF', 
+        borderBottom: '1px solid #E5E7EB',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 24px'
+      }}>
+        <h1 style={{ fontSize: '18px', fontWeight: '600', color: '#2C3E50' }}>Post New Job</h1>
+      </div>
 
-      <main className="container">
-        <div style={{ marginTop: '24px', marginBottom: '16px' }}>
-          <a href="/marketplace" style={{ color: 'var(--gold-premium)', fontSize: '14px' }}>
-            ← Back to Marketplace
+      <main style={{ maxWidth: '1400px', padding: '24px', margin: '0 auto' }}>
+        <div style={{ marginBottom: '16px' }}>
+          <a href="/loads" style={{ color: '#C8A64D', fontSize: '14px', textDecoration: 'none' }}>
+            ← Back to Loads
           </a>
         </div>
 
         <div style={{
-          backgroundColor: '#132433',
-          borderRadius: '12px',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '8px',
           padding: '32px',
-          border: '1px solid rgba(255,255,255,0.08)',
-          maxWidth: '800px'
+          border: '1px solid #E5E7EB',
+          maxWidth: '800px',
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
         }}>
-          <h1 className="section-title" style={{ marginBottom: '24px' }}>Post a New Job</h1>
+          <h2 style={{ marginBottom: '24px', fontSize: '20px', fontWeight: '600', color: '#2C3E50' }}>Post a New Job</h2>
 
           <form onSubmit={handleSubmit}>
             <div style={{ display: 'grid', gap: '24px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                     Pickup Location *
                   </label>
                   <input
@@ -141,10 +150,10 @@ export default function PostJobPage() {
                     style={{
                       width: '100%',
                       padding: '12px',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
                       borderRadius: '6px',
-                      color: '#fff',
+                      color: '#2C3E50',
                       fontSize: '14px'
                     }}
                     placeholder="e.g., Manchester, M1"
@@ -152,7 +161,7 @@ export default function PostJobPage() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                     Delivery Location *
                   </label>
                   <input
@@ -164,10 +173,10 @@ export default function PostJobPage() {
                     style={{
                       width: '100%',
                       padding: '12px',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
                       borderRadius: '6px',
-                      color: '#fff',
+                      color: '#2C3E50',
                       fontSize: '14px'
                     }}
                     placeholder="e.g., London, SE1"
@@ -177,7 +186,7 @@ export default function PostJobPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                     Pickup Date & Time
                   </label>
                   <input
@@ -188,17 +197,17 @@ export default function PostJobPage() {
                     style={{
                       width: '100%',
                       padding: '12px',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
                       borderRadius: '6px',
-                      color: '#fff',
+                      color: '#2C3E50',
                       fontSize: '14px'
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                     Delivery Date & Time
                   </label>
                   <input
@@ -209,10 +218,10 @@ export default function PostJobPage() {
                     style={{
                       width: '100%',
                       padding: '12px',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
                       borderRadius: '6px',
-                      color: '#fff',
+                      color: '#2C3E50',
                       fontSize: '14px'
                     }}
                   />
@@ -220,7 +229,7 @@ export default function PostJobPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                   Vehicle Type
                 </label>
                 <select
@@ -230,10 +239,10 @@ export default function PostJobPage() {
                   style={{
                     width: '100%',
                     padding: '12px',
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
                     borderRadius: '6px',
-                    color: '#fff',
+                    color: '#2C3E50',
                     fontSize: '14px'
                   }}
                 >
@@ -249,7 +258,7 @@ export default function PostJobPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                     Pallets
                   </label>
                   <input
@@ -261,10 +270,10 @@ export default function PostJobPage() {
                     style={{
                       width: '100%',
                       padding: '12px',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
                       borderRadius: '6px',
-                      color: '#fff',
+                      color: '#2C3E50',
                       fontSize: '14px'
                     }}
                     placeholder="0"
@@ -272,7 +281,7 @@ export default function PostJobPage() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                     Weight (kg)
                   </label>
                   <input
@@ -285,10 +294,10 @@ export default function PostJobPage() {
                     style={{
                       width: '100%',
                       padding: '12px',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
                       borderRadius: '6px',
-                      color: '#fff',
+                      color: '#2C3E50',
                       fontSize: '14px'
                     }}
                     placeholder="0"
@@ -296,7 +305,7 @@ export default function PostJobPage() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                     Budget (£)
                   </label>
                   <input
@@ -309,10 +318,10 @@ export default function PostJobPage() {
                     style={{
                       width: '100%',
                       padding: '12px',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
                       borderRadius: '6px',
-                      color: '#fff',
+                      color: '#2C3E50',
                       fontSize: '14px'
                     }}
                     placeholder="0.00"
@@ -321,7 +330,7 @@ export default function PostJobPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                   Load Details
                 </label>
                 <textarea
@@ -332,10 +341,10 @@ export default function PostJobPage() {
                   style={{
                     width: '100%',
                     padding: '12px',
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
                     borderRadius: '6px',
-                    color: '#fff',
+                    color: '#2C3E50',
                     fontSize: '14px',
                     resize: 'vertical'
                   }}
@@ -347,12 +356,34 @@ export default function PostJobPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="action-btn primary"
-                  style={{ opacity: submitting ? 0.6 : 1 }}
+                  style={{ 
+                    padding: '12px 24px',
+                    backgroundColor: '#C8A64D',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: submitting ? 'not-allowed' : 'pointer',
+                    opacity: submitting ? 0.6 : 1
+                  }}
                 >
-                  {submitting ? 'Posting...' : 'Post Job to Marketplace'}
+                  {submitting ? 'Posting...' : 'Post Job'}
                 </button>
-                <a href="/marketplace" className="action-btn secondary">
+                <a 
+                  href="/loads" 
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: 'transparent',
+                    color: '#64748B',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    textDecoration: 'none',
+                    display: 'inline-block'
+                  }}
+                >
                   Cancel
                 </a>
               </div>
