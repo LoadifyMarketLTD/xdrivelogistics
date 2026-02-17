@@ -18,12 +18,17 @@ export default function LiveAvailabilityPage() {
     if (!companyId) return
     const fetch = async () => {
       try {
-        const { data } = await supabase.from('vehicles').select('*').eq('company_id', companyId).eq('is_available', true)
+        const { data, error } = await supabase.from('vehicles').select('*').eq('company_id', companyId).eq('is_available', true)
+        if (error) throw error
         setVehicles(data || [])
-      } catch (e) {} finally { setLoading(false) }
+      } catch (e) {
+        console.error('Error fetching available vehicles:', e)
+      } finally { 
+        setLoading(false) 
+      }
     }
     fetch()
-  }, [companyId])
+  }, [companyId, supabase])
   
   if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
   

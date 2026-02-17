@@ -45,7 +45,9 @@ export default function MyFleetPage() {
     }
   }
   
-  useEffect(() => { fetchVehicles() }, [companyId])
+  useEffect(() => { 
+    fetchVehicles() 
+  }, [companyId])
   
   const handleSave = async (data: any) => {
     if (!companyId) return

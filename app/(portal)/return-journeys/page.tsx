@@ -14,12 +14,17 @@ export default function ReturnJourneysPage() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const { data } = await supabase.from('jobs').select('*').eq('status', 'completed').order('created_at', { ascending: false }).limit(10)
+        const { data, error } = await supabase.from('jobs').select('*').eq('status', 'completed').order('created_at', { ascending: false }).limit(10)
+        if (error) throw error
         setJobs(data || [])
-      } catch (e) {} finally { setLoading(false) }
+      } catch (e) {
+        console.error('Error fetching return journeys:', e)
+      } finally { 
+        setLoading(false) 
+      }
     }
     fetch()
-  }, [])
+  }, [supabase])
   
   if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
   

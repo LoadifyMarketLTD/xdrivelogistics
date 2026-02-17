@@ -18,8 +18,11 @@ export default function FreightVisionPage() {
     if (!companyId) return
     const fetch = async () => {
       try {
-        const { data: jobs } = await supabase.from('jobs').select('*').eq('posted_by_company_id', companyId)
-        const { data: bids } = await supabase.from('job_bids').select('*').eq('bidder_company_id', companyId)
+        const { data: jobs, error: jobsError } = await supabase.from('jobs').select('*').eq('posted_by_company_id', companyId)
+        if (jobsError) throw jobsError
+        
+        const { data: bids, error: bidsError } = await supabase.from('job_bids').select('*').eq('bidder_company_id', companyId)
+        if (bidsError) throw bidsError
         
         setStats({
           totalJobs: jobs?.length || 0,
@@ -27,10 +30,14 @@ export default function FreightVisionPage() {
           totalRevenue: jobs?.reduce((sum, j) => sum + (j.budget || 0), 0) || 0,
           activeBids: bids?.filter(b => b.status === 'submitted').length || 0
         })
-      } catch (e) {} finally { setLoading(false) }
+      } catch (e) {
+        console.error('Error fetching freight vision stats:', e)
+      } finally { 
+        setLoading(false) 
+      }
     }
     fetch()
-  }, [companyId])
+  }, [companyId, supabase])
   
   if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
   
