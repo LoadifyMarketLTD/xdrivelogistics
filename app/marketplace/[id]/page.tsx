@@ -8,6 +8,7 @@ import { Job, JobBid, Company } from '@/lib/types'
 import PlatformNav from '@/components/PlatformNav'
 import JobTimeline from '@/components/marketplace/JobTimeline'
 import StatusBadge from '@/components/StatusBadge'
+import BidsList from '@/components/marketplace/BidsList'
 import '@/styles/dashboard.css'
 
 export const dynamic = 'force-dynamic'
@@ -473,77 +474,34 @@ export default function JobDetailPage() {
           </div>
         )}
 
-        {isPostedByMe && (
+        {isPostedByMe && bids.length > 0 && (
+          <BidsList
+            bids={bids}
+            isJobOwner={true}
+            onAcceptBid={handleAcceptBid}
+            onRejectBid={handleRejectBid}
+          />
+        )}
+
+        {isPostedByMe && bids.length === 0 && (
           <div style={{
             backgroundColor: '#132433',
             borderRadius: '12px',
             padding: '32px',
             border: '1px solid rgba(255,255,255,0.08)'
           }}>
-            <h2 className="section-title">Bids Received ({bids.length})</h2>
-            
-            {bids.length === 0 ? (
-              <p style={{ color: '#94a3b8', textAlign: 'center', padding: '40px' }}>
-                No bids yet. Share your job to attract carriers!
-              </p>
-            ) : (
-              <div style={{ display: 'grid', gap: '16px' }}>
-                {bids.map((bid) => (
-                  <div
-                    key={bid.id}
-                    style={{
-                      padding: '20px',
-                      backgroundColor: 'rgba(255,255,255,0.02)',
-                      borderRadius: '8px',
-                      border: bid.status === 'accepted' ? '2px solid var(--success-green)' : '1px solid rgba(255,255,255,0.08)'
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                      <div>
-                        <div style={{ fontSize: '18px', color: '#fff', fontWeight: '600', marginBottom: '4px' }}>
-                          {bid.bidder_company?.name || 'Unknown Company'}
-                        </div>
-                        <div style={{ fontSize: '24px', color: 'var(--gold-premium)', fontWeight: '700' }}>
-                          £{bid.quote_amount.toFixed(2)}
-                        </div>
-                      </div>
-                      <span className={`status-badge ${bid.status}`}>
-                        {bid.status}
-                      </span>
-                    </div>
-
-                    {bid.message && (
-                      <p style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '12px', lineHeight: '1.6' }}>
-                        {bid.message}
-                      </p>
-                    )}
-
-                    <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '16px' }}>
-                      Submitted {new Date(bid.created_at).toLocaleString()}
-                    </div>
-
-                    {bid.status === 'submitted' && job.status === 'open' && (
-                      <div style={{ display: 'flex', gap: '12px' }}>
-                        <button
-                          onClick={() => handleAcceptBid(bid.id)}
-                          className="action-btn success"
-                          style={{ fontSize: '14px', padding: '8px 16px' }}
-                        >
-                          ✅ Accept Bid
-                        </button>
-                        <button
-                          onClick={() => handleRejectBid(bid.id)}
-                          className="action-btn secondary"
-                          style={{ fontSize: '14px', padding: '8px 16px' }}
-                        >
-                          ❌ Reject
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
+            <h2 className="section-title">Bids Received (0)</h2>
+            <div style={{
+              padding: '40px',
+              textAlign: 'center',
+              color: '#94a3b8'
+            }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📭</div>
+              <div style={{ fontSize: '16px', marginBottom: '8px' }}>No bids yet</div>
+              <div style={{ fontSize: '14px', opacity: 0.8 }}>
+                Share your job to attract carriers!
               </div>
-            )}
+            </div>
           </div>
         )}
       </main>
