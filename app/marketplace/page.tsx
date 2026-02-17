@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
 import { Job, Company } from '@/lib/types'
+import PlatformNav from '@/components/PlatformNav'
 import '@/styles/dashboard.css'
 
 export const dynamic = 'force-dynamic'
@@ -79,22 +80,7 @@ export default function MarketplacePage() {
   if (error) {
     return (
       <div className="dashboard-content">
-        <header className="platform-header">
-          <div className="container">
-            <div className="platform-nav">
-              <div className="platform-brand">
-                <span className="platform-brand-accent">XDrive</span> Marketplace
-              </div>
-              <nav>
-                <ul className="platform-links">
-                  <li><a href="/dashboard">Dashboard</a></li>
-                  <li><a href="/marketplace">Marketplace</a></li>
-                  <li><a href="/jobs/new">Post Job</a></li>
-                </ul>
-              </nav>
-            </div>
-          </div>
-        </header>
+        <PlatformNav />
         <main className="container">
           <div style={{
             backgroundColor: 'rgba(255, 107, 107, 0.1)',
@@ -123,24 +109,7 @@ export default function MarketplacePage() {
 
   return (
     <div className="dashboard-content">
-      {/* Platform Header */}
-      <header className="platform-header">
-        <div className="container">
-          <div className="platform-nav">
-            <div className="platform-brand">
-              <span className="platform-brand-accent">XDrive</span> Marketplace
-            </div>
-            
-            <nav>
-              <ul className="platform-links">
-                <li><a href="/dashboard">Dashboard</a></li>
-                <li><a href="/marketplace" style={{ color: 'var(--gold-premium)' }}>Marketplace</a></li>
-                <li><a href="/jobs/new">Post Job</a></li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <PlatformNav />
 
       {/* Main Content */}
       <main className="container">

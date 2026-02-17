@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
+import PlatformNav from '@/components/PlatformNav'
 import '@/styles/dashboard.css'
 
 export const dynamic = 'force-dynamic'
@@ -106,22 +107,7 @@ export default function PostJobPage() {
 
   return (
     <div className="dashboard-content">
-      <header className="platform-header">
-        <div className="container">
-          <div className="platform-nav">
-            <div className="platform-brand">
-              <span className="platform-brand-accent">XDrive</span> Post Job
-            </div>
-            <nav>
-              <ul className="platform-links">
-                <li><a href="/dashboard">Dashboard</a></li>
-                <li><a href="/marketplace">Marketplace</a></li>
-                <li><a href="/jobs/new" style={{ color: 'var(--gold-premium)' }}>Post Job</a></li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <PlatformNav />
 
       <main className="container">
         <div style={{ marginTop: '24px', marginBottom: '16px' }}>
