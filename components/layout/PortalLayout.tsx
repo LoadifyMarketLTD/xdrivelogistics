@@ -31,11 +31,16 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   const [acceptedBidsCount, setAcceptedBidsCount] = useState(0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
-  // Detect mobile viewport
+  // Detect mobile viewport - only on client side to avoid hydration mismatch
   useEffect(() => {
+    setIsMounted(true)
+    
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
+      if (typeof window !== 'undefined') {
+        setIsMobile(window.innerWidth < 768)
+      }
     }
     
     checkMobile()
@@ -85,6 +90,61 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   }, [companyId])
 
   const totalNotifications = newLoadsCount + acceptedBidsCount
+
+  // Don't render mobile-specific UI until mounted to avoid hydration mismatch
+  if (!isMounted) {
+    return (
+      <div style={{
+        display: 'flex',
+        minHeight: '100vh',
+        background: '#f4f5f7',
+      }}>
+        {/* Left Sidebar - Initial render without mobile detection */}
+        <div style={{
+          width: '220px',
+          background: '#1f2937',
+          position: 'fixed',
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          zIndex: 50,
+        }}>
+          <div style={{
+            padding: '20px 16px',
+            borderBottom: '1px solid #374151',
+          }}>
+            <div style={{
+              fontSize: '16px',
+              fontWeight: '700',
+              color: '#d4af37',
+              letterSpacing: '0.5px',
+            }}>
+              XDRIVE LOGISTICS
+            </div>
+          </div>
+        </div>
+        <div style={{
+          flex: 1,
+          marginLeft: '220px',
+          display: 'flex',
+          flexDirection: 'column',
+        }}>
+          <div style={{
+            height: '56px',
+            background: '#ffffff',
+            borderBottom: '1px solid #e5e7eb',
+          }} />
+          <div style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: '20px',
+          }}>
+            {children}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div style={{
