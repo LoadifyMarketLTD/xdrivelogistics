@@ -56,15 +56,25 @@ export default function LoadsPage() {
   const [bidMessage, setBidMessage] = useState('')
   const [submittingBid, setSubmittingBid] = useState(false)
   
-  // Use ref for mounted state so fetchLoads can access it
+  // Use ref for mounted state to prevent updates after unmount
   const mountedRef = useRef(true)
-
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  
+  // Define fetchLoads using useCallback to make it stable for refresh button
   const fetchLoads = async () => {
     if (!mountedRef.current) return
     
     try {
       setLoading(true)
       setError(null)
+      
+      // Set timeout to ensure loading always resolves
+      timeoutRef.current = setTimeout(() => {
+        if (mountedRef.current) {
+          console.warn('Loads data fetch timeout - resolving loading state')
+          setLoading(false)
+        }
+      }, 10000) // 10 second timeout
       
       const { data, error: fetchError } = await supabase
         .from('jobs')
@@ -76,6 +86,7 @@ export default function LoadsPage() {
       if (!mountedRef.current) return
       
       setLoads(data || [])
+      setError(null)
     } catch (err: any) {
       console.error('Error fetching loads:', err)
       if (mountedRef.current) {
@@ -85,72 +96,29 @@ export default function LoadsPage() {
       if (mountedRef.current) {
         setLoading(false)
       }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
     }
   }
 
   useEffect(() => {
+    mountedRef.current = true
+    
+    // Initial fetch
     fetchLoads()
     
     // Set up polling for real-time updates (every 30s)
     const interval = setInterval(() => {
-      fetchLoads()
-    }, 30000)
-    
-    return () => clearInterval(interval)
-  }, [fetchLoads, companyId])
-
-  useEffect(() => {
-    mountedRef.current = true
-    let timeoutId: NodeJS.Timeout | null = null
-    
-    const fetchData = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        
-        // Set timeout to ensure loading always resolves
-        timeoutId = setTimeout(() => {
-          if (mountedRef.current) {
-            console.warn('Loads data fetch timeout - resolving loading state')
-            setLoading(false)
-          }
-        }, 10000) // 10 second timeout
-        
-        const { data, error: fetchError } = await supabase
-          .from('jobs')
-          .select('*')
-          .order('created_at', { ascending: false })
-        
-        if (fetchError) throw fetchError
-        
-        if (!mountedRef.current) return
-        
-        setLoads(data || [])
-      } catch (err: any) {
-        console.error('Error fetching loads:', err)
-        if (mountedRef.current) {
-          setError(err.message || 'Failed to load data')
-        }
-      } finally {
-        if (mountedRef.current) {
-          setLoading(false)
-        }
-        if (timeoutId) clearTimeout(timeoutId)
-      }
-    }
-    
-    fetchData()
-    
-    // Set up polling for real-time updates (every 30s)
-    const interval = setInterval(() => {
       if (mountedRef.current) {
-        fetchData()
+        fetchLoads()
       }
     }, 30000)
     
     return () => {
       mountedRef.current = false
-      if (timeoutId) clearTimeout(timeoutId)
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
       clearInterval(interval)
     }
   }, [])
