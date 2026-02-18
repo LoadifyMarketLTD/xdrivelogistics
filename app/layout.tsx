@@ -3,7 +3,7 @@ import './globals.css'
 import { AuthProvider } from '@/lib/AuthContext'
 
 export const metadata: Metadata = {
-  title: 'XDrive Logistics - Enterprise Exchange',
+  title: 'XDrive Logistics LTD - Enterprise Exchange',
   description: 'B2B logistics exchange platform',
 }
 
