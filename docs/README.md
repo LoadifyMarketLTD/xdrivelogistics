@@ -81,7 +81,9 @@
 4. **AUDIT_CHECKLIST.md** - Comprehensive audit checklist
 5. **DB_GAP_ANALYSIS.md** - Database schema analysis
 6. **sql/00_db_inventory.sql** - Database inspection queries
-7. **README.md** - This summary document
+7. **sql/jobs_verification.sql** - Jobs table verification queries
+8. **SQL_QUERY_DEBUG_FIX.md** - SQL query debugging guide
+9. **README.md** - This summary document
 
 ### Audit Findings
 
