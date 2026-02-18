@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,19 +35,10 @@ export default function DirectoryPage() {
 
   useEffect(() => {
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
 
     const fetchData = async () => {
       try {
         setLoading(true)
-        
-        // Set timeout to ensure loading always resolves
-        timeoutId = setTimeout(() => {
-          if (mounted) {
-            console.warn('Directory data fetch timeout - resolving loading state')
-            setLoading(false)
-          }
-        }, 10000) // 10 second timeout
         
         const { data, error } = await supabase
           .from('companies')
@@ -64,7 +56,6 @@ export default function DirectoryPage() {
         if (mounted) {
           setLoading(false)
         }
-        if (timeoutId) clearTimeout(timeoutId)
       }
     }
 
@@ -72,7 +63,6 @@ export default function DirectoryPage() {
 
     return () => {
       mounted = false
-      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [])
 
@@ -80,7 +70,6 @@ export default function DirectoryPage() {
     try {
       setLoadingProfile(true)
       
-      // Fetch completed jobs count
       const { data: completedJobs, error: jobsError } = await supabase
         .from('jobs')
         .select('id')
@@ -89,7 +78,6 @@ export default function DirectoryPage() {
       
       if (jobsError) throw jobsError
       
-      // Fetch fleet size
       const { data: vehicles, error: vehiclesError } = await supabase
         .from('vehicles')
         .select('id')
@@ -97,8 +85,7 @@ export default function DirectoryPage() {
       
       if (vehiclesError) throw vehiclesError
       
-      // Calculate rating (placeholder - could be based on reviews later)
-      const rating = 4.5 // Default rating
+      const rating = 4.5
       
       setSelectedCompany({
         company,
@@ -124,7 +111,6 @@ export default function DirectoryPage() {
 
   const filteredAndSortedCompanies = companies
     .filter(company => {
-      // Search filter
       if (searchTerm && !(
         company.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         company.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -153,8 +139,8 @@ export default function DirectoryPage() {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
-        Loading directory...
+      <div className="loading-screen">
+        <div className="loading-text">Loading directory...</div>
       </div>
     )
   }
@@ -162,33 +148,16 @@ export default function DirectoryPage() {
   return (
     <>
       <div>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '20px',
-        }}>
-          <h1 style={{
-            fontSize: '20px',
-            fontWeight: '700',
-            color: '#1f2937',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}>
+        <div className="directory-header">
+          <h1 className="directory-title">
             Company Directory
           </h1>
           
-          <div style={{ display: 'flex', gap: '12px' }}>
-            {/* Vehicle Type Filter */}
+          <div className="directory-filters">
             <select
               value={vehicleTypeFilter}
               onChange={(e) => setVehicleTypeFilter(e.target.value)}
-              style={{
-                padding: '8px 12px',
-                border: '1px solid #d1d5db',
-                fontSize: '13px',
-                color: '#1f2937',
-              }}
+              className="form-input"
             >
               <option value="">All Vehicle Types</option>
               <option value="Small Van">Small Van</option>
@@ -200,49 +169,27 @@ export default function DirectoryPage() {
               <option value="Artic">Artic</option>
             </select>
 
-            {/* Search */}
             <input
               type="text"
               placeholder="Search companies..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                padding: '8px 12px',
-                border: '1px solid #d1d5db',
-                fontSize: '13px',
-                width: '300px',
-                color: '#1f2937',
-              }}
+              className="form-input"
             />
           </div>
         </div>
 
-        <div style={{
-          background: '#ffffff',
-          border: '1px solid #e5e7eb',
-        }}>
-          {/* Table Header */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 1.5fr 1fr 1.5fr 1fr 100px',
-            gap: '12px',
-            padding: '12px 16px',
-            background: '#f9fafb',
-            borderBottom: '1px solid #e5e7eb',
-            fontSize: '12px',
-            fontWeight: '700',
-            color: '#6b7280',
-            textTransform: 'uppercase',
-          }}>
+        <div className="table-container">
+          <div className="table-header directory-grid">
             <div
               onClick={() => handleSort('name')}
-              style={{ cursor: 'pointer', userSelect: 'none' }}
+              className="sort-header"
             >
               Company {sortColumn === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
             </div>
             <div
               onClick={() => handleSort('city')}
-              style={{ cursor: 'pointer', userSelect: 'none' }}
+              className="sort-header"
             >
               Location {sortColumn === 'city' && (sortOrder === 'asc' ? '↑' : '↓')}
             </div>
@@ -252,18 +199,13 @@ export default function DirectoryPage() {
             <div></div>
           </div>
 
-          {/* Table Rows */}
           {filteredAndSortedCompanies.length === 0 ? (
-            <div style={{
-              textAlign: 'center',
-              padding: '60px',
-              color: '#9ca3af',
-            }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📁</div>
-              <div style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>
+            <div className="table-empty">
+              <div>📁</div>
+              <div>
                 No companies found
               </div>
-              <div style={{ fontSize: '13px' }}>
+              <div>
                 {searchTerm ? 'Try adjusting your search' : 'No companies in directory'}
               </div>
             </div>
@@ -271,63 +213,30 @@ export default function DirectoryPage() {
             filteredAndSortedCompanies.map((company) => (
               <div
                 key={company.id}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '2fr 1.5fr 1fr 1.5fr 1fr 100px',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  borderBottom: '1px solid #f3f4f6',
-                  fontSize: '13px',
-                  color: '#374151',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#f9fafb'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent'
-                }}
+                className="table-row directory-grid"
               >
-                <div style={{ fontWeight: '600' }}>{company.name}</div>
+                <div className="company-name">{company.name}</div>
                 <div>
                   {company.city || '—'}
                   {company.postcode && ` ${company.postcode}`}
                 </div>
                 <div>
-                  <span style={{
-                    color: '#f59e0b',
-                    fontSize: '14px',
-                  }}>
+                  <span className="rating-stars">
                     ★★★★☆
                   </span>
                 </div>
-                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                <div className="contact-info">
                   {company.phone || company.email || 'No contact'}
                 </div>
                 <div>
-                  <span style={{
-                    padding: '2px 8px',
-                    background: '#d1fae5',
-                    color: '#065f46',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                  }}>
+                  <span className="status-badge completed">
                     Active
                   </span>
                 </div>
                 <div>
                   <button
                     onClick={() => fetchCompanyProfile(company)}
-                    style={{
-                      padding: '4px 10px',
-                      background: '#f3f4f6',
-                      color: '#374151',
-                      border: '1px solid #d1d5db',
-                      fontSize: '11px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                    }}
+                    className="btn-view"
                   >
                     View
                   </button>
@@ -337,225 +246,97 @@ export default function DirectoryPage() {
           )}
         </div>
 
-        <div style={{
-          marginTop: '16px',
-          fontSize: '13px',
-          color: '#6b7280',
-        }}>
+        <div className="directory-footer">
           Showing {filteredAndSortedCompanies.length} of {companies.length} companies
         </div>
       </div>
 
-      {/* Company Profile Modal */}
       {selectedCompany && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-        }}>
-          <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            padding: '24px',
-            width: '600px',
-            maxWidth: '90%',
-            maxHeight: '80vh',
-            overflowY: 'auto',
-          }}>
+        <div className="modal-overlay">
+          <div className="modal-content">
             {loadingProfile ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+              <div className="loading-text">
                 Loading profile...
               </div>
             ) : (
               <>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'start',
-                  marginBottom: '24px',
-                }}>
+                <div className="modal-header">
                   <div>
-                    <h3 style={{
-                      fontSize: '20px',
-                      fontWeight: '700',
-                      color: '#1f2937',
-                      marginBottom: '4px',
-                    }}>
+                    <h3 className="modal-title">
                       {selectedCompany.company.name}
                     </h3>
-                    <div style={{
-                      fontSize: '13px',
-                      color: '#6b7280',
-                    }}>
+                    <div className="modal-subtitle">
                       Member since {new Date(selectedCompany.company.created_at).toLocaleDateString()}
                     </div>
                   </div>
                   <button
                     onClick={() => setSelectedCompany(null)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      fontSize: '20px',
-                      cursor: 'pointer',
-                      color: '#6b7280',
-                      padding: '4px',
-                    }}
+                    className="modal-close"
                   >
                     ✕
                   </button>
                 </div>
 
-                {/* Stats Grid */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(3, 1fr)',
-                  gap: '16px',
-                  marginBottom: '24px',
-                }}>
-                  <div style={{
-                    background: '#f9fafb',
-                    border: '1px solid #e5e7eb',
-                    padding: '16px',
-                    textAlign: 'center',
-                  }}>
-                    <div style={{
-                      fontSize: '24px',
-                      fontWeight: '700',
-                      color: '#f59e0b',
-                      marginBottom: '4px',
-                    }}>
+                <div className="modal-stats-grid">
+                  <div className="modal-stat-card">
+                    <div className="modal-stat-value orange">
                       {selectedCompany.rating.toFixed(1)} ★
                     </div>
-                    <div style={{
-                      fontSize: '12px',
-                      color: '#6b7280',
-                      textTransform: 'uppercase',
-                      fontWeight: '600',
-                    }}>
+                    <div className="modal-stat-label">
                       Rating
                     </div>
                   </div>
 
-                  <div style={{
-                    background: '#f9fafb',
-                    border: '1px solid #e5e7eb',
-                    padding: '16px',
-                    textAlign: 'center',
-                  }}>
-                    <div style={{
-                      fontSize: '24px',
-                      fontWeight: '700',
-                      color: '#10b981',
-                      marginBottom: '4px',
-                    }}>
+                  <div className="modal-stat-card">
+                    <div className="modal-stat-value green">
                       {selectedCompany.completedJobs}
                     </div>
-                    <div style={{
-                      fontSize: '12px',
-                      color: '#6b7280',
-                      textTransform: 'uppercase',
-                      fontWeight: '600',
-                    }}>
+                    <div className="modal-stat-label">
                       Completed Jobs
                     </div>
                   </div>
 
-                  <div style={{
-                    background: '#f9fafb',
-                    border: '1px solid #e5e7eb',
-                    padding: '16px',
-                    textAlign: 'center',
-                  }}>
-                    <div style={{
-                      fontSize: '24px',
-                      fontWeight: '700',
-                      color: '#3b82f6',
-                      marginBottom: '4px',
-                    }}>
+                  <div className="modal-stat-card">
+                    <div className="modal-stat-value blue">
                       {selectedCompany.fleetSize}
                     </div>
-                    <div style={{
-                      fontSize: '12px',
-                      color: '#6b7280',
-                      textTransform: 'uppercase',
-                      fontWeight: '600',
-                    }}>
+                    <div className="modal-stat-label">
                       Fleet Size
                     </div>
                   </div>
                 </div>
 
-                {/* Contact Information */}
-                <div style={{
-                  background: '#f9fafb',
-                  border: '1px solid #e5e7eb',
-                  padding: '16px',
-                  marginBottom: '16px',
-                }}>
-                  <h4 style={{
-                    fontSize: '14px',
-                    fontWeight: '700',
-                    color: '#1f2937',
-                    marginBottom: '12px',
-                    textTransform: 'uppercase',
-                  }}>
+                <div className="modal-section">
+                  <h4 className="modal-section-title">
                     Contact Information
                   </h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div className="modal-info-list">
                     {selectedCompany.company.city && (
-                      <div style={{ fontSize: '13px', color: '#374151' }}>
+                      <div className="modal-info-item">
                         <strong>Location:</strong> {selectedCompany.company.city}
                         {selectedCompany.company.postcode && ` ${selectedCompany.company.postcode}`}
                       </div>
                     )}
                     {selectedCompany.company.phone && (
-                      <div style={{ fontSize: '13px', color: '#374151' }}>
+                      <div className="modal-info-item">
                         <strong>Phone:</strong> {selectedCompany.company.phone}
                       </div>
                     )}
                     {selectedCompany.company.email && (
-                      <div style={{ fontSize: '13px', color: '#374151' }}>
+                      <div className="modal-info-item">
                         <strong>Email:</strong> {selectedCompany.company.email}
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <button
-                    style={{
-                      flex: 1,
-                      padding: '10px',
-                      background: '#10b981',
-                      color: '#ffffff',
-                      border: 'none',
-                      fontSize: '13px',
-                      fontWeight: '700',
-                      cursor: 'pointer',
-                      textTransform: 'uppercase',
-                    }}
-                  >
+                <div className="modal-actions">
+                  <button className="btn-success">
                     Contact Company
                   </button>
                   <button
                     onClick={() => setSelectedCompany(null)}
-                    style={{
-                      padding: '10px 20px',
-                      background: '#f3f4f6',
-                      color: '#374151',
-                      border: '1px solid #d1d5db',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                    }}
+                    className="btn-secondary"
                   >
                     Close
                   </button>

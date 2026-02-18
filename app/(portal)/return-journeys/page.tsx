@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import Panel from '@/components/portal/Panel'
+import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,19 +13,10 @@ export default function ReturnJourneysPage() {
   
   useEffect(() => {
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
     
     const fetch = async () => {
       try {
         setLoading(true)
-        
-        // Set timeout to ensure loading always resolves
-        timeoutId = setTimeout(() => {
-          if (mounted) {
-            console.warn('Return Journeys data fetch timeout - resolving loading state')
-            setLoading(false)
-          }
-        }, 10000) // 10 second timeout
         
         const { data } = await supabase.from('jobs').select('*').eq('status', 'completed').order('created_at', { ascending: false }).limit(10)
         
@@ -37,48 +29,55 @@ export default function ReturnJourneysPage() {
         if (mounted) {
           setLoading(false)
         }
-        if (timeoutId) clearTimeout(timeoutId)
       }
     }
     fetch()
     
     return () => {
       mounted = false
-      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [])
   
-  if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
+  if (loading) return <div className="loading-screen"><div>Loading...</div></div>
   
   return (
-    <Panel title="Return Journeys" subtitle="Optimize empty return trips">
-      {jobs.length === 0 ? (
-        <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔄</div>
-          <p>No completed journeys available</p>
-          <p style={{ fontSize: '14px', color: 'var(--portal-text-muted)', marginTop: '8px' }}>
-            Return journey suggestions will appear here after deliveries are completed
-          </p>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {jobs.map(job => (
-            <div key={job.id} style={{ padding: '16px', background: 'var(--portal-bg-secondary)', borderRadius: '6px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                <div>
-                  <div style={{ fontWeight: '500', marginBottom: '4px' }}>Return: {job.delivery_location} → {job.pickup_location}</div>
-                  <div style={{ fontSize: '13px', color: 'var(--portal-text-secondary)' }}>
-                    Potential savings: {((job.budget || 0) * 0.4).toFixed(0)} GBP
+    <div className="portal-layout">
+      <div className="portal-header">
+        <h1 className="portal-title">Return Journeys</h1>
+        <p className="page-description">Optimize empty return trips</p>
+      </div>
+
+      <div className="portal-main">
+        <Panel title="Return Journeys" subtitle="Optimize empty return trips">
+          {jobs.length === 0 ? (
+            <div className="portal-card">
+              <div className="section-header">🔄</div>
+              <p>No completed journeys available</p>
+              <p className="page-description">
+                Return journey suggestions will appear here after deliveries are completed
+              </p>
+            </div>
+          ) : (
+            <div className="portal-list">
+              {jobs.map(job => (
+                <div key={job.id} className="portal-card">
+                  <div className="portal-card-header">
+                    <div>
+                      <h3 className="section-header">Return: {job.delivery_location} → {job.pickup_location}</h3>
+                      <p className="page-description">
+                        Potential savings: {((job.budget || 0) * 0.4).toFixed(0)} GBP
+                      </p>
+                    </div>
+                    <button className="btn-secondary">
+                      View Route
+                    </button>
                   </div>
                 </div>
-                <button className="portal-btn portal-btn-outline" style={{ padding: '4px 12px', fontSize: '12px' }}>
-                  View Route
-                </button>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
-    </Panel>
+          )}
+        </Panel>
+      </div>
+    </div>
   )
 }

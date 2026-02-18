@@ -8,6 +8,7 @@ import { format, startOfMonth, endOfMonth, isSameDay, parseISO } from 'date-fns'
 import { LoadingSpinner } from '@/components/Loading'
 import EmptyState from '@/components/EmptyState'
 import StatusBadge from '@/components/StatusBadge'
+import '@/styles/portal.css'
 import 'react-calendar/dist/Calendar.css'
 
 export const dynamic = 'force-dynamic'
@@ -40,19 +41,10 @@ export default function DiaryPage() {
     if (!companyId) return
     
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
     
     const fetchJobs = async () => {
       try {
         setLoading(true)
-        
-        // Set timeout to ensure loading always resolves
-        timeoutId = setTimeout(() => {
-          if (mounted) {
-            console.warn('Diary data fetch timeout - resolving loading state')
-            setLoading(false)
-          }
-        }, 10000) // 10 second timeout
         
         const { data, error } = await supabase
           .from('jobs')
@@ -72,7 +64,6 @@ export default function DiaryPage() {
         if (mounted) {
           setLoading(false)
         }
-        if (timeoutId) clearTimeout(timeoutId)
       }
     }
     
@@ -80,7 +71,6 @@ export default function DiaryPage() {
     
     return () => {
       mounted = false
-      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [companyId])
 
@@ -135,12 +125,7 @@ export default function DiaryPage() {
     const dayJobs = jobsByDate[dateKey]
     if (dayJobs && dayJobs.length > 0) {
       return (
-        <div style={{
-          fontSize: '10px',
-          color: 'var(--gold-premium)',
-          fontWeight: '600',
-          marginTop: '2px'
-        }}>
+        <div className="diary-tile-badge">
           {dayJobs.length} job{dayJobs.length > 1 ? 's' : ''}
         </div>
       )
@@ -150,309 +135,214 @@ export default function DiaryPage() {
 
   if (loading) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center' }}>
+      <div className="loading-screen">
         <LoadingSpinner size="large" text="Loading diary..." />
       </div>
     )
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Header */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '16px'
-      }}>
-        <div>
-          <h1 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>
-            📅 Diary & Calendar
-          </h1>
-          <p style={{ color: '#94a3b8', fontSize: '14px' }}>
-            View and manage your scheduled jobs
-          </p>
-        </div>
-
-        {/* View Mode Toggle */}
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            onClick={() => setViewMode('calendar')}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: viewMode === 'calendar' ? 'var(--gold-premium)' : 'transparent',
-              color: viewMode === 'calendar' ? '#0B1623' : '#fff',
-              border: '1px solid ' + (viewMode === 'calendar' ? 'var(--gold-premium)' : 'rgba(255,255,255,0.2)'),
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-          >
-            📅 Calendar
-          </button>
-          <button
-            onClick={() => setViewMode('list')}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: viewMode === 'list' ? 'var(--gold-premium)' : 'transparent',
-              color: viewMode === 'list' ? '#0B1623' : '#fff',
-              border: '1px solid ' + (viewMode === 'list' ? 'var(--gold-premium)' : 'rgba(255,255,255,0.2)'),
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-          >
-            📋 List
-          </button>
-        </div>
+    <div className="portal-layout">
+      <div className="portal-header">
+        <h1 className="portal-title">📅 Diary & Calendar</h1>
       </div>
 
-      {/* Filter Buttons */}
-      <div style={{
-        display: 'flex',
-        gap: '8px',
-        flexWrap: 'wrap'
-      }}>
-        {(['all', 'today', 'upcoming', 'week', 'month'] as FilterMode[]).map(mode => (
-          <button
-            key={mode}
-            onClick={() => setFilterMode(mode)}
-            style={{
-              padding: '6px 12px',
-              backgroundColor: filterMode === mode ? 'var(--gold-premium)' : 'transparent',
-              color: filterMode === mode ? '#0B1623' : '#fff',
-              border: '1px solid ' + (filterMode === mode ? 'var(--gold-premium)' : 'rgba(255,255,255,0.2)'),
-              borderRadius: '20px',
-              fontSize: '13px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-          >
-            {mode === 'all' && `All Jobs (${jobs.length})`}
-            {mode === 'today' && 'Today'}
-            {mode === 'upcoming' && 'Upcoming'}
-            {mode === 'week' && 'This Week'}
-            {mode === 'month' && 'This Month'}
-          </button>
-        ))}
-      </div>
-
-      {filteredJobs.length === 0 ? (
-        <EmptyState
-          icon="📅"
-          title="No jobs scheduled"
-          description={filterMode === 'all' 
-            ? "You don't have any jobs with scheduled pickup dates yet." 
-            : `No jobs found for ${filterMode}.`}
-          actionLabel="Post a Job"
-          actionHref="/jobs/new"
-          size="large"
-        />
-      ) : (
-        <>
-          {viewMode === 'calendar' ? (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 400px',
-              gap: '24px'
-            }}>
-              {/* Calendar */}
-              <div style={{
-                backgroundColor: '#132433',
-                borderRadius: '12px',
-                padding: '24px',
-                border: '1px solid rgba(255,255,255,0.08)'
-              }}>
-                <style jsx global>{`
-                  .react-calendar {
-                    background: transparent;
-                    border: none;
-                    color: #fff;
-                    width: 100%;
-                    font-family: inherit;
-                  }
-                  .react-calendar__tile {
-                    color: #fff;
-                    background: rgba(255,255,255,0.02);
-                    border: 1px solid rgba(255,255,255,0.05);
-                    borderRadius: 8px;
-                    padding: 12px;
-                    margin: 4px;
-                    transition: all 0.2s;
-                  }
-                  .react-calendar__tile:hover {
-                    background: rgba(255,255,255,0.08);
-                    borderColor: var(--gold-premium);
-                  }
-                  .react-calendar__tile--active {
-                    background: var(--gold-premium) !important;
-                    color: #0B1623 !important;
-                    borderColor: var(--gold-premium) !important;
-                  }
-                  .react-calendar__tile--now {
-                    background: rgba(217, 177, 91, 0.2);
-                  }
-                  .react-calendar__navigation button {
-                    color: #fff;
-                    fontSize: 16px;
-                    fontWeight: 600;
-                  }
-                  .react-calendar__navigation button:hover {
-                    background: rgba(255,255,255,0.08);
-                  }
-                  .react-calendar__month-view__weekdays {
-                    color: #94a3b8;
-                    fontWeight: 600;
-                    fontSize: 12px;
-                    textTransform: uppercase;
-                  }
-                `}</style>
-                <Calendar
-                  value={selectedDate}
-                  onChange={(value) => setSelectedDate(value as Date)}
-                  tileContent={tileContent}
-                />
-              </div>
-
-              {/* Selected Date Jobs */}
-              <div style={{
-                backgroundColor: '#132433',
-                borderRadius: '12px',
-                padding: '24px',
-                border: '1px solid rgba(255,255,255,0.08)'
-              }}>
-                <h3 style={{
-                  fontSize: '18px',
-                  fontWeight: '600',
-                  marginBottom: '16px',
-                  color: '#fff'
-                }}>
-                  {format(selectedDate, 'EEEE, d MMMM yyyy')}
-                </h3>
-
-                {selectedDateJobs.length === 0 ? (
-                  <div style={{
-                    padding: '40px 20px',
-                    textAlign: 'center',
-                    color: '#94a3b8'
-                  }}>
-                    <div style={{ fontSize: '32px', marginBottom: '12px' }}>📭</div>
-                    <div style={{ fontSize: '14px' }}>No jobs scheduled for this date</div>
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {selectedDateJobs.map(job => (
-                      <a
-                        key={job.id}
-                        href={`/loads/${job.id}`}
-                        style={{
-                          padding: '16px',
-                          backgroundColor: 'rgba(255,255,255,0.02)',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(255,255,255,0.05)',
-                          textDecoration: 'none',
-                          transition: 'all 0.2s',
-                          display: 'block'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'
-                          e.currentTarget.style.borderColor = 'var(--gold-premium)'
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                          <div style={{ fontWeight: '600', color: '#fff', fontSize: '14px' }}>
-                            {job.pickup_location} → {job.delivery_location}
-                          </div>
-                          <StatusBadge status={job.status} size="small" />
-                        </div>
-                        <div style={{ fontSize: '13px', color: '#94a3b8' }}>
-                          ⏰ {format(parseISO(job.pickup_datetime!), 'HH:mm')}
-                          {job.vehicle_type && ` • 🚚 ${job.vehicle_type}`}
-                          {job.budget && ` • 💰 £${job.budget.toFixed(2)}`}
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
+      <main className="portal-main">
+        <div className="diary-container">
+          {/* Header */}
+          <div className="diary-header">
+            <div>
+              <p className="page-description">
+                View and manage your scheduled jobs
+              </p>
             </div>
+
+            {/* View Mode Toggle */}
+            <div className="diary-view-toggle">
+              <button
+                onClick={() => setViewMode('calendar')}
+                className={viewMode === 'calendar' ? 'btn-primary' : 'btn-secondary'}
+              >
+                📅 Calendar
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={viewMode === 'list' ? 'btn-primary' : 'btn-secondary'}
+              >
+                📋 List
+              </button>
+            </div>
+          </div>
+
+          {/* Filter Buttons */}
+          <div className="diary-filters">
+            {(['all', 'today', 'upcoming', 'week', 'month'] as FilterMode[]).map(mode => (
+              <button
+                key={mode}
+                onClick={() => setFilterMode(mode)}
+                className={filterMode === mode ? 'diary-filter-active' : 'diary-filter'}
+              >
+                {mode === 'all' && `All Jobs (${jobs.length})`}
+                {mode === 'today' && 'Today'}
+                {mode === 'upcoming' && 'Upcoming'}
+                {mode === 'week' && 'This Week'}
+                {mode === 'month' && 'This Month'}
+              </button>
+            ))}
+          </div>
+
+          {filteredJobs.length === 0 ? (
+            <EmptyState
+              icon="📅"
+              title="No jobs scheduled"
+              description={filterMode === 'all' 
+                ? "You don't have any jobs with scheduled pickup dates yet." 
+                : `No jobs found for ${filterMode}.`}
+              actionLabel="Post a Job"
+              actionHref="/jobs/new"
+              size="large"
+            />
           ) : (
-            /* List View */
-            <div style={{
-              backgroundColor: '#132433',
-              borderRadius: '12px',
-              padding: '32px',
-              border: '1px solid rgba(255,255,255,0.08)'
-            }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                {Object.entries(jobsByDate)
-                  .sort(([a], [b]) => a.localeCompare(b))
-                  .map(([dateKey, dateJobs]) => (
-                    <div key={dateKey}>
-                      <h3 style={{
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        marginBottom: '12px',
-                        color: 'var(--gold-premium)'
-                      }}>
-                        {format(parseISO(dateKey), 'EEEE, d MMMM yyyy')}
-                      </h3>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {dateJobs.map(job => (
+            <>
+              {viewMode === 'calendar' ? (
+                <div className="diary-calendar-grid">
+                  {/* Calendar */}
+                  <div className="portal-card diary-calendar-card">
+                    <style jsx global>{`
+                      .react-calendar {
+                        background: transparent;
+                        border: none;
+                        color: #1F2937;
+                        width: 100%;
+                        font-family: inherit;
+                      }
+                      .react-calendar__tile {
+                        color: #1F2937;
+                        background: #F9FAFB;
+                        border: 1px solid #E5E7EB;
+                        border-radius: 6px;
+                        padding: 12px;
+                        margin: 4px;
+                        transition: all 0.2s;
+                      }
+                      .react-calendar__tile:hover {
+                        background: #E5E7EB;
+                        border-color: #2563EB;
+                      }
+                      .react-calendar__tile--active {
+                        background: #2563EB !important;
+                        color: #FFFFFF !important;
+                        border-color: #2563EB !important;
+                      }
+                      .react-calendar__tile--now {
+                        background: #DBEAFE;
+                        border-color: #93C5FD;
+                      }
+                      .react-calendar__navigation button {
+                        color: #1F2937;
+                        font-size: 16px;
+                        font-weight: 600;
+                      }
+                      .react-calendar__navigation button:hover {
+                        background: #F3F4F6;
+                      }
+                      .react-calendar__month-view__weekdays {
+                        color: #6B7280;
+                        font-weight: 600;
+                        font-size: 12px;
+                        text-transform: uppercase;
+                      }
+                      .diary-tile-badge {
+                        font-size: 10px;
+                        color: #2563EB;
+                        font-weight: 600;
+                        margin-top: 2px;
+                      }
+                    `}</style>
+                    <Calendar
+                      value={selectedDate}
+                      onChange={(value) => setSelectedDate(value as Date)}
+                      tileContent={tileContent}
+                    />
+                  </div>
+
+                  {/* Selected Date Jobs */}
+                  <div className="portal-card">
+                    <h3 className="section-header">
+                      {format(selectedDate, 'EEEE, d MMMM yyyy')}
+                    </h3>
+
+                    {selectedDateJobs.length === 0 ? (
+                      <div className="diary-empty">
+                        <div className="diary-empty-icon">📭</div>
+                        <div className="diary-empty-text">No jobs scheduled for this date</div>
+                      </div>
+                    ) : (
+                      <div className="diary-job-list">
+                        {selectedDateJobs.map(job => (
                           <a
                             key={job.id}
                             href={`/loads/${job.id}`}
-                            style={{
-                              padding: '16px',
-                              backgroundColor: 'rgba(255,255,255,0.02)',
-                              borderRadius: '8px',
-                              border: '1px solid rgba(255,255,255,0.05)',
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              textDecoration: 'none',
-                              transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'
-                              e.currentTarget.style.borderColor = 'var(--gold-premium)'
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'
-                              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'
-                            }}
+                            className="diary-job-card"
                           >
-                            <div>
-                              <div style={{ fontWeight: '600', marginBottom: '4px', color: '#fff' }}>
+                            <div className="diary-job-header">
+                              <div className="diary-job-route">
                                 {job.pickup_location} → {job.delivery_location}
                               </div>
-                              <div style={{ fontSize: '13px', color: '#94a3b8' }}>
-                                ⏰ {format(parseISO(job.pickup_datetime!), 'HH:mm')}
-                                {job.vehicle_type && ` • 🚚 ${job.vehicle_type}`}
-                                {job.budget && ` • 💰 £${job.budget.toFixed(2)}`}
-                              </div>
+                              <StatusBadge status={job.status} size="small" />
                             </div>
-                            <StatusBadge status={job.status} size="small" />
+                            <div className="diary-job-details">
+                              ⏰ {format(parseISO(job.pickup_datetime!), 'HH:mm')}
+                              {job.vehicle_type && ` • 🚚 ${job.vehicle_type}`}
+                              {job.budget && ` • 💰 £${job.budget.toFixed(2)}`}
+                            </div>
                           </a>
                         ))}
                       </div>
-                    </div>
-                  ))}
-              </div>
-            </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* List View */
+                <div className="portal-card">
+                  <div className="diary-list-view">
+                    {Object.entries(jobsByDate)
+                      .sort(([a], [b]) => a.localeCompare(b))
+                      .map(([dateKey, dateJobs]) => (
+                        <div key={dateKey} className="diary-date-group">
+                          <h3 className="diary-date-header">
+                            {format(parseISO(dateKey), 'EEEE, d MMMM yyyy')}
+                          </h3>
+                          <div className="diary-job-list">
+                            {dateJobs.map(job => (
+                              <a
+                                key={job.id}
+                                href={`/loads/${job.id}`}
+                                className="diary-job-card-list"
+                              >
+                                <div>
+                                  <div className="diary-job-route">
+                                    {job.pickup_location} → {job.delivery_location}
+                                  </div>
+                                  <div className="diary-job-details">
+                                    ⏰ {format(parseISO(job.pickup_datetime!), 'HH:mm')}
+                                    {job.vehicle_type && ` • 🚚 ${job.vehicle_type}`}
+                                    {job.budget && ` • 💰 £${job.budget.toFixed(2)}`}
+                                  </div>
+                                </div>
+                                <StatusBadge status={job.status} size="small" />
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </>
           )}
-        </>
-      )}
+        </div>
+      </main>
     </div>
   )
 }

@@ -7,6 +7,7 @@ import Panel from '@/components/portal/Panel'
 import QuotesStats from '@/components/portal/quotes/QuotesStats'
 import QuotesFilters from '@/components/portal/quotes/QuotesFilters'
 import QuotesTable from '@/components/portal/quotes/QuotesTable'
+import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,19 +42,10 @@ export default function QuotesPage() {
     if (!companyId) return
     
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
     
     const fetchQuotes = async () => {
       try {
         setLoading(true)
-        
-        // Set timeout to ensure loading always resolves
-        timeoutId = setTimeout(() => {
-          if (mounted) {
-            console.warn('Quotes data fetch timeout - resolving loading state')
-            setLoading(false)
-          }
-        }, 10000) // 10 second timeout
         
         const { data, error: fetchError } = await supabase
           .from('job_bids')
@@ -96,7 +88,6 @@ export default function QuotesPage() {
         if (mounted) {
           setLoading(false)
         }
-        if (timeoutId) clearTimeout(timeoutId)
       }
     }
     
@@ -104,7 +95,6 @@ export default function QuotesPage() {
     
     return () => {
       mounted = false
-      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [companyId])
   
@@ -167,25 +157,19 @@ export default function QuotesPage() {
   
   if (loading) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center' }}>
-        <div style={{ fontSize: '16px', color: 'var(--portal-text-secondary)' }}>
-          Loading quotes...
-        </div>
+      <div className="loading-screen">
+        <div>Loading quotes...</div>
       </div>
     )
   }
   
   if (error) {
     return (
-      <div>
+      <div className="portal-layout">
         <Panel title="Quotes" subtitle="Manage your quotes and bids">
-          <div style={{ 
-            padding: '40px', 
-            textAlign: 'center',
-            color: 'var(--portal-error)'
-          }}>
-            <p style={{ fontSize: '16px', marginBottom: '12px' }}>Error loading quotes</p>
-            <p style={{ fontSize: '14px' }}>{error}</p>
+          <div className="portal-card">
+            <p>Error loading quotes</p>
+            <p className="page-description">{error}</p>
           </div>
         </Panel>
       </div>
@@ -193,36 +177,43 @@ export default function QuotesPage() {
   }
   
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Stats */}
-      {quotes.length > 0 && (
-        <QuotesStats 
-          totalQuotes={stats.totalQuotes}
-          acceptedQuotes={stats.acceptedQuotes}
-          totalValue={stats.totalValue}
-          acceptanceRate={stats.acceptanceRate}
-        />
-      )}
-      
-      {/* Quotes List */}
-      <Panel 
-        title="All Quotes" 
-        subtitle={`${filteredQuotes.length} ${filteredQuotes.length === 1 ? 'quote' : 'quotes'} found`}
-      >
+    <div className="portal-layout">
+      <div className="portal-header">
+        <h1 className="portal-title">Quotes</h1>
+        <p className="page-description">Manage your quotes and bids</p>
+      </div>
+
+      <div className="portal-main">
+        {/* Stats */}
         {quotes.length > 0 && (
-          <QuotesFilters 
-            statusFilter={statusFilter}
-            onStatusChange={setStatusFilter}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
+          <QuotesStats 
+            totalQuotes={stats.totalQuotes}
+            acceptedQuotes={stats.acceptedQuotes}
+            totalValue={stats.totalValue}
+            acceptanceRate={stats.acceptanceRate}
           />
         )}
         
-        <QuotesTable 
-          quotes={filteredQuotes}
-          onWithdraw={handleWithdraw}
-        />
-      </Panel>
+        {/* Quotes List */}
+        <Panel 
+          title="All Quotes" 
+          subtitle={`${filteredQuotes.length} ${filteredQuotes.length === 1 ? 'quote' : 'quotes'} found`}
+        >
+          {quotes.length > 0 && (
+            <QuotesFilters 
+              statusFilter={statusFilter}
+              onStatusChange={setStatusFilter}
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+            />
+          )}
+          
+          <QuotesTable 
+            quotes={filteredQuotes}
+            onWithdraw={handleWithdraw}
+          />
+        </Panel>
+      </div>
     </div>
   )
 }

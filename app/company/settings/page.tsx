@@ -154,88 +154,51 @@ export default function CompanySettingsPage() {
 
   if (authLoading || loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0F1F2E', color: '#fff' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '18px' }}>Loading...</div>
-        </div>
+      <div className="loading-screen">
+        <div className="loading-text">Loading...</div>
       </div>
     )
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#F5F5F5' }}>
-      <div style={{ 
-        height: '64px', 
-        backgroundColor: '#FFFFFF', 
-        borderBottom: '1px solid #E5E7EB',
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0 24px'
-      }}>
-        <h1 style={{ fontSize: '18px', fontWeight: '600', color: '#2C3E50' }}>Company Settings</h1>
+    <div className="portal-layout">
+      <div className="portal-header">
+        <h1 className="portal-title">Company Settings</h1>
       </div>
 
-      <main style={{ padding: '40px 20px', maxWidth: '900px', margin: '0 auto' }}>
-        <div style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: '8px',
-          padding: '48px',
-          border: '1px solid #E5E7EB',
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-        }}>
-          <div style={{ marginBottom: '32px' }}>
-            <h1 style={{ fontSize: '28px', marginBottom: '8px', color: '#fff' }}>
+      <main className="portal-main">
+        <div className="portal-card">
+          <div>
+            <h1 className="section-title">
               Company Settings
             </h1>
-            <p style={{ fontSize: '15px', color: '#94a3b8' }}>
+            <p className="section-subtitle">
               Manage your company details and information.
             </p>
           </div>
 
           {error && (
-            <div style={{
-              padding: '12px 16px',
-              backgroundColor: 'rgba(255, 107, 107, 0.1)',
-              border: '1px solid rgba(255, 107, 107, 0.3)',
-              borderRadius: '8px',
-              marginBottom: '24px',
-              color: '#ff6b6b',
-              fontSize: '14px'
-            }}>
+            <div className="alert alert-error">
               {error}
             </div>
           )}
 
           {success && (
-            <div style={{
-              padding: '12px 16px',
-              backgroundColor: 'rgba(34, 197, 94, 0.1)',
-              border: '1px solid rgba(34, 197, 94, 0.3)',
-              borderRadius: '8px',
-              marginBottom: '24px',
-              color: '#22c55e',
-              fontSize: '14px'
-            }}>
+            <div className="alert alert-success">
               ✓ Company details updated successfully!
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
             {/* Basic Information */}
-            <div style={{ marginBottom: '32px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#fff', marginBottom: '16px' }}>
+            <div className="form-section">
+              <h2 className="form-section-title">
                 Basic Information
               </h2>
               
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#fff'
-                  }}>
+              <div className="form-grid-2">
+                <div className="form-field">
+                  <label className="form-label">
                     Company Name *
                   </label>
                   <input
@@ -243,132 +206,68 @@ export default function CompanySettingsPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '15px'
-                    }}
+                    className="form-input"
                     placeholder="Your Company Ltd"
                   />
                 </div>
 
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#fff'
-                  }}>
+                <div className="form-field">
+                  <label className="form-label">
                     Phone Number
                   </label>
                   <input
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '15px'
-                    }}
+                    className="form-input"
                     placeholder="+44 7xxx xxx xxx"
                   />
                 </div>
               </div>
 
-              <div style={{ marginTop: '16px' }}>
-                <label style={{
-                  display: 'block',
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#fff'
-                }}>
+              <div className="form-field">
+                <label className="form-label">
                   Email Address
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '6px',
-                    color: '#fff',
-                    fontSize: '15px'
-                  }}
+                  className="form-input"
                   placeholder="contact@company.com"
                 />
               </div>
             </div>
 
             {/* Company Registration */}
-            <div style={{ marginBottom: '32px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#fff', marginBottom: '16px' }}>
+            <div className="form-section">
+              <h2 className="form-section-title">
                 Company Registration
               </h2>
               
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#fff'
-                  }}>
+              <div className="form-grid-2">
+                <div className="form-field">
+                  <label className="form-label">
                     VAT Number
                   </label>
                   <input
                     type="text"
                     value={vatNumber}
                     onChange={(e) => setVatNumber(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '15px'
-                    }}
+                    className="form-input"
                     placeholder="GB123456789"
                   />
                 </div>
 
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#fff'
-                  }}>
+                <div className="form-field">
+                  <label className="form-label">
                     Company Number
                   </label>
                   <input
                     type="text"
                     value={companyNumber}
                     onChange={(e) => setCompanyNumber(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '15px'
-                    }}
+                    className="form-input"
                     placeholder="12345678"
                   />
                 </div>
@@ -376,177 +275,94 @@ export default function CompanySettingsPage() {
             </div>
 
             {/* Address Information */}
-            <div style={{ marginBottom: '32px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#fff', marginBottom: '16px' }}>
+            <div className="form-section">
+              <h2 className="form-section-title">
                 Address Information
               </h2>
               
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{
-                  display: 'block',
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#fff'
-                }}>
-                  Address Line 1
-                </label>
-                <input
-                  type="text"
-                  value={addressLine1}
-                  onChange={(e) => setAddressLine1(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '6px',
-                    color: '#fff',
-                    fontSize: '15px'
-                  }}
-                  placeholder="123 Business Street"
-                />
-              </div>
-
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{
-                  display: 'block',
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#fff'
-                }}>
-                  Address Line 2
-                </label>
-                <input
-                  type="text"
-                  value={addressLine2}
-                  onChange={(e) => setAddressLine2(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '6px',
-                    color: '#fff',
-                    fontSize: '15px'
-                  }}
-                  placeholder="Suite 100"
-                />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#fff'
-                  }}>
-                    City
+              <div className="form-grid">
+                <div className="form-field">
+                  <label className="form-label">
+                    Address Line 1
                   </label>
                   <input
                     type="text"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '15px'
-                    }}
-                    placeholder="London"
+                    value={addressLine1}
+                    onChange={(e) => setAddressLine1(e.target.value)}
+                    className="form-input"
+                    placeholder="123 Business Street"
                   />
                 </div>
 
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#fff'
-                  }}>
-                    Postcode
+                <div className="form-field">
+                  <label className="form-label">
+                    Address Line 2
                   </label>
                   <input
                     type="text"
-                    value={postcode}
-                    onChange={(e) => setPostcode(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '15px'
-                    }}
-                    placeholder="SW1A 1AA"
+                    value={addressLine2}
+                    onChange={(e) => setAddressLine2(e.target.value)}
+                    className="form-input"
+                    placeholder="Suite 100"
                   />
                 </div>
 
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#fff'
-                  }}>
-                    Country
-                  </label>
-                  <input
-                    type="text"
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '15px'
-                    }}
-                    placeholder="United Kingdom"
-                  />
+                <div className="form-grid-3">
+                  <div className="form-field">
+                    <label className="form-label">
+                      City
+                    </label>
+                    <input
+                      type="text"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="form-input"
+                      placeholder="London"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="form-label">
+                      Postcode
+                    </label>
+                    <input
+                      type="text"
+                      value={postcode}
+                      onChange={(e) => setPostcode(e.target.value)}
+                      className="form-input"
+                      placeholder="SW1A 1AA"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="form-label">
+                      Country
+                    </label>
+                    <input
+                      type="text"
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                      className="form-input"
+                      placeholder="United Kingdom"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Submit Button */}
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <div className="btn-group">
               <button
                 type="button"
                 onClick={() => router.push('/dashboard')}
-                style={{
-                  padding: '12px 24px',
-                  backgroundColor: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '6px',
-                  color: '#fff',
-                  fontSize: '15px',
-                  fontWeight: '600',
-                  cursor: 'pointer'
-                }}
+                className="btn-secondary"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="action-btn primary"
-                style={{
-                  padding: '12px 32px',
-                  fontSize: '15px',
-                  fontWeight: '600',
-                  opacity: submitting ? 0.6 : 1
-                }}
+                className="btn-primary"
               >
                 {submitting ? 'Saving...' : 'Save Changes'}
               </button>

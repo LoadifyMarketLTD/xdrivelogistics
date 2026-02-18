@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
+import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,19 +32,10 @@ export default function DashboardPage() {
     if (!companyId) return
     
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
 
     const fetchData = async () => {
       try {
         setLoading(true)
-        
-        // Set timeout to ensure loading always resolves
-        timeoutId = setTimeout(() => {
-          if (mounted) {
-            console.warn('Dashboard data fetch timeout - resolving loading state')
-            setLoading(false)
-          }
-        }, 10000) // 10 second timeout
         
         // Fetch all jobs for total loads
         const { data: allJobs, error: allJobsError } = await supabase
@@ -101,7 +93,6 @@ export default function DashboardPage() {
         if (mounted) {
           setLoading(false)
         }
-        if (timeoutId) clearTimeout(timeoutId)
       }
     }
 
@@ -109,268 +100,137 @@ export default function DashboardPage() {
 
     return () => {
       mounted = false
-      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [companyId])
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
-        Loading dashboard...
+      <div className="loading-screen">
+        <div className="loading-text">Loading dashboard...</div>
       </div>
     )
   }
 
   return (
-    <div style={{ maxWidth: '1400px' }}>
-      <h1 style={{
-        fontSize: '20px',
-        fontWeight: '700',
-        color: '#1f2937',
-        marginBottom: '20px',
-        textTransform: 'uppercase',
-        letterSpacing: '0.5px',
-      }}>
-        Dashboard
-      </h1>
-
-      {/* Reports & Statistics Section */}
-      <div style={{ marginBottom: '24px' }}>
-        <h2 style={{
-          fontSize: '14px',
-          fontWeight: '700',
-          color: '#374151',
-          marginBottom: '12px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.3px',
-        }}>
-          Reports & Statistics
-        </h2>
-        
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '16px',
-        }}>
-          {/* Total Loads */}
-          <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            padding: '16px',
-          }}>
-            <div style={{
-              fontSize: '12px',
-              color: '#6b7280',
-              marginBottom: '8px',
-              fontWeight: '600',
-              textTransform: 'uppercase',
-            }}>
-              Total Loads (System)
-            </div>
-            <div style={{
-              fontSize: '28px',
-              fontWeight: '700',
-              color: '#1f2937',
-            }}>
-              {stats.totalLoads}
-            </div>
-            <div style={{
-              fontSize: '11px',
-              color: '#9ca3af',
-              marginTop: '4px',
-            }}>
-              All available loads
-            </div>
-          </div>
-
-          {/* Active Bids */}
-          <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            padding: '16px',
-          }}>
-            <div style={{
-              fontSize: '12px',
-              color: '#6b7280',
-              marginBottom: '8px',
-              fontWeight: '600',
-              textTransform: 'uppercase',
-            }}>
-              Active Bids
-            </div>
-            <div style={{
-              fontSize: '28px',
-              fontWeight: '700',
-              color: '#3b82f6',
-            }}>
-              {stats.activeBids}
-            </div>
-            <div style={{
-              fontSize: '11px',
-              color: '#9ca3af',
-              marginTop: '4px',
-            }}>
-              Pending responses
-            </div>
-          </div>
-
-          {/* Accepted Loads */}
-          <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            padding: '16px',
-          }}>
-            <div style={{
-              fontSize: '12px',
-              color: '#6b7280',
-              marginBottom: '8px',
-              fontWeight: '600',
-              textTransform: 'uppercase',
-            }}>
-              Accepted Loads
-            </div>
-            <div style={{
-              fontSize: '28px',
-              fontWeight: '700',
-              color: '#10b981',
-            }}>
-              {stats.acceptedLoads}
-            </div>
-            <div style={{
-              fontSize: '11px',
-              color: '#9ca3af',
-              marginTop: '4px',
-            }}>
-              Won bids
-            </div>
-          </div>
-
-          {/* Revenue */}
-          <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            padding: '16px',
-          }}>
-            <div style={{
-              fontSize: '12px',
-              color: '#6b7280',
-              marginBottom: '8px',
-              fontWeight: '600',
-              textTransform: 'uppercase',
-            }}>
-              Revenue (Accepted)
-            </div>
-            <div style={{
-              fontSize: '28px',
-              fontWeight: '700',
-              color: '#10b981',
-            }}>
-              £{stats.revenue.toFixed(2)}
-            </div>
-            <div style={{
-              fontSize: '11px',
-              color: '#9ca3af',
-              marginTop: '4px',
-            }}>
-              From accepted bids
-            </div>
-          </div>
-        </div>
+    <div className="portal-layout">
+      <div className="portal-header">
+        <h1 className="portal-title">Dashboard</h1>
       </div>
 
-      {/* Activity at a Glance Section */}
-      <div>
-        <h2 style={{
-          fontSize: '14px',
-          fontWeight: '700',
-          color: '#374151',
-          marginBottom: '12px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.3px',
-        }}>
-          My Posted Loads
-        </h2>
-        
-        <div style={{
-          background: '#ffffff',
-          border: '1px solid #e5e7eb',
-        }}>
-          {/* Table Header */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 2fr 1fr 1fr 100px',
-            gap: '12px',
-            padding: '12px 16px',
-            background: '#f9fafb',
-            borderBottom: '1px solid #e5e7eb',
-            fontSize: '12px',
-            fontWeight: '700',
-            color: '#6b7280',
-            textTransform: 'uppercase',
-          }}>
-            <div>From</div>
-            <div>To</div>
-            <div>Vehicle</div>
-            <div>Status</div>
-            <div>Budget</div>
-          </div>
+      <main className="portal-main">
+        <div className="portal-card">
+          <h1 className="section-title">Dashboard</h1>
+          <p className="page-description">
+            Overview of your logistics operations
+          </p>
 
-          {/* Table Rows */}
-          {recentJobs.length === 0 ? (
-            <div style={{
-              textAlign: 'center',
-              padding: '40px',
-              color: '#9ca3af',
-              fontSize: '14px',
-            }}>
-              No loads posted yet
-            </div>
-          ) : (
-            recentJobs.map((job) => (
-              <div
-                key={job.id}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '2fr 2fr 1fr 1fr 100px',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  borderBottom: '1px solid #f3f4f6',
-                  fontSize: '13px',
-                  color: '#374151',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#f9fafb'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent'
-                }}
-              >
-                <div>{job.pickup_location || '—'}</div>
-                <div>{job.delivery_location || '—'}</div>
-                <div>{job.vehicle_type || '—'}</div>
-                <div>
-                  <span style={{
-                    padding: '2px 8px',
-                    background: job.status === 'open' ? '#dbeafe' : 
-                               job.status === 'completed' ? '#d1fae5' : '#fef3c7',
-                    color: job.status === 'open' ? '#1e40af' :
-                           job.status === 'completed' ? '#065f46' : '#92400e',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                  }}>
-                    {job.status}
-                  </span>
+          {/* Reports & Statistics Section */}
+          <div>
+            <h2 className="section-header">
+              Reports & Statistics
+            </h2>
+            
+            <div className="stats-grid">
+              {/* Total Loads */}
+              <div className="stat-card">
+                <div className="stat-label">
+                  Total Loads (System)
                 </div>
-                <div style={{ fontWeight: '600' }}>
-                  {job.budget ? `£${job.budget.toFixed(2)}` : '—'}
+                <div className="stat-value">
+                  {stats.totalLoads}
+                </div>
+                <div className="stat-description">
+                  All available loads
                 </div>
               </div>
-            ))
-          )}
+
+              {/* Active Bids */}
+              <div className="stat-card">
+                <div className="stat-label">
+                  Active Bids
+                </div>
+                <div className="stat-value blue">
+                  {stats.activeBids}
+                </div>
+                <div className="stat-description">
+                  Pending responses
+                </div>
+              </div>
+
+              {/* Accepted Loads */}
+              <div className="stat-card">
+                <div className="stat-label">
+                  Accepted Loads
+                </div>
+                <div className="stat-value green">
+                  {stats.acceptedLoads}
+                </div>
+                <div className="stat-description">
+                  Won bids
+                </div>
+              </div>
+
+              {/* Revenue */}
+              <div className="stat-card">
+                <div className="stat-label">
+                  Revenue (Accepted)
+                </div>
+                <div className="stat-value green">
+                  £{stats.revenue.toFixed(2)}
+                </div>
+                <div className="stat-description">
+                  From accepted bids
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Activity at a Glance Section */}
+          <div>
+            <h2 className="section-header">
+              My Posted Loads
+            </h2>
+          
+            <div className="table-container">
+              {/* Table Header */}
+              <div className="table-header" style={{ gridTemplateColumns: '2fr 2fr 1fr 1fr 100px', gap: '12px' }}>
+                <div>From</div>
+                <div>To</div>
+                <div>Vehicle</div>
+                <div>Status</div>
+                <div>Budget</div>
+              </div>
+
+              {/* Table Rows */}
+              {recentJobs.length === 0 ? (
+                <div className="table-empty">
+                  No loads posted yet
+                </div>
+              ) : (
+                recentJobs.map((job) => (
+                  <div
+                    key={job.id}
+                    className="table-row"
+                    style={{ gridTemplateColumns: '2fr 2fr 1fr 1fr 100px', gap: '12px' }}
+                  >
+                    <div>{job.pickup_location || '—'}</div>
+                    <div>{job.delivery_location || '—'}</div>
+                    <div>{job.vehicle_type || '—'}</div>
+                    <div>
+                      <span className={`status-badge ${job.status}`}>
+                        {job.status}
+                      </span>
+                    </div>
+                    <div style={{ fontWeight: '600' }}>
+                      {job.budget ? `£${job.budget.toFixed(2)}` : '—'}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
