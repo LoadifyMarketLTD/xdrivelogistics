@@ -10,6 +10,56 @@ export interface Profile {
   is_active: boolean
   created_at: string
   updated_at: string
+  
+  // Extended profile fields
+  first_name: string | null
+  last_name: string | null
+  phone_2: string | null
+  job_title: string | null
+  department: string | null
+  time_zone: string
+  is_driver: boolean
+  web_login_allowed: boolean
+  email_visible_to_members: boolean
+  has_mobile_account: boolean
+  mobile_option: string
+  username: string | null
+  logo_url: string | null
+  interface_language: string
+}
+
+export interface UserSettings {
+  id: string
+  user_id: string
+  show_notification_bar: boolean
+  enable_load_alerts: boolean
+  send_booking_confirmation: boolean
+  enroute_alert_hours: number
+  alert_distance_uk_miles: number
+  alert_distance_euro_miles: number
+  despatch_group: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface UserRole {
+  id: string
+  user_id: string
+  role_name: 'Company Admin' | 'Company User' | 'Finance Director' | 
+             'Finance Bookkeeper' | 'Driver' | 'Dispatcher' | 'Viewer'
+  granted_at: string
+}
+
+export interface UserProfileComplete extends Profile {
+  show_notification_bar: boolean
+  enable_load_alerts: boolean
+  send_booking_confirmation: boolean
+  enroute_alert_hours: number
+  alert_distance_uk_miles: number
+  alert_distance_euro_miles: number
+  despatch_group: string | null
+  company_name: string | null
+  roles: string[] | null
 }
 
 export interface Company {
@@ -243,7 +293,6 @@ export interface Vehicle {
   make: string | null
   model: string | null
   year: number | null
-  capacity_kg: number | null
   notes: string | null
   is_available: boolean
   created_at: string
@@ -260,6 +309,35 @@ export interface Vehicle {
   notify_when: string | null
   is_tracked: boolean
   vehicle_size: string | null
+  
+  // Detailed vehicle fields
+  telematics_id: string | null
+  vehicle_reference: string | null // What others can see
+  internal_reference: string | null // What you can see
+  body_type: string | null
+  notify_when_tracked: boolean
+  vin: string | null
+  has_livery: boolean
+  has_tail_lift: boolean
+  has_hiab: boolean
+  has_trailer: boolean
+  has_moffet_mounty: boolean
+  loading_capacity_m3: number | null
+  length_m: number | null
+  width_m: number | null
+  height_m: number | null
+  max_weight_kg: number | null
+}
+
+export interface VehicleDocument {
+  id: string
+  vehicle_id: string
+  document_name: string
+  document_url: string
+  expiry_date: string | null
+  uploaded_at: string
+  uploaded_by: string | null
+  created_at: string
 }
 
 export interface VehicleTrackingHistory {
@@ -276,4 +354,10 @@ export interface VehicleWithTracking extends Vehicle {
   company_name: string | null
   company_phone: string | null
   tracking_count: number
+}
+
+export interface VehicleWithDetails extends Vehicle {
+  company_name: string | null
+  document_count: number
+  expired_documents_count: number
 }
