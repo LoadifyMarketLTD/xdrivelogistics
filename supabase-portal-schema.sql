@@ -62,10 +62,12 @@ create table if not exists public.company_memberships (
 create table if not exists public.drivers (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
-  name text not null,
+  full_name text not null,
   phone text,
-  licence text,
-  status text not null default 'active' check (status in ('active','inactive')),
+  email text,
+  license_number text,
+  notes text,
+  is_active boolean default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -73,13 +75,14 @@ create table if not exists public.drivers (
 create table if not exists public.vehicles (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
-  reg text,
-  type text,
-  length_m numeric,
-  width_m numeric,
-  height_m numeric,
-  payload_kg numeric,
-  status text not null default 'active' check (status in ('active','inactive')),
+  vehicle_type text not null,
+  registration text not null,
+  make text,
+  model text,
+  year integer,
+  capacity_kg numeric,
+  notes text,
+  is_available boolean default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
