@@ -233,3 +233,47 @@ export interface JobWithTracking extends Job {
   document_count: number
   note_count: number
 }
+
+// Vehicle Types - Fleet Management
+export interface Vehicle {
+  id: string
+  company_id: string
+  vehicle_type: string
+  registration: string
+  make: string | null
+  model: string | null
+  year: number | null
+  capacity_kg: number | null
+  notes: string | null
+  is_available: boolean
+  created_at: string
+  updated_at: string
+  
+  // Enhanced tracking fields
+  driver_name: string | null
+  current_status: string
+  current_location: string | null
+  last_tracked_at: string | null
+  future_position: string | null
+  future_journey: string | null
+  advertise_to: string
+  notify_when: string | null
+  is_tracked: boolean
+  vehicle_size: string | null
+}
+
+export interface VehicleTrackingHistory {
+  id: string
+  vehicle_id: string
+  location: string
+  status: string | null
+  tracked_at: string
+  notes: string | null
+  created_at: string
+}
+
+export interface VehicleWithTracking extends Vehicle {
+  company_name: string | null
+  company_phone: string | null
+  tracking_count: number
+}
