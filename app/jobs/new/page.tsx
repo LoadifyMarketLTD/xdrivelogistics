@@ -250,7 +250,7 @@ export default function PostJobPage() {
                   <option value="Small Van">Small Van</option>
                   <option value="Medium Van">Medium Van</option>
                   <option value="Large Van">Large Van</option>
-                  <option value="Luton">Luton</option>
+                  <option value="Luton Van">Luton Van</option>
                   <option value="7.5 Tonne">7.5 Tonne</option>
                   <option value="Sprinter">Sprinter</option>
                 </select>
