@@ -79,7 +79,7 @@ export default function PostJobPage() {
       if (formData.budget) jobData.budget = parseFloat(formData.budget)
       
       // Build comprehensive load details with cargo info
-      let cargoInfo = []
+      const cargoInfo = []
       if (formData.cargo_type) cargoInfo.push(`Cargo Type: ${formData.cargo_type}`)
       if (formData.pallets) cargoInfo.push(`Pallets: ${formData.pallets}`)
       if (formData.boxes) cargoInfo.push(`Boxes: ${formData.boxes}`)
@@ -249,6 +249,7 @@ export default function PostJobPage() {
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                   Vehicle Type
                 </label>
+                {/* Note: These values must match the database vehicle_type values/enum */}
                 <select
                   name="vehicle_type"
                   value={formData.vehicle_type}
