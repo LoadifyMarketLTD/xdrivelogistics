@@ -1,6 +1,8 @@
 -- ============================================================
 -- INVOICE SYSTEM - QUICK START SQL
+-- SISTEM FACTURI - SQL PORNIRE RAPIDĂ
 -- Minimal version - copy and paste in Supabase SQL Editor
+-- Versiune minimală - copiază și lipește în Supabase SQL Editor
 -- ============================================================
 -- ✅ Safe to run: Folosește IF NOT EXISTS - nu va șterge date
 -- ✅ Idempotent: Poți rula de mai multe ori fără probleme
@@ -11,7 +13,8 @@
 --        Pentru verificare prerequisite, folosește CHECK_PREREQUISITES.sql
 -- ============================================================
 
--- Create invoices table
+-- 1. CREATE INVOICES TABLE / CREEAZĂ TABELUL INVOICES
+-- ============================================================
 CREATE TABLE IF NOT EXISTS public.invoices (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
@@ -30,7 +33,9 @@ CREATE TABLE IF NOT EXISTS public.invoices (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- 2. AUTO-GENERATE INVOICE NUMBER / AUTO-GENEREAZĂ NUMĂRUL FACTURII
 -- Auto-generate invoice numbers (INV-2026-1001, INV-2026-1002, etc.)
+-- ============================================================
 CREATE SEQUENCE IF NOT EXISTS invoice_number_seq START 1001;
 
 CREATE OR REPLACE FUNCTION generate_invoice_number()
@@ -49,21 +54,53 @@ CREATE TRIGGER set_invoice_number
   FOR EACH ROW
   EXECUTE FUNCTION generate_invoice_number();
 
--- Create indexes
+-- 3. CREATE INDEXES / CREEAZĂ INDEXURI
+-- ============================================================
 CREATE INDEX IF NOT EXISTS idx_invoices_company_id ON public.invoices(company_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_job_id ON public.invoices(job_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_status ON public.invoices(status);
 
--- Enable security
+-- 4. ENABLE ROW LEVEL SECURITY / ACTIVEAZĂ SECURITATEA LA NIVEL DE RÂND
+-- ============================================================
 ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
 
--- RLS policies
+-- 5. CREATE RLS POLICIES / CREEAZĂ POLITICI RLS
+-- ============================================================
+
+-- Policy for viewing invoices / Politică pentru vizualizarea facturilor
 DROP POLICY IF EXISTS "Users can view company invoices" ON public.invoices;
 CREATE POLICY "Users can view company invoices"
   ON public.invoices FOR SELECT
-  USING (company_id IN (SELECT company_id FROM public.profiles WHERE id = auth.uid()));
+  USING (
+    company_id IN (
+      SELECT company_id FROM public.profiles WHERE id = auth.uid()
+    )
+  );
 
+-- Policy for managing invoices / Politică pentru gestionarea facturilor
 DROP POLICY IF EXISTS "Users can manage company invoices" ON public.invoices;
 CREATE POLICY "Users can manage company invoices"
   ON public.invoices FOR ALL
-  USING (company_id IN (SELECT company_id FROM public.profiles WHERE id = auth.uid()));
+  USING (
+    company_id IN (
+      SELECT company_id FROM public.profiles WHERE id = auth.uid()
+    )
+  );
+
+-- ============================================================
+-- COMPLETE! / COMPLET!
+-- ============================================================
+-- Your invoices table is now ready to use!
+-- Tabelul de facturi este acum gata de utilizare!
+-- 
+-- You can now:
+-- - Create invoices linked to jobs
+-- - Track invoice status (pending, sent, paid, overdue, cancelled)
+-- - Auto-generate invoice numbers (INV-2026-1001, INV-2026-1002, etc.)
+-- - Manage invoices with Row Level Security
+-- 
+-- Acum poți:
+-- - Crea facturi legate de joburi
+-- - Urmări statusul facturilor (pending, sent, paid, overdue, cancelled)
+-- - Auto-generare numere facturi (INV-2026-1001, INV-2026-1002, etc.)
+-- - Gestiona facturi cu Row Level Security
