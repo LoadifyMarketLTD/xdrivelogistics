@@ -269,7 +269,7 @@ export default function Footer() {
               fontSize: '0.8125rem',
               color: 'var(--muted-2)',
             }}>
-              XDrive Logistics Ltd. | Înregistrată în Anglia și Țara Galilor | Company Number: 13175184 | VAT: GB372319642 | Adresă: 101 Cornelian Street Blackburn BB1 9QL
+              XDrive Logistics Ltd. | Înregistrată în Anglia și Țara Galilor | Company Number: 13171804 | VAT: GB375949535 | Adresă: 101 Cornelian Street Blackburn BB1 9QL
             </p>
           </div>
         </div>
