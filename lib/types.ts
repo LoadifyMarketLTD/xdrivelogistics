@@ -361,3 +361,26 @@ export interface VehicleWithDetails extends Vehicle {
   document_count: number
   expired_documents_count: number
 }
+
+// Invoice with related job details
+export interface InvoiceWithDetails {
+  id: string
+  company_id: string
+  invoice_number: string
+  job_id: string | null
+  customer_name: string
+  customer_email: string | null
+  amount: number
+  vat_amount: number
+  total_amount: number
+  status: 'pending' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+  issue_date: string
+  due_date: string
+  paid_date: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+  job?: Job | null
+  company?: Company | null
+  company_name?: string | null
+}
