@@ -15,7 +15,7 @@ export default function AddVehicleModal({ companyId, onClose, onSuccess }: AddVe
     vehicle_type: '',
     make: '',
     model: '',
-    status: 'active'
+    is_available: true
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -34,7 +34,7 @@ export default function AddVehicleModal({ companyId, onClose, onSuccess }: AddVe
           vehicle_type: formData.vehicle_type || null,
           make: formData.make || null,
           model: formData.model || null,
-          status: formData.status
+          is_available: formData.is_available
         }])
 
       if (insertError) throw insertError
@@ -127,15 +127,15 @@ export default function AddVehicleModal({ companyId, onClose, onSuccess }: AddVe
             </div>
 
             <div className="form-group">
-              <label htmlFor="status">Status</label>
+              <label htmlFor="is_available">Status</label>
               <select
-                id="status"
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                id="is_available"
+                value={formData.is_available ? 'available' : 'unavailable'}
+                onChange={(e) => setFormData({ ...formData, is_available: e.target.value === 'available' })}
                 className="form-input"
               >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+                <option value="available">Available</option>
+                <option value="unavailable">Unavailable</option>
               </select>
             </div>
           </div>

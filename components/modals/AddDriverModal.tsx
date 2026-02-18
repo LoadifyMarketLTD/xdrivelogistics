@@ -15,7 +15,7 @@ export default function AddDriverModal({ companyId, onClose, onSuccess }: AddDri
     license_number: '',
     phone: '',
     email: '',
-    status: 'active'
+    is_active: true
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -34,7 +34,7 @@ export default function AddDriverModal({ companyId, onClose, onSuccess }: AddDri
           license_number: formData.license_number || null,
           phone: formData.phone || null,
           email: formData.email || null,
-          status: formData.status
+          is_active: formData.is_active
         }])
 
       if (insertError) throw insertError
@@ -115,11 +115,11 @@ export default function AddDriverModal({ companyId, onClose, onSuccess }: AddDri
             </div>
 
             <div className="form-group">
-              <label htmlFor="status">Status</label>
+              <label htmlFor="is_active">Status</label>
               <select
-                id="status"
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                id="is_active"
+                value={formData.is_active ? 'active' : 'inactive'}
+                onChange={(e) => setFormData({ ...formData, is_active: e.target.value === 'active' })}
                 className="form-input"
               >
                 <option value="active">Active</option>
