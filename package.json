@@ -1,7 +1,7 @@
 {
   "name": "xdrivelogistics",
   "version": "1.0.0",
-  "description": "A modern, single-page website for XDrive Logistics - UK dedicated transport services.",
+  "description": "A modern, single-page website for XDrive Logistics LTD - UK dedicated transport services.",
   "main": "index.js",
   "scripts": {
     "dev": "next dev",

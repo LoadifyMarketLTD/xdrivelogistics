@@ -12,7 +12,7 @@ const CONTACT = {
 export default function ContactForm() {
   const buildMessage = (data: Record<string, string>) => {
     return [
-      "Quote Request — XDrive Logistics",
+      "Quote Request — XDrive Logistics LTD",
       "",
       `Pickup: ${data.pickup || ""}`,
       `Drop-off: ${data.dropoff || ""}`,
@@ -32,7 +32,7 @@ export default function ContactForm() {
     const data = Object.fromEntries(formData.entries()) as Record<string, string>;
     const body = buildMessage(data);
 
-    const mailto = `mailto:${CONTACT.email}?subject=${encodeURIComponent("Quote Request — XDrive Logistics")}&body=${encodeURIComponent(body)}`;
+    const mailto = `mailto:${CONTACT.email}?subject=${encodeURIComponent("Quote Request — XDrive Logistics LTD")}&body=${encodeURIComponent(body)}`;
     window.location.href = mailto;
     
     const toast = document.getElementById("toast");

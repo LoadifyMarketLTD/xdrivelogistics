@@ -68,8 +68,7 @@ export default function Navbar() {
           alignItems: 'center',
           gap: '8px'
         }}>
-          <span style={{ color: '#C8A64D' }}>XDrive</span>
-          <span>Logistics</span>
+          <span style={{ color: '#C8A64D' }}>XDrive Logistics LTD</span>
         </Link>
 
         <div style={{
