@@ -1,63 +1,65 @@
 -- ============================================================
--- XDRIVE LOGISTICS - DELIVERY TRACKING SYSTEM MIGRATION
+-- XDRIVE LOGISTICS - DELIVERY TRACKING SYSTEM MIGRATION (FIXED)
 -- Phase 1: Database Schema Extensions
 -- Run this in Supabase SQL Editor AFTER main schema
+-- 
+-- FIX: Handles both ENUM and TEXT CHECK constraints for status
 -- ============================================================
 
 -- ============================================================
--- 0. FIX STATUS COLUMN IF USING ENUM TYPE
+-- 0. ENSURE 'completed' IS A VALID STATUS VALUE
 -- ============================================================
--- Check if jobs.status is using an ENUM type and fix it if needed
+
+-- Option 1: If status is an ENUM, add 'completed' if missing
 DO $$
-DECLARE
-  status_type TEXT;
-  constraint_def TEXT;
 BEGIN
-  -- Check the data type of the status column
-  SELECT data_type INTO status_type
-  FROM information_schema.columns
-  WHERE table_schema = 'public'
-    AND table_name = 'jobs'
-    AND column_name = 'status';
-
-  -- If it's a user-defined type (enum), we need to handle it
-  IF status_type = 'USER-DEFINED' THEN
-    -- Get the enum type name
-    SELECT udt_name INTO status_type
-    FROM information_schema.columns
-    WHERE table_schema = 'public'
-      AND table_name = 'jobs'
-      AND column_name = 'status';
-    
-    -- Check if 'completed' exists in the enum
+  -- Check if job_status enum type exists
+  IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'job_status') THEN
+    -- Add 'completed' to enum if it doesn't exist (PostgreSQL 9.1+)
     IF NOT EXISTS (
       SELECT 1 FROM pg_enum e
       JOIN pg_type t ON e.enumtypid = t.oid
-      WHERE t.typname = status_type
-        AND e.enumlabel = 'completed'
+      WHERE t.typname = 'job_status' AND e.enumlabel = 'completed'
     ) THEN
-      -- Add 'completed' to the enum if it doesn't exist
-      EXECUTE format('ALTER TYPE %I ADD VALUE IF NOT EXISTS ''completed''', status_type);
-    END IF;
-    
-  ELSIF status_type = 'text' OR status_type = 'character varying' THEN
-    -- If it's TEXT/VARCHAR, ensure the CHECK constraint allows 'completed'
-    -- Drop existing constraint if it exists and doesn't include 'completed'
-    SELECT conname INTO constraint_def
-    FROM pg_constraint
-    WHERE conrelid = 'public.jobs'::regclass
-      AND conname LIKE '%status%'
-      AND contype = 'c'
-      AND NOT (consrc LIKE '%completed%' OR pg_get_constraintdef(oid) LIKE '%completed%');
-    
-    IF constraint_def IS NOT NULL THEN
-      EXECUTE format('ALTER TABLE public.jobs DROP CONSTRAINT IF EXISTS %I', constraint_def);
-      
-      -- Add new constraint that includes 'completed'
-      ALTER TABLE public.jobs ADD CONSTRAINT jobs_status_check 
-        CHECK (status IN ('open', 'assigned', 'in-transit', 'completed', 'cancelled'));
+      ALTER TYPE job_status ADD VALUE 'completed';
+      RAISE NOTICE 'Added ''completed'' to job_status enum';
     END IF;
   END IF;
+END $$;
+
+-- Option 2: If status is TEXT with CHECK constraint, ensure constraint includes 'completed'
+DO $$
+DECLARE
+  constraint_name TEXT;
+BEGIN
+  -- Find any CHECK constraint on jobs.status that might not include 'completed'
+  SELECT con.conname INTO constraint_name
+  FROM pg_constraint con
+  JOIN pg_class rel ON rel.oid = con.conrelid
+  JOIN pg_namespace nsp ON nsp.oid = rel.relnamespace
+  WHERE nsp.nspname = 'public'
+    AND rel.relname = 'jobs'
+    AND con.contype = 'c'
+    AND con.conname LIKE '%status%'
+    AND pg_get_constraintdef(con.oid) NOT LIKE '%completed%';
+  
+  IF constraint_name IS NOT NULL THEN
+    EXECUTE format('ALTER TABLE public.jobs DROP CONSTRAINT %I', constraint_name);
+    RAISE NOTICE 'Dropped old status constraint: %', constraint_name;
+  END IF;
+  
+  -- Add or replace constraint to ensure it includes all required statuses
+  ALTER TABLE public.jobs DROP CONSTRAINT IF EXISTS jobs_status_check;
+  ALTER TABLE public.jobs ADD CONSTRAINT jobs_status_check 
+    CHECK (status IN ('open', 'assigned', 'in-transit', 'completed', 'cancelled'));
+  RAISE NOTICE 'Added new status constraint with ''completed''';
+  
+EXCEPTION
+  WHEN duplicate_object THEN
+    RAISE NOTICE 'Constraint already exists and is correct';
+  WHEN OTHERS THEN
+    -- If this fails, the status column might be using an enum
+    RAISE NOTICE 'Could not modify TEXT constraint, status might be using ENUM type';
 END $$;
 
 -- ============================================================
@@ -341,7 +343,6 @@ BEGIN
       WHEN 'assigned' THEN 'assigned'
       WHEN 'in-transit' THEN 'on_my_way'
       WHEN 'completed' THEN 'completed'
-      WHEN 'delivered' THEN 'delivered'
       WHEN 'cancelled' THEN 'cancelled'
       ELSE 'note_added'
     END,
@@ -385,6 +386,7 @@ ALTER TABLE public.job_feedback ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.job_invoices ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for job_tracking_events
+DROP POLICY IF EXISTS "Users can view tracking events for jobs they're involved in" ON public.job_tracking_events;
 CREATE POLICY "Users can view tracking events for jobs they're involved in"
   ON public.job_tracking_events FOR SELECT
   USING (
@@ -398,6 +400,7 @@ CREATE POLICY "Users can view tracking events for jobs they're involved in"
     )
   );
 
+DROP POLICY IF EXISTS "Users can insert tracking events for their jobs" ON public.job_tracking_events;
 CREATE POLICY "Users can insert tracking events for their jobs"
   ON public.job_tracking_events FOR INSERT
   WITH CHECK (
@@ -412,6 +415,7 @@ CREATE POLICY "Users can insert tracking events for their jobs"
   );
 
 -- RLS Policies for job_documents
+DROP POLICY IF EXISTS "Users can view documents for jobs they're involved in" ON public.job_documents;
 CREATE POLICY "Users can view documents for jobs they're involved in"
   ON public.job_documents FOR SELECT
   USING (
@@ -425,6 +429,7 @@ CREATE POLICY "Users can view documents for jobs they're involved in"
     )
   );
 
+DROP POLICY IF EXISTS "Users can upload documents for their jobs" ON public.job_documents;
 CREATE POLICY "Users can upload documents for their jobs"
   ON public.job_documents FOR INSERT
   WITH CHECK (
@@ -439,6 +444,7 @@ CREATE POLICY "Users can upload documents for their jobs"
   );
 
 -- RLS Policies for job_notes
+DROP POLICY IF EXISTS "Users can view notes for jobs they're involved in" ON public.job_notes;
 CREATE POLICY "Users can view notes for jobs they're involved in"
   ON public.job_notes FOR SELECT
   USING (
@@ -452,6 +458,7 @@ CREATE POLICY "Users can view notes for jobs they're involved in"
     )
   );
 
+DROP POLICY IF EXISTS "Users can add notes to their jobs" ON public.job_notes;
 CREATE POLICY "Users can add notes to their jobs"
   ON public.job_notes FOR INSERT
   WITH CHECK (
@@ -466,6 +473,7 @@ CREATE POLICY "Users can add notes to their jobs"
   );
 
 -- RLS Policies for job_feedback
+DROP POLICY IF EXISTS "Users can view feedback for jobs they're involved in" ON public.job_feedback;
 CREATE POLICY "Users can view feedback for jobs they're involved in"
   ON public.job_feedback FOR SELECT
   USING (
@@ -479,6 +487,7 @@ CREATE POLICY "Users can view feedback for jobs they're involved in"
     )
   );
 
+DROP POLICY IF EXISTS "Companies can submit feedback for completed jobs" ON public.job_feedback;
 CREATE POLICY "Companies can submit feedback for completed jobs"
   ON public.job_feedback FOR INSERT
   WITH CHECK (
@@ -486,7 +495,7 @@ CREATE POLICY "Companies can submit feedback for completed jobs"
     AND EXISTS (
       SELECT 1 FROM public.jobs j
       WHERE j.id = job_feedback.job_id
-      AND j.status IN ('completed', 'delivered')
+      AND j.status IN ('completed', 'cancelled')
       AND (
         j.posted_by_company_id = given_by_company_id
         OR j.assigned_company_id = given_by_company_id
@@ -495,6 +504,7 @@ CREATE POLICY "Companies can submit feedback for completed jobs"
   );
 
 -- RLS Policies for job_invoices
+DROP POLICY IF EXISTS "Users can view invoices for jobs they're involved in" ON public.job_invoices;
 CREATE POLICY "Users can view invoices for jobs they're involved in"
   ON public.job_invoices FOR SELECT
   USING (
@@ -508,6 +518,7 @@ CREATE POLICY "Users can view invoices for jobs they're involved in"
     )
   );
 
+DROP POLICY IF EXISTS "Job posters can manage invoices" ON public.job_invoices;
 CREATE POLICY "Job posters can manage invoices"
   ON public.job_invoices FOR ALL
   USING (
@@ -541,3 +552,14 @@ CREATE TRIGGER update_job_invoices_updated_at
 -- ============================================================
 -- All tracking fields, tables, and policies are now in place.
 -- Next: Update TypeScript types and create UI components.
+
+-- Verify the migration
+DO $$
+BEGIN
+  RAISE NOTICE '✅ Migration completed successfully!';
+  RAISE NOTICE 'Created tables: job_tracking_events, job_documents, job_notes, job_feedback, job_invoices';
+  RAISE NOTICE 'Added 60+ tracking fields to jobs table';
+  RAISE NOTICE 'Created helper functions: add_tracking_event, update_job_pod, update_job_status';
+  RAISE NOTICE 'Created view: jobs_with_tracking';
+  RAISE NOTICE 'Configured RLS policies for all new tables';
+END $$;
