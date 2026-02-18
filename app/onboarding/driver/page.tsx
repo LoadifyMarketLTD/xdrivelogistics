@@ -10,12 +10,12 @@ export const dynamic = 'force-dynamic'
 
 export default function DriverOnboardingPage() {
   const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
+  const { user, companyId, loading: authLoading } = useAuth()
   
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+  const [fullName, setFullName] = useState('')
   const [phone, setPhone] = useState('')
-  const [licenseType, setLicenseType] = useState('')
+  const [email, setEmail] = useState('')
+  const [licenseNumber, setLicenseNumber] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -30,18 +30,13 @@ export default function DriverOnboardingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!firstName.trim()) {
-      setError('First name is required')
+    if (!fullName.trim()) {
+      setError('Full name is required')
       return
     }
 
-    if (!lastName.trim()) {
-      setError('Last name is required')
-      return
-    }
-
-    if (!licenseType) {
-      setError('License type is required')
+    if (!companyId) {
+      setError('You must be part of a company to create a driver profile')
       return
     }
 
@@ -54,11 +49,12 @@ export default function DriverOnboardingPage() {
       const { error: driverError } = await supabase
         .from('drivers')
         .insert({
-          user_id: user?.id,
-          first_name: firstName.trim(),
-          last_name: lastName.trim(),
+          company_id: companyId,
+          full_name: fullName.trim(),
           phone: phone.trim() || null,
-          license_type: licenseType,
+          email: email.trim() || null,
+          license_number: licenseNumber.trim() || null,
+          is_active: true
         })
 
       if (driverError) throw driverError
@@ -164,12 +160,12 @@ export default function DriverOnboardingPage() {
                   fontWeight: '600',
                   color: '#fff'
                 }}>
-                  First Name *
+                  Full Name *
                 </label>
                 <input
                   type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   required
                   autoFocus
                   style={{
@@ -181,7 +177,7 @@ export default function DriverOnboardingPage() {
                     color: '#fff',
                     fontSize: '16px'
                   }}
-                  placeholder="Enter your first name"
+                  placeholder="Enter your full name"
                 />
               </div>
 
@@ -193,13 +189,12 @@ export default function DriverOnboardingPage() {
                   fontWeight: '600',
                   color: '#fff'
                 }}>
-                  Last Name *
+                  Email
                 </label>
                 <input
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  required
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   style={{
                     width: '100%',
                     padding: '14px',
@@ -209,7 +204,7 @@ export default function DriverOnboardingPage() {
                     color: '#fff',
                     fontSize: '16px'
                   }}
-                  placeholder="Enter your last name"
+                  placeholder="driver@example.com"
                 />
               </div>
 
@@ -248,12 +243,12 @@ export default function DriverOnboardingPage() {
                   fontWeight: '600',
                   color: '#fff'
                 }}>
-                  License Type *
+                  License Number
                 </label>
-                <select
-                  value={licenseType}
-                  onChange={(e) => setLicenseType(e.target.value)}
-                  required
+                <input
+                  type="text"
+                  value={licenseNumber}
+                  onChange={(e) => setLicenseNumber(e.target.value)}
                   style={{
                     width: '100%',
                     padding: '14px',
@@ -263,15 +258,10 @@ export default function DriverOnboardingPage() {
                     color: '#fff',
                     fontSize: '16px'
                   }}
-                >
-                  <option value="">Select license type</option>
-                  <option value="B">Class B - Car/Van</option>
-                  <option value="C1">Class C1 - Light Truck (up to 7.5t)</option>
-                  <option value="C">Class C - Rigid Truck</option>
-                  <option value="CE">Class CE - Articulated Truck</option>
-                </select>
+                  placeholder="ABC123456"
+                />
                 <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '6px' }}>
-                  Select your highest driving license category
+                  Enter your driving license number (optional)
                 </div>
               </div>
 
@@ -305,9 +295,9 @@ export default function DriverOnboardingPage() {
                 ℹ️ What happens next:
               </strong>
               <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                <li>Your driver profile will be created</li>
+                <li>Your driver profile will be added to your company</li>
                 <li>You can be assigned to transport jobs</li>
-                <li>You'll receive notifications for new assignments</li>
+                <li>Company dispatchers can view your availability</li>
                 <li>Track your completed deliveries</li>
               </ul>
             </div>

@@ -20,7 +20,11 @@ export default function PostJobPage() {
     delivery_datetime: '',
     vehicle_type: '',
     load_details: '',
+    cargo_type: '',
     pallets: '',
+    boxes: '',
+    bags: '',
+    items: '',
     weight_kg: '',
     budget: ''
   })
@@ -37,10 +41,51 @@ export default function PostJobPage() {
     }
   }, [authLoading, user, companyId, router])
 
+  // Round time to nearest 30-minute interval
+  const roundToNearest30Minutes = (datetimeValue: string): string => {
+    if (!datetimeValue) return ''
+    
+    try {
+      const date = new Date(datetimeValue)
+      const minutes = date.getMinutes()
+      
+      // Round to nearest 30 minutes (0 or 30)
+      let roundedMinutes: number
+      let hourAdjustment = 0
+      
+      if (minutes < 15) {
+        roundedMinutes = 0
+      } else if (minutes < 45) {
+        roundedMinutes = 30
+      } else {
+        roundedMinutes = 0
+        hourAdjustment = 1
+      }
+      
+      date.setMinutes(roundedMinutes)
+      date.setSeconds(0)
+      date.setMilliseconds(0)
+      date.setHours(date.getHours() + hourAdjustment)
+      
+      // Return in datetime-local format (YYYY-MM-DDTHH:MM)
+      return date.toISOString().slice(0, 16)
+    } catch (error) {
+      console.error('Error rounding datetime:', error)
+      return datetimeValue
+    }
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    
+    // For datetime fields, enforce 30-minute intervals
+    const processedValue = (name === 'pickup_datetime' || name === 'delivery_datetime') 
+      ? roundToNearest30Minutes(value)
+      : value
+    
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [name]: processedValue
     }))
   }
 
@@ -70,10 +115,23 @@ export default function PostJobPage() {
       if (formData.pickup_datetime) jobData.pickup_datetime = formData.pickup_datetime
       if (formData.delivery_datetime) jobData.delivery_datetime = formData.delivery_datetime
       if (formData.vehicle_type) jobData.vehicle_type = formData.vehicle_type
-      if (formData.load_details) jobData.load_details = formData.load_details
       if (formData.pallets) jobData.pallets = parseInt(formData.pallets)
       if (formData.weight_kg) jobData.weight_kg = parseFloat(formData.weight_kg)
       if (formData.budget) jobData.budget = parseFloat(formData.budget)
+      
+      // Build comprehensive load details with cargo info
+      const cargoInfo = []
+      if (formData.cargo_type) cargoInfo.push(`Cargo Type: ${formData.cargo_type}`)
+      if (formData.pallets) cargoInfo.push(`Pallets: ${formData.pallets}`)
+      if (formData.boxes) cargoInfo.push(`Boxes: ${formData.boxes}`)
+      if (formData.bags) cargoInfo.push(`Bags: ${formData.bags}`)
+      if (formData.items) cargoInfo.push(`Items: ${formData.items}`)
+      if (formData.weight_kg) cargoInfo.push(`Weight: ${formData.weight_kg} kg`)
+      
+      const cargoDetails = cargoInfo.length > 0 ? cargoInfo.join(' | ') : ''
+      const userDetails = formData.load_details ? formData.load_details : ''
+      
+      jobData.load_details = [cargoDetails, userDetails].filter(Boolean).join('\n\n')
 
       const { data, error } = await supabase
         .from('jobs')
@@ -194,6 +252,7 @@ export default function PostJobPage() {
                     name="pickup_datetime"
                     value={formData.pickup_datetime}
                     onChange={handleChange}
+                    step="1800"
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -204,6 +263,9 @@ export default function PostJobPage() {
                       fontSize: '14px'
                     }}
                   />
+                  <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
+                    Times are rounded to 30-minute intervals
+                  </div>
                 </div>
 
                 <div>
@@ -215,6 +277,7 @@ export default function PostJobPage() {
                     name="delivery_datetime"
                     value={formData.delivery_datetime}
                     onChange={handleChange}
+                    step="1800"
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -225,6 +288,9 @@ export default function PostJobPage() {
                       fontSize: '14px'
                     }}
                   />
+                  <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
+                    Times are rounded to 30-minute intervals
+                  </div>
                 </div>
               </div>
 
@@ -232,6 +298,7 @@ export default function PostJobPage() {
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                   Vehicle Type
                 </label>
+                {/* Note: These values must match the database vehicle_type values/enum */}
                 <select
                   name="vehicle_type"
                   value={formData.vehicle_type}
@@ -250,13 +317,45 @@ export default function PostJobPage() {
                   <option value="Small Van">Small Van</option>
                   <option value="Medium Van">Medium Van</option>
                   <option value="Large Van">Large Van</option>
-                  <option value="Luton">Luton</option>
+                  <option value="Luton Van">Luton Van</option>
                   <option value="7.5 Tonne">7.5 Tonne</option>
                   <option value="Sprinter">Sprinter</option>
                 </select>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+              {/* Cargo Type Selector */}
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
+                  Cargo Type
+                </label>
+                <select
+                  name="cargo_type"
+                  value={formData.cargo_type}
+                  onChange={handleChange}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '6px',
+                    color: '#2C3E50',
+                    fontSize: '14px'
+                  }}
+                >
+                  <option value="">Select cargo type</option>
+                  <option value="Palletized">Palletized</option>
+                  <option value="Boxed">Boxed/Cartons</option>
+                  <option value="Bagged">Bagged/Sacks</option>
+                  <option value="Loose">Loose Items</option>
+                  <option value="Furniture">Furniture</option>
+                  <option value="Equipment">Equipment</option>
+                  <option value="Mixed">Mixed Load</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              {/* Cargo Quantities Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                     Pallets
@@ -280,6 +379,77 @@ export default function PostJobPage() {
                   />
                 </div>
 
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
+                    Boxes
+                  </label>
+                  <input
+                    type="number"
+                    name="boxes"
+                    value={formData.boxes}
+                    onChange={handleChange}
+                    min="0"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '6px',
+                      color: '#2C3E50',
+                      fontSize: '14px'
+                    }}
+                    placeholder="0"
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
+                    Bags
+                  </label>
+                  <input
+                    type="number"
+                    name="bags"
+                    value={formData.bags}
+                    onChange={handleChange}
+                    min="0"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '6px',
+                      color: '#2C3E50',
+                      fontSize: '14px'
+                    }}
+                    placeholder="0"
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
+                    Items
+                  </label>
+                  <input
+                    type="number"
+                    name="items"
+                    value={formData.items}
+                    onChange={handleChange}
+                    min="0"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '6px',
+                      color: '#2C3E50',
+                      fontSize: '14px'
+                    }}
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                     Weight (kg)

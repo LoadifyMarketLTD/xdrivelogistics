@@ -5,6 +5,8 @@ import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
 import ErrorBanner from '@/components/ErrorBanner'
 import EmptyState from '@/components/EmptyState'
+import ResponsiveContainer from '@/components/layout/ResponsiveContainer'
+import ResponsiveGrid from '@/components/layout/ResponsiveGrid'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
@@ -119,7 +121,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div style={{ maxWidth: '1400px' }}>
+    <ResponsiveContainer maxWidth="xl">
       {error && (
         <ErrorBanner 
           error={error} 
@@ -129,135 +131,157 @@ export default function DashboardPage() {
       )}
       
       <h1 style={{
-        fontSize: '20px',
+        fontSize: 'clamp(1.25rem, 2vw, 1.75rem)',
         fontWeight: '700',
         color: '#1f2937',
-        marginBottom: '20px',
+        marginBottom: 'clamp(16px, 2.5vw, 24px)',
         textTransform: 'uppercase',
         letterSpacing: '0.5px',
       }}>
         Dashboard
       </h1>
-    <div className="portal-layout">
-      <div className="portal-header">
-        <h1 className="portal-title">Dashboard</h1>
-      </div>
 
-      <main className="portal-main">
-        <div className="portal-card">
-          <h1 className="section-title">Dashboard</h1>
-          <p className="page-description">
-            Overview of your logistics operations
-          </p>
+      <div style={{ marginBottom: 'clamp(24px, 3vw, 32px)' }}>
+        <p style={{
+          fontSize: 'clamp(0.875rem, 1.2vw, 1rem)',
+          color: '#6b7280',
+          marginBottom: 'clamp(20px, 2.5vw, 28px)',
+        }}>
+          Overview of your logistics operations
+        </p>
 
-          {/* Reports & Statistics Section */}
-          <div>
-            <h2 className="section-header">
-              Reports & Statistics
-            </h2>
-            
-            <div className="stats-grid">
-              {/* Total Loads */}
-              <div className="stat-card">
-                <div className="stat-label">
-                  Total Loads (System)
-                </div>
-                <div className="stat-value">
-                  {stats.totalLoads}
-                </div>
-                <div className="stat-description">
-                  All available loads
-                </div>
+        {/* Reports & Statistics Section */}
+        <div style={{ marginBottom: 'clamp(32px, 4vw, 48px)' }}>
+          <h2 style={{
+            fontSize: 'clamp(1rem, 1.5vw, 1.25rem)',
+            fontWeight: '600',
+            color: '#1f2937',
+            marginBottom: 'clamp(16px, 2vw, 20px)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+          }}>
+            Reports & Statistics
+          </h2>
+          
+          <ResponsiveGrid columns={{ mobile: 1, tablet: 2, desktop: 4, wide: 4, ultrawide: 4 }}>
+            {/* Total Loads */}
+            <div className="stat-card">
+              <div className="stat-label">
+                Total Loads (System)
               </div>
-
-              {/* Active Bids */}
-              <div className="stat-card">
-                <div className="stat-label">
-                  Active Bids
-                </div>
-                <div className="stat-value blue">
-                  {stats.activeBids}
-                </div>
-                <div className="stat-description">
-                  Pending responses
-                </div>
+              <div className="stat-value">
+                {stats.totalLoads}
               </div>
-
-              {/* Accepted Loads */}
-              <div className="stat-card">
-                <div className="stat-label">
-                  Accepted Loads
-                </div>
-                <div className="stat-value green">
-                  {stats.acceptedLoads}
-                </div>
-                <div className="stat-description">
-                  Won bids
-                </div>
-              </div>
-
-              {/* Revenue */}
-              <div className="stat-card">
-                <div className="stat-label">
-                  Revenue (Accepted)
-                </div>
-                <div className="stat-value green">
-                  £{stats.revenue.toFixed(2)}
-                </div>
-                <div className="stat-description">
-                  From accepted bids
-                </div>
+              <div className="stat-description">
+                All available loads
               </div>
             </div>
-          </div>
 
-          {/* Activity at a Glance Section */}
-          <div>
-            <h2 className="section-header">
-              My Posted Loads
-            </h2>
-          
-            <div className="table-container">
-              {/* Table Header */}
-              <div className="table-header" style={{ gridTemplateColumns: '2fr 2fr 1fr 1fr 100px', gap: '12px' }}>
-                <div>From</div>
-                <div>To</div>
-                <div>Vehicle</div>
-                <div>Status</div>
-                <div>Budget</div>
+            {/* Active Bids */}
+            <div className="stat-card">
+              <div className="stat-label">
+                Active Bids
               </div>
+              <div className="stat-value blue">
+                {stats.activeBids}
+              </div>
+              <div className="stat-description">
+                Pending responses
+              </div>
+            </div>
 
-              {/* Table Rows */}
-              {recentJobs.length === 0 ? (
-                <div className="table-empty">
-                  No loads posted yet
+            {/* Accepted Loads */}
+            <div className="stat-card">
+              <div className="stat-label">
+                Accepted Loads
+              </div>
+              <div className="stat-value green">
+                {stats.acceptedLoads}
+              </div>
+              <div className="stat-description">
+                Won bids
+              </div>
+            </div>
+
+            {/* Revenue */}
+            <div className="stat-card">
+              <div className="stat-label">
+                Revenue (Accepted)
+              </div>
+              <div className="stat-value green">
+                £{stats.revenue.toFixed(2)}
+              </div>
+              <div className="stat-description">
+                From accepted bids
+              </div>
+            </div>
+          </ResponsiveGrid>
+        </div>
+
+        {/* My Posted Loads Section */}
+        <div>
+          <h2 style={{
+            fontSize: 'clamp(1rem, 1.5vw, 1.25rem)',
+            fontWeight: '600',
+            color: '#1f2937',
+            marginBottom: 'clamp(16px, 2vw, 20px)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+          }}>
+            My Posted Loads
+          </h2>
+        
+          <div style={{
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
+            borderRadius: '8px',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              overflowX: 'auto',
+              WebkitOverflowScrolling: 'touch',
+            }}>
+              <div style={{ minWidth: '600px' }}>
+                {/* Table Header */}
+                <div className="table-header" style={{ gridTemplateColumns: '2fr 2fr 1fr 1fr 100px', gap: '12px' }}>
+                  <div>From</div>
+                  <div>To</div>
+                  <div>Vehicle</div>
+                  <div>Status</div>
+                  <div>Budget</div>
                 </div>
-              ) : (
-                recentJobs.map((job) => (
-                  <div
-                    key={job.id}
-                    className="table-row"
-                    style={{ gridTemplateColumns: '2fr 2fr 1fr 1fr 100px', gap: '12px' }}
-                  >
-                    <div>{job.pickup_location || '—'}</div>
-                    <div>{job.delivery_location || '—'}</div>
-                    <div>{job.vehicle_type || '—'}</div>
-                    <div>
-                      <span className={`status-badge ${job.status}`}>
-                        {job.status}
-                      </span>
-                    </div>
-                    <div style={{ fontWeight: '600' }}>
-                      {job.budget ? `£${job.budget.toFixed(2)}` : '—'}
-                    </div>
+
+                {/* Table Rows */}
+                {recentJobs.length === 0 ? (
+                  <div className="table-empty">
+                    No loads posted yet
                   </div>
-                ))
-              )}
+                ) : (
+                  recentJobs.map((job) => (
+                    <div
+                      key={job.id}
+                      className="table-row"
+                      style={{ gridTemplateColumns: '2fr 2fr 1fr 1fr 100px', gap: '12px' }}
+                    >
+                      <div>{job.pickup_location || '—'}</div>
+                      <div>{job.delivery_location || '—'}</div>
+                      <div>{job.vehicle_type || '—'}</div>
+                      <div>
+                        <span className={`status-badge ${job.status}`}>
+                          {job.status}
+                        </span>
+                      </div>
+                      <div style={{ fontWeight: '600' }}>
+                        {job.budget ? `£${job.budget.toFixed(2)}` : '—'}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </main>
-    </div>
-    </div>
+      </div>
+    </ResponsiveContainer>
   )
 }
