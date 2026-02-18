@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/lib/AuthContext'
 import { Vehicle } from '@/lib/types'
+import ResponsiveContainer from '@/components/layout/ResponsiveContainer'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
@@ -107,15 +108,15 @@ export default function MyFleetPage() {
   }
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr 300px',
-      gap: '20px',
-      maxWidth: '1600px',
-      margin: '0 auto'
-    }}>
-      {/* Main Content */}
-      <div>
+    <ResponsiveContainer maxWidth="xl">
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 300px',
+        gap: '20px',
+        margin: '0 auto'
+      }}>
+        {/* Main Content */}
+        <div>
         {/* Header */}
         <div style={{
           marginBottom: '20px',
@@ -589,6 +590,6 @@ export default function MyFleetPage() {
           </div>
         </div>
       </div>
-    </div>
+    </ResponsiveContainer>
   )
 }
