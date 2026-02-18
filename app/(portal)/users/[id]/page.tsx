@@ -435,6 +435,31 @@ export default function EditUserPage() {
                 color: '#374151',
                 marginBottom: '8px'
               }}>
+                Department:
+              </label>
+              <input
+                type="text"
+                value={formData.department}
+                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                placeholder="Operations"
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  fontSize: '14px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
                 Time Zone: <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <select
@@ -495,6 +520,95 @@ export default function EditUserPage() {
               <span>Mobile Account</span>
             </label>
           </div>
+
+          <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
+                Mobile Option:
+              </label>
+              <select
+                value={formData.mobile_option}
+                onChange={(e) => setFormData({ ...formData, mobile_option: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  fontSize: '14px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  backgroundColor: '#ffffff'
+                }}
+              >
+                <option value="FREE">FREE</option>
+                <option value="PREMIUM">PREMIUM</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
+                Username: <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                placeholder="username or email"
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  fontSize: '14px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px'
+                }}
+              />
+            </div>
+          </div>
+
+          <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
+            <button
+              type="button"
+              onClick={() => alert('Change email functionality coming soon')}
+              style={{
+                padding: '10px 20px',
+                fontSize: '14px',
+                color: '#3b82f6',
+                backgroundColor: '#eff6ff',
+                border: '1px solid #3b82f6',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: '500'
+              }}
+            >
+              Change Email
+            </button>
+            <button
+              type="button"
+              onClick={() => alert('Password reset email will be sent')}
+              style={{
+                padding: '10px 20px',
+                fontSize: '14px',
+                color: '#3b82f6',
+                backgroundColor: '#eff6ff',
+                border: '1px solid #3b82f6',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: '500'
+              }}
+            >
+              Send an email to update a password
+            </button>
+          </div>
         </FormSection>
 
         <FormSection title="Settings">
@@ -530,45 +644,77 @@ export default function EditUserPage() {
             </label>
           </div>
 
-          <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-            <div>
-              <label style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px', display: 'block' }}>
-                UK Alert Distance:
-              </label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <input
-                  type="number"
-                  value={formData.alert_distance_uk_miles}
-                  onChange={(e) => setFormData({ ...formData, alert_distance_uk_miles: Number(e.target.value) })}
-                  style={{
-                    width: '100px',
-                    padding: '8px 12px',
-                    fontSize: '14px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px'
-                  }}
-                />
-                <span style={{ fontSize: '14px', color: '#6b7280' }}>miles</span>
-              </div>
+          <div style={{ marginTop: '20px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
+              Send En-route Alerts Every:
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input
+                type="number"
+                value={formData.enroute_alert_hours}
+                onChange={(e) => setFormData({ ...formData, enroute_alert_hours: Number(e.target.value) })}
+                style={{
+                  width: '100px',
+                  padding: '8px 12px',
+                  fontSize: '14px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px'
+                }}
+              />
+              <span style={{ fontSize: '14px', color: '#6b7280' }}>hours</span>
             </div>
-            <div>
-              <label style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px', display: 'block' }}>
-                Euro Alert Distance:
-              </label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <input
-                  type="number"
-                  value={formData.alert_distance_euro_miles}
-                  onChange={(e) => setFormData({ ...formData, alert_distance_euro_miles: Number(e.target.value) })}
-                  style={{
-                    width: '100px',
-                    padding: '8px 12px',
-                    fontSize: '14px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px'
-                  }}
-                />
-                <span style={{ fontSize: '14px', color: '#6b7280' }}>miles</span>
+          </div>
+
+          <div style={{ marginTop: '20px' }}>
+            <p style={{ fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '12px' }}>
+              Notify all live tracked drivers within [select mileage below] of the pick up location
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+              <div>
+                <label style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px', display: 'block' }}>
+                  UK:
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="number"
+                    value={formData.alert_distance_uk_miles}
+                    onChange={(e) => setFormData({ ...formData, alert_distance_uk_miles: Number(e.target.value) })}
+                    style={{
+                      width: '100px',
+                      padding: '8px 12px',
+                      fontSize: '14px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px'
+                    }}
+                  />
+                  <span style={{ fontSize: '14px', color: '#6b7280' }}>miles</span>
+                </div>
+              </div>
+              <div>
+                <label style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px', display: 'block' }}>
+                  Euro:
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="number"
+                    value={formData.alert_distance_euro_miles}
+                    onChange={(e) => setFormData({ ...formData, alert_distance_euro_miles: Number(e.target.value) })}
+                    style={{
+                      width: '100px',
+                      padding: '8px 12px',
+                      fontSize: '14px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px'
+                    }}
+                  />
+                  <span style={{ fontSize: '14px', color: '#6b7280' }}>miles</span>
+                </div>
               </div>
             </div>
           </div>
@@ -587,6 +733,98 @@ export default function EditUserPage() {
                 <span>{role}</span>
               </label>
             ))}
+          </div>
+        </FormSection>
+
+        <FormSection title="User Logo">
+          <div>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
+              Upload Picture:
+            </label>
+            <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '12px' }}>
+              Maximum file size is 2MB. You can upload a BMP, GIF, JPG, JPEG or PNG file.
+            </p>
+            <input
+              type="file"
+              accept=".bmp,.gif,.jpg,.jpeg,.png"
+              onChange={(e) => {
+                // TODO: Implement file upload
+                alert('Logo upload functionality coming soon')
+              }}
+              style={{
+                padding: '8px',
+                fontSize: '14px',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px'
+              }}
+            />
+          </div>
+        </FormSection>
+
+        <FormSection title="Language">
+          <div>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
+              Interface Language:
+            </label>
+            <select
+              value={formData.interface_language}
+              onChange={(e) => setFormData({ ...formData, interface_language: e.target.value })}
+              style={{
+                width: '100%',
+                maxWidth: '300px',
+                padding: '10px 12px',
+                fontSize: '14px',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                backgroundColor: '#ffffff'
+              }}
+            >
+              <option value="English">English</option>
+              <option value="Romanian">Romanian</option>
+              <option value="Spanish">Spanish</option>
+              <option value="French">French</option>
+              <option value="German">German</option>
+            </select>
+          </div>
+        </FormSection>
+
+        <FormSection title="Messenger Settings">
+          <div>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
+              Despatch Group:
+            </label>
+            <input
+              type="text"
+              value={formData.despatch_group}
+              onChange={(e) => setFormData({ ...formData, despatch_group: e.target.value })}
+              placeholder="Enter despatch group"
+              style={{
+                width: '100%',
+                maxWidth: '400px',
+                padding: '10px 12px',
+                fontSize: '14px',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px'
+              }}
+            />
           </div>
         </FormSection>
 
