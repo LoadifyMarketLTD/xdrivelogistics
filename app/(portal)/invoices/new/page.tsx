@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
@@ -30,31 +30,9 @@ export default function NewInvoicePage() {
   const [dueInDays, setDueInDays] = useState('30') // Default 30 days
   const [notes, setNotes] = useState('')
 
-  useEffect(() => {
-    if (companyId) {
-      fetchJobs()
-    }
-  }, [companyId])
-
-  useEffect(() => {
-    if (selectedJobId) {
-      const job = jobs.find(j => j.id === selectedJobId)
-      setSelectedJob(job || null)
-      
-      // Pre-fill customer name from job if available
-      if (job) {
-        if (job.booked_by_company_name && !customerName) {
-          setCustomerName(job.booked_by_company_name)
-        }
-        // Pre-fill amount from agreed_rate if available
-        if (job.agreed_rate && !amount) {
-          setAmount(job.agreed_rate.toString())
-        }
-      }
-    }
-  }, [selectedJobId, jobs])
-
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
+    if (!companyId) return
+    
     try {
       setLoading(true)
       
@@ -74,7 +52,30 @@ export default function NewInvoicePage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [companyId])
+
+  useEffect(() => {
+    if (companyId) {
+      fetchJobs()
+    }
+  }, [companyId, fetchJobs])
+
+  useEffect(() => {
+    if (selectedJobId) {
+      const job = jobs.find(j => j.id === selectedJobId)
+      setSelectedJob(job || null)
+      
+      // Pre-fill customer name from job if available (only if customer name is empty)
+      if (job && job.booked_by_company_name && !customerName) {
+        setCustomerName(job.booked_by_company_name)
+      }
+      // Pre-fill amount from agreed_rate if available (only if amount is empty)
+      if (job && job.agreed_rate && !amount) {
+        setAmount(job.agreed_rate.toString())
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedJobId, jobs])
 
   const calculateVAT = () => {
     if (!amount || !vatRate) return 0

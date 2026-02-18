@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { InvoiceWithDetails, Job } from '@/lib/types'
@@ -18,12 +18,7 @@ export default function InvoiceDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [updating, setUpdating] = useState(false)
 
-  useEffect(() => {
-    if (!invoiceId) return
-    fetchInvoiceDetails()
-  }, [invoiceId])
-
-  const fetchInvoiceDetails = async () => {
+  const fetchInvoiceDetails = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -67,7 +62,12 @@ export default function InvoiceDetailPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [invoiceId])
+
+  useEffect(() => {
+    if (!invoiceId) return
+    fetchInvoiceDetails()
+  }, [invoiceId, fetchInvoiceDetails])
 
   const updateInvoiceStatus = async (newStatus: string) => {
     if (!invoice) return
