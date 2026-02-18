@@ -29,7 +29,7 @@ BEGIN;
 -- 3. User's profile links to company (marketplace schema)
 -- ============================================================
 
-CREATE OR REPLACE FUNCTION public.is_company_member(p_company_id uuid)
+CREATE OR REPLACE FUNCTION public.is_company_member(_company_id uuid)
 RETURNS boolean
 LANGUAGE sql
 STABLE
@@ -39,14 +39,14 @@ AS $$
   SELECT EXISTS (
     SELECT 1
     FROM public.companies c
-    WHERE c.id = p_company_id
+    WHERE c.id = _company_id
       AND c.created_by = auth.uid()
   )
   -- OR user has active membership (portal schema)
   OR EXISTS (
     SELECT 1
     FROM public.company_memberships m
-    WHERE m.company_id = p_company_id
+    WHERE m.company_id = _company_id
       AND m.user_id = auth.uid()
       AND m.status = 'active'
   )
@@ -55,7 +55,7 @@ AS $$
     SELECT 1
     FROM public.profiles p
     WHERE p.id = auth.uid()
-      AND p.company_id = p_company_id
+      AND p.company_id = _company_id
   );
 $$;
 

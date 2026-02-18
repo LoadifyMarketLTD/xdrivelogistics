@@ -13,7 +13,6 @@ SELECT
   
   -- 2. Profile Info (if using marketplace schema)
   (SELECT company_id FROM public.profiles WHERE id = auth.uid()) AS profile_company_id,
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) AS profile_role,
   
   -- 3. Companies Created by Current User
   (SELECT json_agg(json_build_object('id', id, 'name', name, 'created_at', created_at))
