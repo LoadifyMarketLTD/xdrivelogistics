@@ -1,594 +1,315 @@
-# UI STANDARDS - XDrive Logistics Portal
+# UI Standard - Light Premium Theme
 
-**Version:** 1.0  
-**Last Updated:** 2026-02-17  
-**Design System:** Light Premium / Courier Exchange Style
+Generated: 2026-02-17
 
----
+## Color System
 
-## 1. TYPOGRAPHY STANDARDS
+All colors are defined as CSS variables in `styles/portal.css`:
+
+### Core Colors
+```css
+--bg: #F4F6F9              /* Main page background */
+--card: #FFFFFF            /* Card/panel background */
+--text: #1F2937            /* Primary text color */
+--muted: #6B7280           /* Secondary/muted text */
+--border: #E5E7EB          /* Border color */
+```
+
+### Action Colors
+```css
+--primary: #2563EB         /* Primary blue */
+--primaryHover: #1D4ED8    /* Primary hover state */
+--success: #10B981         /* Success green */
+--danger: #EF4444          /* Error/danger red */
+--warning: #F59E0B         /* Warning orange */
+```
+
+### Effects
+```css
+--shadow: 0 2px 8px rgba(0,0,0,0.05)  /* Standard shadow */
+```
+
+## Typography
 
 ### Font Stack
 ```css
-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
+             'Helvetica Neue', Arial, sans-serif;
 ```
 
-**Rationale:** System fonts for optimal performance and native OS feel
+### Text Hierarchy
+- **Page Title (H1)**: 20px, 700 weight, #1F2937, uppercase, 0.5px spacing
+- **Section Title (H2)**: 16px, 600 weight, #1F2937
+- **Section Header**: 14px, 700 weight, #374151, uppercase
+- **Body Text**: 14px, normal weight, #1F2937
+- **Helper Text**: 12px, normal weight, #6B7280
+- **Form Labels**: 14px, 600 weight, #374151
 
-### Text Sizes & Hierarchy
+### Input Text Visibility
+✅ All inputs use: `color: #1F2937` (dark gray on white)
+✅ Placeholder text: `color: #9CA3AF` (visible but subtle)
+✅ No white-on-white or light-gray-on-light-gray combinations
 
-| Element | Size | Weight | Usage | CSS Variable |
-|---------|------|--------|-------|--------------|
-| Page Title (h1) | 20-24px | 700 | Main page headings | `--text-h1: 20px` |
-| Section Title (h2) | 16-18px | 600-700 | Section headers | `--text-h2: 16px` |
-| Subsection (h3) | 14px | 600 | Card titles, labels | `--text-h3: 14px` |
-| Body Text | 13-14px | 400-500 | Default content | `--text-body: 13px` |
-| Helper Text | 11-12px | 400 | Hints, captions | `--text-small: 11px` |
-| Input Labels | 12-13px | 500-600 | Form labels | `--text-label: 12px` |
-| Table Headers | 11px | 700 | Table column headers | `--text-table-header: 11px` |
+## Layout Structure
 
-### Letter Spacing
-- **Headers:** 0.5px (uppercase titles)
-- **Body:** Normal (0px)
-- **Small caps:** 0.3px
+Every portal page MUST follow this structure:
 
-### Text Visibility Requirements
-✅ **All input fields must have visible text while typing**
-- Input text: minimum 13px, color #1f2937
-- Placeholder text: #9ca3af
-- Focus state: border change + no color change on text
-
----
-
-## 2. COLOR SYSTEM (Light Premium)
-
-### Primary Palette
-
-```css
-:root {
-  /* Backgrounds */
-  --bg-main: #f4f5f7;          /* Page background */
-  --bg-secondary: #fafafa;     /* Alternate sections */
-  --card-bg: #ffffff;          /* Card/panel background */
+```tsx
+<div className="portal-layout">
+  <div className="portal-header">
+    <h1 className="portal-title">Page Title</h1>
+  </div>
   
-  /* Text Colors */
-  --text-primary: #1f2937;     /* Main text */
-  --text-secondary: #6b7280;   /* Secondary text */
-  --text-muted: #9ca3af;       /* Muted/disabled text */
-  --text-light: #d1d5db;       /* Very light text */
-  
-  /* Borders */
-  --border: #e5e7eb;           /* Default borders */
-  --border-dark: #d1d5db;      /* Hover/active borders */
-  --border-focus: #d4af37;     /* Focus state borders */
-  
-  /* Brand Colors */
-  --primary: #d4af37;          /* Gold accent */
-  --primary-hover: #c29d2f;    /* Gold hover */
-  --primary-light: #f4e8c1;    /* Gold light background */
-  
-  /* Dark Actions */
-  --dark: #1f2937;             /* Dark buttons/sidebar */
-  --dark-hover: #111827;       /* Dark hover */
-  
-  /* Status Colors */
-  --success: #10b981;          /* Green */
-  --success-bg: #d1fae5;       /* Green light */
-  --success-text: #065f46;     /* Green dark */
-  
-  --warning: #f59e0b;          /* Orange */
-  --warning-bg: #fef3c7;       /* Orange light */
-  --warning-text: #92400e;     /* Orange dark */
-  
-  --error: #ef4444;            /* Red */
-  --error-bg: #fee2e2;         /* Red light */
-  --error-text: #991b1b;       /* Red dark */
-  
-  --info: #3b82f6;             /* Blue */
-  --info-bg: #dbeafe;          /* Blue light */
-  --info-text: #1e3a8a;        /* Blue dark */
-  
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-```
-
-### Color Usage Rules
-
-❌ **Never Use:**
-- White text on white background
-- Light gray (#f3f4f6) text on white background
-- Hard-coded hex colors in components (use CSS variables)
-
-✅ **Always Use:**
-- CSS variables for all colors
-- Minimum contrast ratio 4.5:1 for text
-- Consistent status colors (green=success, red=error, orange=warning, blue=info)
-
----
-
-## 3. LAYOUT & SPACING STANDARDS
-
-### Container Classes
-
-```css
-.portal-layout {
-  display: flex;
-  min-height: 100vh;
-  background: var(--bg-main);
-}
-
-.portal-content {
-  flex: 1;
-  padding: 20-24px;
-  max-width: 1100px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.portal-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  padding: 20px;
-  border-radius: 8px; /* Subtle, not heavy */
-}
-
-.portal-header {
-  padding: 16px 0;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--border);
-}
-```
-
-### Spacing Scale
-
-| Size | Value | Usage |
-|------|-------|-------|
-| xs | 4px | Tiny gaps |
-| sm | 8px | Small gaps |
-| md | 12px | Medium gaps |
-| base | 16px | Default spacing |
-| lg | 20px | Large spacing |
-| xl | 24px | Section spacing |
-| 2xl | 32px | Page sections |
-
-### Consistent Spacing
-
-**Card Padding:** 20px (default)  
-**Section Margin:** 24px between sections  
-**Form Grid Gap:** 16px between fields  
-**Table Padding:** 10-12px cell padding  
-**Button Padding:** 8px 16px (small), 10px 20px (medium)
-
-### Maximum Width
-
-**Portal Content:** 1100px (centered)  
-**Forms:** 600-800px max  
-**Modals:** 500px (small), 700px (medium), 900px (large)
-
----
-
-## 4. COMPONENT STANDARDS
-
-### Buttons
-
-```css
-/* Primary Button */
-.portal-btn-primary {
-  background: var(--primary);
-  color: #ffffff;
-  padding: 8px 16px;
-  border: none;
-  font-size: 12-13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.portal-btn-primary:hover {
-  background: var(--primary-hover);
-}
-
-/* Dark Button */
-.portal-btn-dark {
-  background: var(--dark);
-  color: #ffffff;
-}
-
-.portal-btn-dark:hover {
-  background: var(--dark-hover);
-}
-
-/* Outline Button */
-.portal-btn-outline {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-}
-```
-
-### Tabs
-
-```css
-.portal-tabs {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.portal-tab {
-  padding: 12px 20px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.portal-tab:hover {
-  color: var(--text-primary);
-  background: var(--bg-secondary);
-}
-
-.portal-tab.active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
-  background: var(--bg-secondary);
-}
-```
-
-**Tab Requirements:**
-✅ Tabs must maintain active state  
-✅ Tabs must not reset on data updates  
-✅ Tabs must be keyboard accessible (arrow keys)  
-✅ Active tab must be visually distinct
-
-### Filters
-
-```css
-.portal-filters {
-  display: flex;
-  gap: 12px;
-  padding: 16px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  margin-bottom: 16px;
-}
-
-.portal-filter-input {
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 13px;
-}
-
-.portal-filter-clear {
-  color: var(--text-secondary);
-  text-decoration: underline;
-  cursor: pointer;
-  font-size: 12px;
-}
-```
-
-**Filter Requirements:**
-✅ Show current selected values  
-✅ "Clear filters" button visible when filters applied  
-✅ Filters don't break when no results  
-✅ Filter state persists during pagination
-
-### Dropdowns
-
-**Requirements:**
-✅ Open/close on click  
-✅ Close on outside click  
-✅ Close on ESC key  
-✅ No overflow outside viewport  
-✅ Max-height with scroll for long lists  
-✅ Keyboard navigation (arrow keys + enter)
-
----
-
-## 5. TABLES
-
-```css
-.portal-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-}
-
-.portal-table-header {
-  background: #f9fafb;
-  border-bottom: 1px solid var(--border);
-}
-
-.portal-table-header th {
-  padding: 10px 12px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  text-align: left;
-}
-
-.portal-table-row {
-  border-bottom: 1px solid #f3f4f6;
-  transition: background 0.15s;
-}
-
-.portal-table-row:hover {
-  background: #f9fafb;
-}
-
-.portal-table-cell {
-  padding: 10px 12px;
-  font-size: 13px;
-  color: var(--text-primary);
-}
-```
-
-**Responsive Table Strategy:**
-- Desktop (>1024px): Full table
-- Tablet (768-1024px): Horizontal scroll with shadow
-- Mobile (<768px): Stacked cards or horizontal scroll
-
----
-
-## 6. FORMS
-
-```css
-.portal-form-group {
-  margin-bottom: 16px;
-}
-
-.portal-form-label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 6px;
-}
-
-.portal-form-input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 13px;
-  color: var(--text-primary); /* VISIBLE TEXT */
-  background: #ffffff;
-  transition: border-color 0.2s;
-}
-
-.portal-form-input::placeholder {
-  color: var(--text-muted);
-}
-
-.portal-form-input:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-
-.portal-form-helper {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-.portal-form-error {
-  font-size: 11px;
-  color: var(--error);
-  margin-top: 4px;
-}
-```
-
----
-
-## 7. STATUS INDICATORS
-
-```css
-.portal-status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.portal-status-success {
-  background: var(--success-bg);
-  color: var(--success-text);
-}
-
-.portal-status-warning {
-  background: var(--warning-bg);
-  color: var(--warning-text);
-}
-
-.portal-status-error {
-  background: var(--error-bg);
-  color: var(--error-text);
-}
-
-.portal-status-info {
-  background: var(--info-bg);
-  color: var(--info-text);
-}
-```
-
----
-
-## 8. MODALS
-
-**Standard Modal Structure:**
-```html
-<div class="portal-modal-overlay">
-  <div class="portal-modal">
-    <div class="portal-modal-header">
-      <h3>Modal Title</h3>
-      <button class="portal-modal-close">×</button>
+  <main className="portal-main">
+    <div className="portal-card">
+      <h1 className="section-title">Main Section</h1>
+      <p className="page-description">Description text</p>
+      
+      {/* Content */}
     </div>
-    <div class="portal-modal-body">
-      <!-- Content -->
-    </div>
-    <div class="portal-modal-footer">
-      <button>Cancel</button>
-      <button>Confirm</button>
+  </main>
+</div>
+```
+
+### Layout Classes
+- `.portal-layout` - Full page wrapper with #F4F6F9 background
+- `.portal-header` - 64px header bar, white background
+- `.portal-title` - Page title styling
+- `.portal-main` - Content area, max-width 1100px, centered, 40px padding
+- `.portal-card` - White card, 8px radius, border, shadow, 40px padding
+
+## Form Components
+
+### Form Structure
+```tsx
+<div className="form-section">
+  <h2 className="form-section-title">Section Name</h2>
+  
+  <div className="form-grid-2">
+    <div className="form-field">
+      <label className="form-label">Field Label</label>
+      <input className="form-input" />
     </div>
   </div>
 </div>
 ```
 
-**Modal Requirements:**
-✅ ESC key closes modal  
-✅ Backdrop click closes modal  
-✅ Focus trap within modal  
-✅ Scroll lock on body  
-✅ Smooth fade-in animation  
-✅ Centered on viewport
+### Form Classes
+- `.form-section` - Section wrapper, 32px margin bottom
+- `.form-section-title` - 16px, 600 weight
+- `.form-grid-2` - 2-column grid (responsive to 1 column on mobile)
+- `.form-grid-3` - 3-column grid
+- `.form-field` - Field wrapper with 6px gap
+- `.form-label` - 14px, 600 weight, #374151
+- `.form-input` - White bg, #1F2937 text, #D1D5DB border, focus: #2563EB ring
 
----
+### Input States
+- **Default**: White background, gray border
+- **Focus**: Blue border (#2563EB) + blue ring shadow
+- **Disabled**: Opacity 0.6, not-allowed cursor
+- **Error**: Red border, red ring
 
-## 9. EMPTY STATES
+## Buttons
 
-**Standard Empty State Structure:**
-```html
-<div class="portal-empty-state">
-  <div class="portal-empty-icon">📦</div>
-  <h3 class="portal-empty-title">No items yet</h3>
-  <p class="portal-empty-text">Get started by creating your first item</p>
-  <button class="portal-btn-primary">Create Item</button>
+### Primary Button
+```tsx
+<button className="btn-primary">Action</button>
+```
+- Background: #2563EB
+- Hover: #1D4ED8
+- Text: white, 14px, 600 weight
+- Padding: 12px 28px
+- Radius: 6px
+
+### Secondary Button
+```tsx
+<button className="btn-secondary">Cancel</button>
+```
+- Background: white
+- Border: 1px solid #D1D5DB
+- Text: #1F2937
+- Hover: #F9FAFB background
+
+### Other Button Variants
+- `.btn-success` - Green button for positive actions
+- `.btn-quote` - Green "Quote Now" button for Loads page
+
+## Tables
+
+### Table Structure
+```tsx
+<div className="table-container">
+  <div className="table-header" style={{gridTemplateColumns: '...'}}>
+    <div>Column 1</div>
+    <div>Column 2</div>
+  </div>
+  
+  <div className="table-row" style={{gridTemplateColumns: '...'}}>
+    <div>Data 1</div>
+    <div>Data 2</div>
+  </div>
 </div>
 ```
 
-```css
-.portal-empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-muted);
-}
+### Table Classes
+- `.table-container` - White card wrapper
+- `.table-header` - #F9FAFB background, 12px uppercase text
+- `.table-row` - Hover: #F9FAFB background, cursor pointer
+- `.table-empty` - Centered empty state message
 
-.portal-empty-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
+## Status Badges
 
-.portal-empty-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-}
-
-.portal-empty-text {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 20px;
-}
+```tsx
+<span className="status-badge open">Open</span>
 ```
 
----
+Variants:
+- `.status-badge.open` - Blue background
+- `.status-badge.completed` - Green background
+- `.status-badge.pending` - Yellow background
+- `.status-badge.cancelled` - Red background
 
-## 10. ERROR STATES
+## Alerts
 
-**User-Friendly Error Messages:**
-
-❌ **Bad:** `Error: 23503 - Foreign key violation in table jobs`  
-✅ **Good:** `Unable to delete this item because it has associated records.`
-
-❌ **Bad:** `AuthError: JWT expired`  
-✅ **Good:** `Your session has expired. Please log in again.`
-
-**Error Display:**
-```css
-.portal-error-banner {
-  padding: 12px 16px;
-  background: var(--error-bg);
-  border-left: 3px solid var(--error);
-  color: var(--error-text);
-  font-size: 13px;
-  margin-bottom: 16px;
-}
+```tsx
+<div className="alert-error">Error message</div>
+<div className="alert-success">Success message</div>
 ```
 
----
+## Loading States
 
-## 11. TOAST NOTIFICATIONS
-
-**Requirements:**
-✅ Auto-dismiss after 4-5 seconds  
-✅ Manual dismiss with X button  
-✅ Stack multiple toasts  
-✅ Different colors for success/error/info/warning  
-✅ Smooth slide-in from top or bottom
-
----
-
-## 12. RESPONSIVE BREAKPOINTS
-
-```css
-/* Mobile */
-@media (max-width: 767px) {
-  .portal-content { padding: 12px; }
-  .portal-card { padding: 16px; }
-  h1 { font-size: 18px; }
-}
-
-/* Tablet */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .portal-content { padding: 16px; }
-}
-
-/* Desktop */
-@media (min-width: 1024px) {
-  .portal-content { padding: 24px; }
-  max-width: 1100px;
-}
-
-/* Large Desktop */
-@media (min-width: 1440px) {
-  max-width: 1200px;
-}
+```tsx
+<div className="loading-screen">
+  <div className="loading-text">Loading...</div>
+</div>
 ```
 
----
+## Stats Cards
 
-## IMPLEMENTATION CHECKLIST
+```tsx
+<div className="stats-grid">
+  <div className="stat-card">
+    <div className="stat-label">Label</div>
+    <div className="stat-value">123</div>
+    <div className="stat-description">Description</div>
+  </div>
+</div>
+```
 
-### Phase 1: Foundation
-- [x] Define CSS variables in portal.css
-- [x] Create typography scale
-- [x] Set color system
-- [x] Define spacing scale
+### Stat Value Variants
+- `.stat-value` - Default black (#1F2937)
+- `.stat-value.blue` - Blue (#3B82F6)
+- `.stat-value.green` - Green (#10B981)
 
-### Phase 2: Components
-- [ ] Standardize all buttons
-- [ ] Standardize all inputs
-- [ ] Standardize all cards
-- [ ] Standardize tabs/filters
+## Spacing System
 
-### Phase 3: Pages
-- [ ] Apply standards to all portal pages
-- [ ] Remove inline styles where possible
-- [ ] Replace hard-coded colors with variables
-- [ ] Test input visibility on all pages
+Consistent spacing grid:
+- **Gap between sections**: 24px
+- **Card padding**: 40px (desktop), 24px (mobile)
+- **Form field gap**: 16px
+- **Form field internal gap**: 6px
+- **Button group gap**: 12px
+- **Table cell padding**: 12px 16px
 
-### Phase 4: Responsive
-- [ ] Test at 360px, 768px, 1280px
-- [ ] Fix table responsiveness
-- [ ] Fix sidebar mobile behavior
-- [ ] Capture screenshots
+## Responsive Breakpoints
 
----
+- **Mobile**: < 768px
+  - Single column grids
+  - Full width buttons
+  - Reduced card padding (24px)
+  - Collapsible sidebar
 
-**Document Status:** ✅ COMPLETE  
-**Next Steps:** Apply standards to all portal pages
+- **Tablet**: 768px - 1024px
+  - 2-column grids where applicable
+  - Fixed sidebar
+
+- **Desktop**: > 1024px
+  - Full grid layouts (3-4 columns)
+  - Fixed sidebar
+  - Maximum content width: 1100px
+
+## Tabs/Filters
+
+### Tab Navigation
+```tsx
+<div className="loads-tabs">
+  <button className="loads-tab loads-tab-active">Tab 1</button>
+  <button className="loads-tab">Tab 2</button>
+</div>
+```
+
+### Filters
+```tsx
+<div className="loads-filter-group">
+  <label className="loads-filter-label">Filter</label>
+  <input className="loads-filter-input" />
+</div>
+```
+
+## Modal/Overlay
+
+```tsx
+<div className="modal-overlay">
+  <div className="modal-content">
+    <div className="modal-header">
+      <h2>Modal Title</h2>
+      <button className="btn-secondary">Close</button>
+    </div>
+    <div className="modal-body">
+      {/* Content */}
+    </div>
+    <div className="modal-actions">
+      <button className="btn-secondary">Cancel</button>
+      <button className="btn-primary">Confirm</button>
+    </div>
+  </div>
+</div>
+```
+
+## Empty States
+
+```tsx
+<div className="diary-empty">
+  <div className="diary-empty-icon">📅</div>
+  <div className="diary-empty-text">
+    <p>No items found</p>
+    <button className="btn-primary">Add New</button>
+  </div>
+</div>
+```
+
+## Implementation Checklist
+
+For each new page or feature:
+- [ ] Use `.portal-layout` wrapper
+- [ ] Use `.portal-header` for page title
+- [ ] Use `.portal-main` for content area
+- [ ] Use `.portal-card` for sections
+- [ ] NO inline `style={{}}` props
+- [ ] NO Tailwind utility classes
+- [ ] Use semantic class names from portal.css
+- [ ] Ensure text is readable (dark on light)
+- [ ] Add focus states to interactive elements
+- [ ] Test responsiveness at 360px, 768px, 1280px
+- [ ] Verify empty states have helpful messages
+- [ ] Check loading states resolve correctly
+
+## Files Modified
+
+All styling centralized in:
+- `styles/portal.css` - All portal theme CSS (~1500 lines)
+- `app/globals.css` - Global resets and base styles
+
+## Pages Using This Standard
+
+✅ All 9 portal pages + Company Settings (10 total)
+- Company Settings (reference)
+- Dashboard
+- Loads
+- Quotes
+- Diary
+- Directory
+- Drivers & Vehicles
+- Live Availability
+- Return Journeys
+- Freight Vision

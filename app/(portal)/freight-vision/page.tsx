@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/lib/AuthContext'
 import Panel from '@/components/portal/Panel'
 import StatCard from '@/components/portal/StatCard'
+import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,19 +18,10 @@ export default function FreightVisionPage() {
     if (!companyId) return
     
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
     
     const fetch = async () => {
       try {
         setLoading(true)
-        
-        // Set timeout to ensure loading always resolves
-        timeoutId = setTimeout(() => {
-          if (mounted) {
-            console.warn('Freight Vision data fetch timeout - resolving loading state')
-            setLoading(false)
-          }
-        }, 10000) // 10 second timeout
         
         const { data: jobs } = await supabase.from('jobs').select('*').eq('posted_by_company_id', companyId)
         const { data: bids } = await supabase.from('job_bids').select('*').eq('bidder_company_id', companyId)
@@ -48,38 +40,43 @@ export default function FreightVisionPage() {
         if (mounted) {
           setLoading(false)
         }
-        if (timeoutId) clearTimeout(timeoutId)
       }
     }
     fetch()
     
     return () => {
       mounted = false
-      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [companyId])
   
-  if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
+  if (loading) return <div className="loading-screen"><div>Loading...</div></div>
   
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div className="portal-grid-2">
-        <StatCard label="Total Jobs Posted" value={stats.totalJobs} change={`${stats.completedJobs} completed`} />
-        <StatCard label="Total Revenue" value={`£${(stats.totalRevenue/1000).toFixed(1)}k`} />
+    <div className="portal-layout">
+      <div className="portal-header">
+        <h1 className="portal-title">Freight Vision</h1>
+        <p className="page-description">Performance metrics and analytics</p>
       </div>
-      
-      <div className="portal-grid-2">
-        <StatCard label="Active Bids" value={stats.activeBids} />
-        <StatCard label="Completion Rate" value={`${stats.totalJobs > 0 ? ((stats.completedJobs/stats.totalJobs)*100).toFixed(0) : 0}%`} />
-      </div>
-      
-      <Panel title="Analytics Overview" subtitle="Performance metrics and insights">
-        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--portal-text-secondary)' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>📊</div>
-          <p style={{ fontSize: '16px', marginBottom: '8px' }}>Advanced Analytics</p>
-          <p style={{ fontSize: '14px' }}>Detailed charts and visualizations coming soon</p>
+
+      <div className="portal-main">
+        <div className="portal-grid-2">
+          <StatCard label="Total Jobs Posted" value={stats.totalJobs} change={`${stats.completedJobs} completed`} />
+          <StatCard label="Total Revenue" value={`£${(stats.totalRevenue/1000).toFixed(1)}k`} />
         </div>
-      </Panel>
+        
+        <div className="portal-grid-2">
+          <StatCard label="Active Bids" value={stats.activeBids} />
+          <StatCard label="Completion Rate" value={`${stats.totalJobs > 0 ? ((stats.completedJobs/stats.totalJobs)*100).toFixed(0) : 0}%`} />
+        </div>
+        
+        <Panel title="Analytics Overview" subtitle="Performance metrics and insights">
+          <div className="portal-card">
+            <div className="section-header">📊</div>
+            <p>Advanced Analytics</p>
+            <p className="page-description">Detailed charts and visualizations coming soon</p>
+          </div>
+        </Panel>
+      </div>
     </div>
   )
 }
