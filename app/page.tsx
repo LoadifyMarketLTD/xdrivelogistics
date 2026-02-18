@@ -1,18 +1,27 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import LandingPage from './(marketing)/_components/LandingPage'
+'use client'
 
-export default async function Home() {
-  const supabase = await createClient()
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+
+export default function Home() {
+  const router = useRouter()
   
-  // Server-side auth check
-  const { data: { session } } = await supabase.auth.getSession()
+  useEffect(() => {
+    // Redirect to portal dashboard
+    router.push('/dashboard')
+  }, [router])
   
-  // If user is authenticated, redirect to dashboard
-  if (session) {
-    redirect('/dashboard')
-  }
-  
-  // Otherwise, show landing page
-  return <LandingPage />
+  return (
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '100vh',
+      background: '#f4f5f7'
+    }}>
+      <div style={{ textAlign: 'center', color: '#6b7280' }}>
+        <div style={{ fontSize: '16px' }}>Redirecting to portal...</div>
+      </div>
+    </div>
+  );
 }

@@ -1,13 +1,36 @@
 -- ============================================================
--- INVOICE SQL - To run in Supabase SQL Editor
--- SQL pentru INVOICE - De rulat în Supabase SQL Editor
+-- ⚠️  ATENȚIE! IMPORTANT! CITEȘTE ASTA! ⚠️
 -- ============================================================
--- ✅ Safe to run: Folosește IF NOT EXISTS - nu va șterge date
--- ✅ Idempotent: Poți rula de mai multe ori fără probleme
--- ⚠️ Requires: Tabelele companies și jobs trebuie să existe deja
--- ⚠️ Requires: Tabelul profiles trebuie să aibă coloana company_id
+-- 
+-- ❌ NU COPIA DOAR: "SQL_CODE_AICI.sql"
+-- ✅ COPIAZĂ ÎNTREG CONȚINUTUL DIN ACEST FIȘIER!
 --
--- NOTĂ: Pentru versiune completă cu verificări, vezi SQL_CODE_AICI.sql
+-- ❌ NU COPIA COD CU "..." (trei puncte)!
+-- ✅ COPIAZĂ CODUL COMPLET (TOATE cele 113 linii)!
+--
+-- ERORI COMUNE:
+-- - "syntax error at or near SQL_CODE_AICI" = ai copiat NUMELE
+-- - "syntax error at or near .." = ai copiat cod cu ... (placeholders)
+--
+-- SOLUȚIE: Copiază TOT din ACEST fișier, fără ... (placeholders)!
+--
+-- ============================================================
+-- SQL CODE PENTRU INVOICE - COPIAZĂ ȘI RULEAZĂ ÎN SUPABASE
+-- SQL CODE FOR INVOICE - COPY AND RUN IN SUPABASE
+-- ============================================================
+-- 
+-- INSTRUCȚIUNI / INSTRUCTIONS:
+-- 1. Deschide Supabase SQL Editor / Open Supabase SQL Editor
+-- 2. Selectează TOT (Ctrl+A) / Select ALL (Ctrl+A)
+-- 3. Copiază TOT (Ctrl+C) / Copy ALL (Ctrl+C)
+-- 4. Lipește în SQL Editor (Ctrl+V) / Paste in SQL Editor (Ctrl+V)
+-- 5. Apasă "Run" / Click "Run"
+-- 
+-- VERIFICĂ: Trebuie să vezi:
+-- - TOT codul SQL de mai jos (113 linii)
+-- - NU doar numele fișierului
+-- - NU cod cu "..." (trei puncte)
+-- 
 -- ============================================================
 
 -- 1. CREATE INVOICES TABLE / CREEAZĂ TABELUL INVOICES
@@ -31,7 +54,6 @@ CREATE TABLE IF NOT EXISTS public.invoices (
 );
 
 -- 2. AUTO-GENERATE INVOICE NUMBER / AUTO-GENEREAZĂ NUMĂRUL FACTURII
--- Auto-generate invoice numbers (INV-2026-1001, INV-2026-1002, etc.)
 -- ============================================================
 CREATE SEQUENCE IF NOT EXISTS invoice_number_seq START 1001;
 
@@ -85,20 +107,15 @@ CREATE POLICY "Users can manage company invoices"
   );
 
 -- ============================================================
--- COMPLETE! / COMPLET!
+-- SUCCES! / SUCCESS!
 -- ============================================================
--- Your invoices table is now ready to use!
--- Tabelul de facturi este acum gata de utilizare!
+-- Tabelul invoices a fost creat cu succes!
+-- The invoices table has been created successfully!
 -- 
+-- Poți acum:
 -- You can now:
--- - Create invoices
--- - Track invoice status
--- - Auto-generate invoice numbers
--- - Link invoices to jobs
--- 
--- Acum poți:
--- - Crea facturi
--- - Urmări statusul facturilor
--- - Auto-genera numere de facturi
--- - Lega facturi de joburi
+-- - Crea facturi / Create invoices
+-- - Urmări statusul / Track status
+-- - Auto-genera numere / Auto-generate numbers
+-- - Lega de joburi / Link to jobs
 -- ============================================================

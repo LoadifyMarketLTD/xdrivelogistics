@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
-import { JobWithTracking, TrackingEvent, ProofOfDelivery, JobDocument, JobNote, JobInvoice } from '@/lib/types'
+import { JobWithTracking, TrackingEvent, ProofOfDelivery, JobDocument, JobNote } from '@/lib/types'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
@@ -18,7 +18,6 @@ export default function LoadDetailPage() {
   const [pod, setPod] = useState<ProofOfDelivery | null>(null)
   const [documents, setDocuments] = useState<JobDocument[]>([])
   const [notes, setNotes] = useState<JobNote[]>([])
-  const [invoice, setInvoice] = useState<JobInvoice | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -83,16 +82,6 @@ export default function LoadDetailPage() {
 
       if (notesError) throw notesError
 
-      // Fetch invoice
-      const { data: invoiceData, error: invoiceError } = await supabase
-        .from('invoices')
-        .select('*')
-        .eq('job_id', jobId)
-        .single()
-
-      // Invoice might not exist yet, that's OK
-      if (invoiceError && invoiceError.code !== 'PGRST116') throw invoiceError
-
       setJob({
         ...jobData,
         posted_by_company_name: jobData.posted_by_company?.name || null,
@@ -107,7 +96,6 @@ export default function LoadDetailPage() {
       setPod(podData)
       setDocuments(docsData || [])
       setNotes(notesData || [])
-      setInvoice(invoiceData)
 
     } catch (err: any) {
       console.error('Error fetching job details:', err)
@@ -744,30 +732,18 @@ export default function LoadDetailPage() {
           Documents
         </button>
         <button
-          onClick={() => {
-            if (invoice) {
-              router.push(`/invoices/${invoice.id}`)
-            } else {
-              alert('No invoice found for this job')
-            }
-          }}
           style={{
             padding: '10px 20px',
-            backgroundColor: invoice ? '#ef4444' : '#9ca3af',
+            backgroundColor: '#ef4444',
             color: '#ffffff',
             border: 'none',
             borderRadius: '6px',
-            cursor: invoice ? 'pointer' : 'not-allowed',
+            cursor: 'pointer',
             fontSize: '14px',
-            fontWeight: '500',
-            opacity: invoice ? 1 : 0.6
+            fontWeight: '500'
           }}
-          disabled={!invoice}
         >
-          {invoice ? `View invoice (${new Intl.NumberFormat('en-GB', {
-            style: 'currency',
-            currency: 'GBP'
-          }).format(invoice.amount + invoice.vat_amount)})` : 'No invoice'}
+          View invoice (£)
         </button>
         <button
           onClick={() => router.push('/loads')}
