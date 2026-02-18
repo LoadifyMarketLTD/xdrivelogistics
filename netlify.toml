@@ -1,5 +1,4 @@
 [build]
-  base = "XDrive_Logistics_Website"
   command = "npm run build"
   publish = "dist"
 
