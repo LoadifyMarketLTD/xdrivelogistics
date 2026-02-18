@@ -121,18 +121,48 @@ Temporary location in `index.html`:
 const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/YOUR_WEBHOOK_ID";
 ```
 
+## Working with Large Files
+
+This repository is configured with **Git LFS (Large File Storage)** to handle files larger than 100MB.
+
+📖 **Documentation**:
+- [GIT_LFS_GUIDE_RO.md](GIT_LFS_GUIDE_RO.md) - Detailed guide in Romanian / Ghid detaliat în română
+- [GIT_LFS_QUICK_REFERENCE.md](GIT_LFS_QUICK_REFERENCE.md) - Quick reference card / Referință rapidă
+- [LFS_TEST_EXAMPLE.md](LFS_TEST_EXAMPLE.md) - Testing examples / Exemple de testare
+
+Common large file types (videos, high-res images, archives, etc.) are automatically tracked with LFS. To add your large files:
+
+```bash
+git lfs install
+git add your-large-file.mp4
+git commit -m "Add large file"
+git push
+```
+
 ## File Structure
 
 ```
 xdrivelogistics/
-├── index.html          # Main website file
-├── logo.png           # Company logo
-├── robots.txt         # Search engine directives
-├── sitemap.xml        # XML sitemap
-├── .gitignore         # Git ignore rules
-├── README.md          # This file
-├── SECURITY.md        # Security recommendations
-└── RECOMMENDATIONS.md # Full analysis and improvements
+├── index.html                    # Main website file
+├── logo.png                     # Company logo
+├── background.jpg               # Background image
+├── background.webp              # Background image (WebP)
+├── logo.webp                    # Logo (WebP)
+├── robots.txt                   # Search engine directives
+├── sitemap.xml                  # XML sitemap
+├── netlify.toml                 # Netlify configuration
+├── .gitignore                   # Git ignore rules
+├── .gitattributes               # Git LFS configuration
+├── README.md                    # This file
+├── GIT_LFS_GUIDE_RO.md          # Guide for large files (Romanian)
+├── GIT_LFS_QUICK_REFERENCE.md   # LFS quick reference
+├── LFS_TEST_EXAMPLE.md          # LFS testing examples
+├── SECURITY.md                  # Security recommendations
+├── RECOMMENDATIONS.md           # Full analysis and improvements
+├── DOCUMENTS_OVERVIEW.md        # Documentation overview
+├── IMPLEMENTATION_IDEAS.md      # Implementation ideas
+├── QUICK_REFERENCE.md           # Quick reference guide
+└── ANALIZA_STRUCTURALA.md       # Structural analysis
 ```
 
 ## Browser Support
