@@ -109,13 +109,27 @@ CREATE INDEX IF NOT EXISTS idx_profiles_company_id
 ### Safe to Run (Sigur de Rulat)
 ```sql
 -- Toate comenzile folosesc IF NOT EXISTS
-CREATE TABLE IF NOT EXISTS ...
-CREATE INDEX IF NOT EXISTS ...
-CREATE SEQUENCE IF NOT EXISTS ...
+-- Exemple (NU copia literal, folosește fișierele complete):
+
+CREATE TABLE IF NOT EXISTS public.invoices (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  company_id UUID NOT NULL,
+  ...
+);
+
+CREATE INDEX IF NOT EXISTS idx_invoices_company_id 
+  ON public.invoices(company_id);
+
+CREATE SEQUENCE IF NOT EXISTS invoice_number_seq START 1001;
 
 -- Nu șterge date existente
 -- Nu produce erori dacă obiectele există deja
 ```
+
+**⚠️ IMPORTANT**: Aceste sunt doar exemple ilustrative! 
+Pentru SQL complet și funcțional, folosește fișierele:
+- `INVOICE_SQL_WITH_CHECKS.sql` (recomandat)
+- `INVOICE_SQL_QUICK.sql` (rapid)
 
 ### Idempotent (Poate fi Rulat de Mai Multe Ori)
 ```sql
