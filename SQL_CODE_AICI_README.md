@@ -1,23 +1,45 @@
 # 🎯 SQL CODE AICI - COPIAZĂ ȘI RULEAZĂ
 
-## 📁 FIȘIERUL CU COD SQL
+## ⚠️ ATENȚIE - EROARE COMUNĂ!
 
-Deschide acest fișier și copiază tot conținutul:
+### ❌ NU face asta:
+```
+SQL_CODE_AICI.sql   ← GREȘIT! Acesta e doar un nume de fișier!
+```
 
-### ➡️ **`SQL_CODE_AICI.sql`** ⬅️
+Dacă ai încercat să rulezi text de mai sus și ai primit eroarea:
+```
+ERROR: syntax error at or near "SQL_CODE_AICI"
+```
+
+**Este pentru că ai copiat NUMELE fișierului, nu CONȚINUTUL!**
+
+📖 **[CITEȘTE SOLUȚIA COMPLETĂ AICI: FIX_EROARE_SQL_CODE_AICI.md](FIX_EROARE_SQL_CODE_AICI.md)**
 
 ---
 
-## 🚀 CUM SĂ RULEZI
+## 📁 FIȘIERUL CU COD SQL
 
-### Pasul 1: Deschide fișierul
-```
-SQL_CODE_AICI.sql
-```
+### ➡️ **Deschide fișierul: `SQL_CODE_AICI.sql`** ⬅️
+### ✅ **Apoi copiază TOT conținutul din el!** ✅
 
-### Pasul 2: Copiază TOT codul SQL
+---
+
+## 🚀 CUM SĂ RULEZI CORECT
+
+### Pasul 1: Deschide fișierul în editor
+- NU copia numele "SQL_CODE_AICI.sql"
+- Deschide fișierul în VS Code / GitHub / Editor
+- Click pe fișier pentru a vedea conținutul
+
+### Pasul 2: Selectează TOT conținutul din fișier
 - Selectează tot (Ctrl+A sau Cmd+A)
+- Trebuie să vezi cod SQL (CREATE TABLE, CREATE FUNCTION, etc.)
+- NU doar numele fișierului!
+
+### Pasul 3: Copiază conținutul
 - Copiază (Ctrl+C sau Cmd+C)
+- Conținutul trebuie să înceapă cu: `-- ============================================================`
 
 ### Pasul 3: Deschide Supabase
 - Mergi pe https://supabase.com
