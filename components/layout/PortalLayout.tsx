@@ -277,7 +277,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           fontSize: '11px',
           color: '#9ca3af',
         }}>
-          <div>© 2026 XDrive Logistics LTD</div>
+          <div>© 2021 XDrive Logistics LTD</div>
         </div>
       </div>
 
