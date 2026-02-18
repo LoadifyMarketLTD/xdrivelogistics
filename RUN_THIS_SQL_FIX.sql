@@ -274,6 +274,14 @@ BEGIN
   END IF;
 END $$;
 
+-- Drop dependent views before dropping status column
+DO $$
+BEGIN
+  -- Drop views that depend on the status column
+  DROP VIEW IF EXISTS public.vehicles_with_tracking CASCADE;
+  DROP VIEW IF EXISTS public.vehicles_with_details CASCADE;
+END $$;
+
 -- Drop old status column from vehicles
 DO $$
 BEGIN
@@ -288,6 +296,105 @@ BEGIN
     ALTER TABLE public.vehicles DROP COLUMN status;
   END IF;
 END $$;
+
+-- Recreate the vehicles_with_tracking view with explicit columns
+CREATE OR REPLACE VIEW public.vehicles_with_tracking AS
+SELECT 
+  v.id,
+  v.company_id,
+  v.vehicle_type,
+  v.registration,
+  v.make,
+  v.model,
+  v.year,
+  v.notes,
+  v.is_available,
+  v.created_at,
+  v.updated_at,
+  v.driver_name,
+  v.current_status,
+  v.current_location,
+  v.last_tracked_at,
+  v.future_position,
+  v.future_journey,
+  v.advertise_to,
+  v.notify_when,
+  v.is_tracked,
+  v.vehicle_size,
+  v.capacity_kg,
+  v.telematics_id,
+  v.vehicle_reference,
+  v.internal_reference,
+  v.body_type,
+  v.notify_when_tracked,
+  v.vin,
+  v.has_livery,
+  v.has_tail_lift,
+  v.has_hiab,
+  v.has_trailer,
+  v.has_moffet_mounty,
+  v.loading_capacity_m3,
+  v.length_m,
+  v.width_m,
+  v.height_m,
+  v.max_weight_kg,
+  c.name as company_name,
+  c.phone as company_phone,
+  (SELECT COUNT(*) FROM public.vehicle_tracking_history WHERE vehicle_id = v.id) as tracking_count
+FROM public.vehicles v
+LEFT JOIN public.companies c ON v.company_id = c.id;
+
+GRANT SELECT ON public.vehicles_with_tracking TO authenticated;
+
+-- Recreate the vehicles_with_details view with explicit columns
+CREATE OR REPLACE VIEW public.vehicles_with_details AS
+SELECT 
+  v.id,
+  v.company_id,
+  v.vehicle_type,
+  v.registration,
+  v.make,
+  v.model,
+  v.year,
+  v.notes,
+  v.is_available,
+  v.created_at,
+  v.updated_at,
+  v.driver_name,
+  v.current_status,
+  v.current_location,
+  v.last_tracked_at,
+  v.future_position,
+  v.future_journey,
+  v.advertise_to,
+  v.notify_when,
+  v.is_tracked,
+  v.vehicle_size,
+  v.capacity_kg,
+  v.telematics_id,
+  v.vehicle_reference,
+  v.internal_reference,
+  v.body_type,
+  v.notify_when_tracked,
+  v.vin,
+  v.has_livery,
+  v.has_tail_lift,
+  v.has_hiab,
+  v.has_trailer,
+  v.has_moffet_mounty,
+  v.loading_capacity_m3,
+  v.length_m,
+  v.width_m,
+  v.height_m,
+  v.max_weight_kg,
+  c.name as company_name,
+  (SELECT COUNT(*) FROM public.vehicle_documents WHERE vehicle_id = v.id) as document_count,
+  (SELECT COUNT(*) FROM public.vehicle_documents 
+   WHERE vehicle_id = v.id AND expiry_date < CURRENT_DATE) as expired_documents_count
+FROM public.vehicles v
+LEFT JOIN public.companies c ON v.company_id = c.id;
+
+GRANT SELECT ON public.vehicles_with_details TO authenticated;
 
 -- Make vehicle_type and registration NOT NULL
 DO $$
