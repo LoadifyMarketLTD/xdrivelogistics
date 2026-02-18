@@ -1,9 +1,7 @@
 [build]
+  base = "XDrive_Logistics_Website"
   command = "npm run build"
   publish = "dist"
 
-# SPA fallback (important pentru React Router / refresh)
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+[functions]
+  directory = "netlify/functions"
