@@ -281,9 +281,11 @@ BEGIN
   PERFORM add_tracking_event(
     p_job_id,
     CASE p_new_status
+      WHEN 'open' THEN 'created'
       WHEN 'assigned' THEN 'assigned'
       WHEN 'in-transit' THEN 'on_my_way'
       WHEN 'completed' THEN 'completed'
+      WHEN 'delivered' THEN 'delivered'
       WHEN 'cancelled' THEN 'cancelled'
       ELSE 'note_added'
     END,
@@ -428,7 +430,7 @@ CREATE POLICY "Companies can submit feedback for completed jobs"
     AND EXISTS (
       SELECT 1 FROM public.jobs j
       WHERE j.id = job_feedback.job_id
-      AND j.status = 'completed'
+      AND j.status IN ('completed', 'delivered')
       AND (
         j.posted_by_company_id = given_by_company_id
         OR j.assigned_company_id = given_by_company_id

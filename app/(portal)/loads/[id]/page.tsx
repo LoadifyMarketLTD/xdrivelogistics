@@ -69,7 +69,7 @@ export default function LoadDetailPage() {
       'open': { className: 'live', label: 'Live' },
       'assigned': { className: 'allocated', label: 'Allocated' },
       'in-transit': { className: 'allocated', label: 'In Transit' },
-      'completed': { className: 'delivered', label: 'Delivered' },
+      'completed': { className: 'delivered', label: 'Completed' },
       'delivered': { className: 'delivered', label: 'Delivered' },
       'cancelled': { className: 'cancelled', label: 'Cancelled' },
     }
@@ -142,9 +142,33 @@ export default function LoadDetailPage() {
           }}>
             Load Details
           </h1>
-          <p style={{ color: 'var(--cx-text-secondary)', margin: '4px 0' }}>
-            Job ID: {job.id.slice(0, 8)}...
-          </p>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px',
+            color: 'var(--cx-text-secondary)', 
+            margin: '4px 0'
+          }}>
+            <span>Job ID: {job.id}</span>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(job.id)
+                alert('Job ID copied to clipboard!')
+              }}
+              style={{
+                background: 'none',
+                border: '1px solid var(--cx-border)',
+                padding: '2px 8px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                color: 'var(--cx-text-secondary)',
+                borderRadius: '4px'
+              }}
+              title="Copy full Job ID"
+            >
+              📋 Copy
+            </button>
+          </div>
         </div>
         <div>
           {getStatusBadge(job.status)}
