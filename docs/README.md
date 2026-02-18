@@ -85,6 +85,12 @@
 8. **sql/00_db_inventory.sql** - Database inspection queries
 9. **sql/jobs_insert_examples.sql** - Working SQL examples for jobs table
 10. **README.md** - This summary document
+6. **JOBS_INSERT_ERROR_FIX.md** - Jobs table insert error debugging guide
+7. **SQL_QUERY_DEBUG_FIX.md** - SQL query debugging guide (pg_policies)
+8. **sql/00_db_inventory.sql** - Database inspection queries
+9. **sql/jobs_verification.sql** - Jobs table verification queries
+10. **sql/jobs_test_data.sql** - Helper functions for test data creation
+11. **README.md** - This summary document
 
 ### Audit Findings
 
