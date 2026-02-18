@@ -1,26 +1,89 @@
 # 📋 SQL PENTRU SUPABASE SQL EDITOR
 
-## ⚡ QUICK START - Rulează Acesta:
+## ⚡ IMPORTANT - RULEAZĂ ÎN 2 PAȘI!
 
-### Fișierul Recomandat: `migration-delivery-tracking-FIXED.sql`
+### ⚠️ ATENȚIE: Nu mai folosi versiunea veche cu 1 singur fișier!
 
-Copiază tot conținutul din fișierul `migration-delivery-tracking-FIXED.sql` și rulează-l în **Supabase SQL Editor**.
+Datorită unei limitări PostgreSQL cu valorile ENUM, migration-ul trebuie rulat în **2 pași separați**.
+
+## 🚀 QUICK START - Proces în 2 Pași:
+
+### PASUL 1️⃣: Adaugă Valoarea ENUM
+**Fișier:** `migration-delivery-tracking-STEP-1-ENUM.sql`
+
+1. Deschide fișierul `migration-delivery-tracking-STEP-1-ENUM.sql`
+2. Copiază **TOT** conținutul
+3. Lipește în **Supabase SQL Editor**
+4. Click **"Run"**
+5. Așteaptă mesajul: `✅ Added 'completed' to job_status enum`
+
+⏸️ **PAUZĂ OBLIGATORIE** - Lasă SQL Editor să finalizeze!
+
+### PASUL 2️⃣: Rulează Migration-ul Principal
+**Fișier:** `migration-delivery-tracking-STEP-2-MAIN.sql`
+
+1. **DUPĂ** ce Pasul 1 s-a terminat cu succes
+2. Deschide fișierul `migration-delivery-tracking-STEP-2-MAIN.sql`
+3. Copiază **TOT** conținutul
+4. Lipește în **Supabase SQL Editor** (din nou)
+5. Click **"Run"**
+6. Așteaptă mesajul: `✅ MIGRATION COMPLETED SUCCESSFULLY!`
 
 ## 🎯 Ce Rezolvă Această Versiune:
 
-✅ **Rezolvă eroarea**: `invalid input value for enum job_status: "completed"`  
-✅ **Auto-detectează** dacă status e ENUM sau TEXT  
-✅ **Adaugă automat** 'completed' la valorile permise  
-✅ **Sigur să rulezi de mai multe ori** (idempotent)  
+✅ **Rezolvă eroarea**: `unsafe use of new value "completed" of enum type`  
+✅ **Split în 2 tranzacții** pentru compatibilitate PostgreSQL  
+✅ **Auto-verificare** înainte de fiecare pas  
+✅ **Mesaje clare** de progres și succes  
 
 ## 📂 Fișiere Disponibile:
 
-### 1. `migration-delivery-tracking-FIXED.sql` ⭐ RECOMANDAT
-**Rulează pe acesta!**
-- Versiunea completă și fixată
-- Rezolvă automat problema cu enum
-- 22KB, ~500 linii
-- Include toate funcțiile și tabelele
+### 1. `migration-delivery-tracking-STEP-1-ENUM.sql` ⭐ RULEAZĂ PRIMUL
+**Pasul 1 - Obligatoriu**
+- Adaugă valoarea 'completed' la enum
+- Foarte rapid (~1 secundă)
+- Trebuie rulat ÎNAINTE de Step 2
+
+### 2. `migration-delivery-tracking-STEP-2-MAIN.sql` ⭐ RULEAZĂ AL DOILEA
+**Pasul 2 - Main Migration**
+- Creează toate tabelele tracking
+- Adaugă toate câmpurile noi
+- Creează funcții și policies
+- ~3-5 secunde
+
+### 3. `FIX_ENUM_TRANSACTION_ERROR.md` 📖
+**Documentație Completă**
+- Explică de ce 2 pași
+- Troubleshooting
+- Exemple copy-paste
+
+### 4. `migration-delivery-tracking-FIXED.sql` ⚠️ NU FOLOSI
+**Versiunea Veche - Are Bug**
+- Încearcă să facă totul într-o tranzacție
+- Va da eroarea: "unsafe use of new value"
+- Folosește în schimb versiunea în 2 pași!
+
+## 🚀 Pași Completi Vizual:
+
+```
+┌─────────────────────────────────────────┐
+│  STEP 1: Add ENUM Value                 │
+│  File: STEP-1-ENUM.sql                  │
+│  Duration: ~1 second                    │
+│  ✅ Success: "Added 'completed'"        │
+└─────────────────────────────────────────┘
+              ⬇️
+        ⏸️ WAIT (auto)
+              ⬇️
+┌─────────────────────────────────────────┐
+│  STEP 2: Main Migration                 │
+│  File: STEP-2-MAIN.sql                  │
+│  Duration: ~3-5 seconds                 │
+│  ✅ Success: "MIGRATION COMPLETED"      │
+└─────────────────────────────────────────┘
+              ⬇️
+         🎉 DONE!
+```
 
 ### 2. `diagnostic-jobs-status.sql` (OPȚIONAL)
 - Doar pentru diagnostic
