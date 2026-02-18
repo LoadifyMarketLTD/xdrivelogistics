@@ -252,19 +252,27 @@ export interface JobFeedback {
 // Job Invoice
 export interface JobInvoice {
   id: string
-  job_id: string
+  company_id: string
   invoice_number: string
-  invoice_date: string
-  due_date: string
+  job_id: string | null
+  customer_name: string
+  customer_email: string | null
   amount: number
   vat_amount: number
-  total_amount: number
   status: 'pending' | 'sent' | 'paid' | 'overdue' | 'cancelled'
-  payment_terms: string | null
-  smartpay_transaction_id: string | null
-  invoice_url: string | null
+  issue_date: string
+  due_date: string
+  paid_date: string | null
+  notes: string | null
   created_at: string
-  paid_at: string | null
+  updated_at: string
+}
+
+// Invoice with computed fields
+export interface InvoiceWithDetails extends JobInvoice {
+  total_amount: number // Computed: amount + vat_amount
+  job?: Job
+  company_name?: string
 }
 
 // Complete Job with all tracking data

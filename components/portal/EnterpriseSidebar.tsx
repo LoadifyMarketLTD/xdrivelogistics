@@ -13,6 +13,7 @@ const menuItems: MenuItem[] = [
   { label: 'Dashboard', path: '/dashboard', icon: '📊' },
   { label: 'Loads', path: '/loads', icon: '📦' },
   { label: 'Quotes', path: '/quotes', icon: '💰' },
+  { label: 'Invoices', path: '/invoices', icon: '🧾' },
   { label: 'Directory', path: '/directory', icon: '📁' },
   { label: 'Drivers', path: '/drivers-vehicles', icon: '👤' },
   { label: 'Vehicles', path: '/my-fleet', icon: '🚛' },
