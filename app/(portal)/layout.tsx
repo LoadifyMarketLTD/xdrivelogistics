@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import PortalLayout from '@/components/layout/PortalLayout'
+import MobileRedirect from '@/components/mobile/MobileRedirect'
 
 export default function PortalLayoutWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -42,5 +43,10 @@ export default function PortalLayoutWrapper({ children }: { children: React.Reac
     return null
   }
   
-  return <PortalLayout>{children}</PortalLayout>
+  return (
+    <>
+      <MobileRedirect />
+      <PortalLayout>{children}</PortalLayout>
+    </>
+  )
 }
