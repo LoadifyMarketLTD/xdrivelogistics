@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,11 +25,11 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           <DialogTitle className="text-2xl font-bold text-white">
             {activeTab === 'login' ? 'Bine ai revenit!' : 'Creează Cont'}
           </DialogTitle>
-          <p className="text-muted-foreground text-sm">
+          <DialogDescription className="text-muted-foreground text-sm">
             {activeTab === 'login'
               ? 'Intră în contul tău XDrive Logistics'
               : 'Înregistrează-te gratuit pe platformă'}
-          </p>
+          </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="mt-4">
