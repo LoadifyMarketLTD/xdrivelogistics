@@ -17,6 +17,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [activeTab, setActiveTab] = useState('login');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
@@ -30,6 +31,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
     setLoading(true);
 
     try {
@@ -41,8 +43,16 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
       if (signInError) throw signInError;
 
       if (data.user) {
-        // Success! Redirect to dashboard
-        window.location.href = '/dashboard';
+        // Success!
+        setSuccess('Autentificare reușită! Bine ai revenit!');
+        setLoginEmail('');
+        setLoginPassword('');
+        
+        // Close modal after 2 seconds
+        setTimeout(() => {
+          onClose();
+          setSuccess(null);
+        }, 2000);
       }
     } catch (err: any) {
       setError(err.message || 'Autentificare eșuată. Verifică email-ul și parola.');
@@ -54,6 +64,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
 
     if (registerPassword !== registerConfirmPassword) {
       setError('Parolele nu coincid');
@@ -71,12 +82,16 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
       if (signUpError) throw signUpError;
 
       if (data.user) {
-        setError(null);
-        alert('Contul a fost creat! Verifică email-ul pentru confirmare.');
-        setActiveTab('login');
+        setSuccess('Contul a fost creat! Verifică email-ul pentru confirmare.');
         setRegisterEmail('');
         setRegisterPassword('');
         setRegisterConfirmPassword('');
+        
+        // Switch to login tab after 3 seconds
+        setTimeout(() => {
+          setActiveTab('login');
+          setSuccess(null);
+        }, 3000);
       }
     } catch (err: any) {
       setError(err.message || 'Înregistrare eșuată. Încearcă din nou.');
@@ -106,6 +121,13 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 flex items-start gap-2">
             <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-red-500">{error}</p>
+          </div>
+        )}
+
+        {success && (
+          <div className="bg-green-500/10 border border-green-500/50 rounded-lg p-3 flex items-start gap-2">
+            <AlertCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-green-500">{success}</p>
           </div>
         )}
 
