@@ -34,12 +34,13 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   const [isMounted, setIsMounted] = useState(false)
 
   // Detect mobile viewport - only on client side to avoid hydration mismatch
+  // Using 1024px breakpoint (lg) for true mobile-first layout
   useEffect(() => {
     setIsMounted(true)
     
     const checkMobile = () => {
       if (typeof window !== 'undefined') {
-        setIsMobile(window.innerWidth < 768)
+        setIsMobile(window.innerWidth < 1024)
       }
     }
     
@@ -103,7 +104,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         {/* Left Sidebar - Initial render without mobile detection */}
         <div style={{
           width: '220px',
-          background: '#1f2937',
+          background: '#0A2239',
           position: 'fixed',
           height: '100vh',
           display: 'flex',
@@ -112,12 +113,12 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         }}>
           <div style={{
             padding: '20px 16px',
-            borderBottom: '1px solid #374151',
+            borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
           }}>
             <div style={{
               fontSize: '16px',
               fontWeight: '700',
-              color: '#d4af37',
+              color: '#D4AF37',
               letterSpacing: '0.5px',
             }}>
               XDrive Logistics LTD
@@ -155,25 +156,46 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
       overflow: 'hidden',
       background: '#f4f5f7',
     }}>
-      {/* Mobile Menu Toggle */}
+      {/* Mobile Header with Hamburger Menu */}
       {isMobile && (
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          style={{
-            position: 'fixed',
-            top: '10px',
-            left: '10px',
-            zIndex: 100,
-            background: '#1f2937',
-            color: '#ffffff',
-            border: 'none',
-            padding: '8px 12px',
-            cursor: 'pointer',
-            fontSize: '20px',
-          }}
-        >
-          ☰
-        </button>
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '56px',
+          background: '#0A2239',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 16px',
+          zIndex: 100,
+          borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
+        }}>
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            style={{
+              background: 'transparent',
+              color: '#D4AF37',
+              border: 'none',
+              padding: '8px 12px',
+              cursor: 'pointer',
+              fontSize: '24px',
+              lineHeight: '1',
+            }}
+          >
+            ☰
+          </button>
+          <div style={{
+            fontSize: '16px',
+            fontWeight: '700',
+            color: '#D4AF37',
+            letterSpacing: '0.5px',
+          }}>
+            XDrive Logistics
+          </div>
+          <div style={{ width: '48px' }} /> {/* Spacer for centering */}
+        </div>
       )}
 
       {/* Mobile Overlay */}
@@ -192,13 +214,13 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         />
       )}
 
-      {/* Left Sidebar - CX Style */}
+      {/* Left Sidebar - Mobile-First: Hidden on mobile (< 1024px) */}
       <div style={{
         width: '220px',
-        background: '#1f2937',
+        background: '#0A2239',
         position: 'fixed',
         height: '100vh',
-        display: 'flex',
+        display: isMobile && !isMobileMenuOpen ? 'none' : 'flex',
         flexDirection: 'column',
         zIndex: 50,
         left: isMobile ? (isMobileMenuOpen ? '0' : '-220px') : '0',
@@ -207,12 +229,12 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         {/* Logo/Brand */}
         <div style={{
           padding: '20px 16px',
-          borderBottom: '1px solid #374151',
+          borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
         }}>
           <div style={{
             fontSize: '16px',
             fontWeight: '700',
-            color: '#d4af37',
+            color: '#D4AF37',
             letterSpacing: '0.5px',
           }}>
             XDrive Logistics LTD
@@ -247,8 +269,8 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                   padding: '10px 16px',
                   cursor: 'pointer',
                   color: isActive ? '#ffffff' : '#d1d5db',
-                  background: isActive ? '#374151' : 'transparent',
-                  borderLeft: isActive ? '3px solid #d4af37' : '3px solid transparent',
+                  background: isActive ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
+                  borderLeft: isActive ? '3px solid #D4AF37' : '3px solid transparent',
                   fontSize: '13px',
                   fontWeight: isActive ? '600' : '500',
                   transition: 'all 0.15s',
@@ -256,7 +278,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.background = '#2d3748'
+                    e.currentTarget.style.background = 'rgba(212, 175, 55, 0.08)'
                     e.currentTarget.style.color = '#ffffff'
                   }
                 }}
@@ -276,7 +298,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         {/* Footer */}
         <div style={{
           padding: '16px',
-          borderTop: '1px solid #374151',
+          borderTop: '1px solid rgba(212, 175, 55, 0.2)',
           fontSize: '11px',
           color: '#9ca3af',
         }}>
@@ -288,39 +310,35 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
       <div style={{
         flex: 1,
         marginLeft: isMobile ? '0' : '220px',
+        marginTop: isMobile ? '56px' : '0',
         display: 'flex',
         flexDirection: 'column',
         height: '100vh',
       }}>
-        {/* Top Navigation Bar */}
+        {/* Top Navigation Bar - Hidden on mobile since we have header */}
         <div style={{
-          height: isMobile ? 'auto' : '56px',
+          display: isMobile ? 'none' : 'flex',
+          height: '56px',
           minHeight: '56px',
           background: '#ffffff',
           borderBottom: '1px solid #e5e7eb',
-          display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: isMobile ? '10px 50px 10px 50px' : '0 24px',
+          padding: '0 24px',
           position: 'sticky',
           top: 0,
           zIndex: 40,
-          gap: isMobile ? '10px' : '0',
         }}>
           {/* Left side - Action buttons */}
           <div style={{
             display: 'flex',
             gap: '12px',
             alignItems: 'center',
-            flexWrap: 'wrap',
-            justifyContent: isMobile ? 'center' : 'flex-start',
-            width: isMobile ? '100%' : 'auto',
           }}>
             <button
               onClick={() => router.push('/jobs/new')}
               style={{
-                background: '#d4af37',
+                background: '#D4AF37',
                 color: '#ffffff',
                 border: 'none',
                 padding: '8px 16px',
@@ -334,7 +352,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                 e.currentTarget.style.background = '#c29d2f'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#d4af37'
+                e.currentTarget.style.background = '#D4AF37'
               }}
             >
               POST LOAD
@@ -343,7 +361,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             <button
               onClick={() => router.push('/loads')}
               style={{
-                background: '#1f2937',
+                background: '#0A2239',
                 color: '#ffffff',
                 border: 'none',
                 padding: '8px 16px',
@@ -354,10 +372,10 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                 letterSpacing: '0.5px',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#111827'
+                e.currentTarget.style.background = '#081729'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#1f2937'
+                e.currentTarget.style.background = '#0A2239'
               }}
             >
               BOOK DIRECT
@@ -369,9 +387,6 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             display: 'flex',
             gap: '16px',
             alignItems: 'center',
-            flexWrap: 'wrap',
-            justifyContent: isMobile ? 'center' : 'flex-end',
-            width: isMobile ? '100%' : 'auto',
           }}>
             {/* Notifications */}
             {totalNotifications > 0 && (
@@ -450,10 +465,64 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         <div style={{
           flex: 1,
           overflowY: 'auto',
-          padding: '20px',
+          padding: isMobile ? '16px' : '24px 32px',
         }}>
           {children}
         </div>
+
+        {/* Mobile Action Bar - Sticky at bottom */}
+        {isMobile && (
+          <div style={{
+            position: 'sticky',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            background: '#ffffff',
+            borderTop: '1px solid #e5e7eb',
+            padding: '12px 16px',
+            display: 'flex',
+            gap: '12px',
+            zIndex: 40,
+          }}>
+            <button
+              onClick={() => router.push('/jobs/new')}
+              style={{
+                flex: 1,
+                background: '#D4AF37',
+                color: '#ffffff',
+                border: 'none',
+                padding: '12px 16px',
+                fontSize: '13px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                borderRadius: '4px',
+              }}
+            >
+              POST LOAD
+            </button>
+            
+            <button
+              onClick={() => router.push('/loads')}
+              style={{
+                flex: 1,
+                background: '#0A2239',
+                color: '#ffffff',
+                border: 'none',
+                padding: '12px 16px',
+                fontSize: '13px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                borderRadius: '4px',
+              }}
+            >
+              BOOK DIRECT
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
