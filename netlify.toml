@@ -1,21 +1,9 @@
 [build]
   command = "npm run build"
-  publish = ".next"
-  ignore = "exit 0"  # Deploy freeze: Manual deploys only until portal UI complete
+  publish = "dist"
 
-# Use Netlify's Next.js plugin for proper Next.js support
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
-
-# Environment variables - Set these in Netlify UI:
-# NEXT_PUBLIC_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
-# NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
-# NEXT_PUBLIC_SITE_URL=https://xdrivelogistics.co.uk
+# SPA fallback (important pentru React Router / refresh)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
