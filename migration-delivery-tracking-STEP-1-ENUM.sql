@@ -1,5 +1,5 @@
 -- ============================================================
--- XDRIVE LOGISTICS - DELIVERY TRACKING SYSTEM
+-- XDrive Logistics LTD - DELIVERY TRACKING SYSTEM
 -- STEP 1: Add ENUM Value (MUST RUN FIRST, SEPARATELY)
 -- 
 -- IMPORTANT: This MUST be run in a separate transaction BEFORE

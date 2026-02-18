@@ -1,5 +1,5 @@
 -- ============================================================
--- XDRIVE LOGISTICS - DELIVERY TRACKING SYSTEM MIGRATION (FIXED)
+-- XDrive Logistics LTD - DELIVERY TRACKING SYSTEM MIGRATION (FIXED)
 -- Phase 1: Database Schema Extensions
 -- Run this in Supabase SQL Editor AFTER main schema
 -- 

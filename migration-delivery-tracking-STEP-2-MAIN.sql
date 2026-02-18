@@ -1,5 +1,5 @@
 -- ============================================================
--- XDRIVE LOGISTICS - DELIVERY TRACKING SYSTEM
+-- XDrive Logistics LTD - DELIVERY TRACKING SYSTEM
 -- STEP 2: Main Migration (RUN AFTER STEP 1)
 -- 
 -- PREREQUISITE: Run migration-delivery-tracking-STEP-1-ENUM.sql FIRST

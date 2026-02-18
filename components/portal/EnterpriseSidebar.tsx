@@ -52,7 +52,7 @@ export default function EnterpriseSidebar() {
             color: '#d4af37',
             letterSpacing: '0.5px',
           }}>
-            XDRIVE LOGISTICS
+            XDrive Logistics LTD
           </div>
           <div style={{
             fontSize: '11px',

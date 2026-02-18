@@ -1,5 +1,5 @@
 -- ============================================================
--- XDRIVE LOGISTICS - DELIVERY TRACKING SYSTEM MIGRATION
+-- XDrive Logistics LTD - DELIVERY TRACKING SYSTEM MIGRATION
 -- Phase 1: Database Schema Extensions
 -- Run this in Supabase SQL Editor AFTER main schema
 -- ============================================================

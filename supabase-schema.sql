@@ -1,5 +1,5 @@
 -- ============================================================
--- XDRIVE LOGISTICS - MULTI-TENANT SUPABASE SCHEMA
+-- XDrive Logistics LTD - MULTI-TENANT SUPABASE SCHEMA
 -- Complete SQL Script for Real Data Integration
 -- Run this in Supabase SQL Editor
 -- ============================================================
