@@ -15,7 +15,7 @@ interface Driver {
   license_number: string | null
   phone: string | null
   email: string | null
-  status: string
+  is_active: boolean
   created_at: string
 }
 
@@ -25,7 +25,7 @@ interface Vehicle {
   vehicle_type: string | null
   make: string | null
   model: string | null
-  status: string
+  is_available: boolean
   created_at: string
 }
 
@@ -125,8 +125,8 @@ export default function DriversVehiclesPage() {
                         {driver.license_number || '—'}
                       </div>
                       <div>
-                        <span className={`status-badge ${driver.status === 'active' ? 'completed' : 'pending'}`}>
-                          {driver.status || 'active'}
+                        <span className={`status-badge ${driver.is_active ? 'completed' : 'pending'}`}>
+                          {driver.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </div>
                     </div>
@@ -174,8 +174,8 @@ export default function DriversVehiclesPage() {
                         {vehicle.model && ` ${vehicle.model}`}
                       </div>
                       <div>
-                        <span className={`status-badge ${vehicle.status === 'active' ? 'completed' : 'pending'}`}>
-                          {vehicle.status || 'active'}
+                        <span className={`status-badge ${vehicle.is_available ? 'completed' : 'pending'}`}>
+                          {vehicle.is_available ? 'Available' : 'Unavailable'}
                         </span>
                       </div>
                     </div>
