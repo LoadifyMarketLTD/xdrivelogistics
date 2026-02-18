@@ -2,6 +2,14 @@
 -- INVOICE SYSTEM - QUICK START SQL
 -- Minimal version - copy and paste in Supabase SQL Editor
 -- ============================================================
+-- ✅ Safe to run: Folosește IF NOT EXISTS - nu va șterge date
+-- ✅ Idempotent: Poți rula de mai multe ori fără probleme
+-- ⚠️ Requires: Tabelele companies și jobs trebuie să existe deja
+-- ⚠️ Requires: Tabelul profiles trebuie să aibă coloana company_id
+--
+-- NOTĂ: Pentru verificări automate, folosește INVOICE_SQL_WITH_CHECKS.sql
+--        Pentru verificare prerequisite, folosește CHECK_PREREQUISITES.sql
+-- ============================================================
 
 -- Create invoices table
 CREATE TABLE IF NOT EXISTS public.invoices (
