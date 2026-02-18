@@ -1,27 +1,37 @@
 # 🎯 SQL CODE AICI - COPIAZĂ ȘI RULEAZĂ
 
-## ⚠️ ATENȚIE - EROARE COMUNĂ!
+## ⚠️ ATENȚIE - ERORI COMUNE!
 
 ### ❌ NU face asta:
 ```
 SQL_CODE_AICI.sql   ← GREȘIT! Acesta e doar un nume de fișier!
 ```
 
-Dacă ai încercat să rulezi text de mai sus și ai primit eroarea:
-```
-ERROR: syntax error at or near "SQL_CODE_AICI"
+### ❌ NU copia asta:
+```sql
+CREATE TABLE public.invoices (
+  id UUID ...,
+  ...   ← GREȘIT! "..." NU este cod SQL valid!
+);
 ```
 
-**Este pentru că ai copiat NUMELE fișierului, nu CONȚINUTUL!**
+### Erori pe care le poți primi:
 
-📖 **[CITEȘTE SOLUȚIA COMPLETĂ AICI: FIX_EROARE_SQL_CODE_AICI.md](FIX_EROARE_SQL_CODE_AICI.md)**
+1. **"syntax error at or near SQL_CODE_AICI"**
+   - **Cauză:** Ai copiat NUMELE fișierului, nu conținutul
+   - **Soluție:** [FIX_EROARE_SQL_CODE_AICI.md](FIX_EROARE_SQL_CODE_AICI.md)
+
+2. **"syntax error at or near .."**
+   - **Cauză:** Ai copiat cod cu `...` (trei puncte) ca placeholders
+   - **Soluție:** [FIX_EROARE_ELLIPSIS_SQL.md](FIX_EROARE_ELLIPSIS_SQL.md) ⭐
 
 ---
 
 ## 📁 FIȘIERUL CU COD SQL
 
 ### ➡️ **Deschide fișierul: `SQL_CODE_AICI.sql`** ⬅️
-### ✅ **Apoi copiază TOT conținutul din el!** ✅
+### ✅ **Apoi copiază TOT conținutul din el (113 linii)!** ✅
+### ❌ **NU copia versiuni cu "..." (placeholders)!** ❌
 
 ---
 
@@ -29,17 +39,20 @@ ERROR: syntax error at or near "SQL_CODE_AICI"
 
 ### Pasul 1: Deschide fișierul în editor
 - NU copia numele "SQL_CODE_AICI.sql"
+- NU copia cod cu "..." (trei puncte)
 - Deschide fișierul în VS Code / GitHub / Editor
-- Click pe fișier pentru a vedea conținutul
+- Click pe fișier pentru a vedea conținutul complet
 
 ### Pasul 2: Selectează TOT conținutul din fișier
 - Selectează tot (Ctrl+A sau Cmd+A)
-- Trebuie să vezi cod SQL (CREATE TABLE, CREATE FUNCTION, etc.)
+- Trebuie să vezi cod SQL complet (CREATE TABLE, CREATE FUNCTION, etc.)
 - NU doar numele fișierului!
+- NU cod cu "..."!
 
 ### Pasul 3: Copiază conținutul
 - Copiază (Ctrl+C sau Cmd+C)
 - Conținutul trebuie să înceapă cu: `-- ============================================================`
+- Trebuie să ai ~113 linii, nu doar 10-20 linii!
 
 ### Pasul 3: Deschide Supabase
 - Mergi pe https://supabase.com

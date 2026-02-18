@@ -5,8 +5,14 @@
 -- ❌ NU COPIA DOAR: "SQL_CODE_AICI.sql"
 -- ✅ COPIAZĂ ÎNTREG CONȚINUTUL DIN ACEST FIȘIER!
 --
--- Dacă vezi eroarea: "syntax error at or near SQL_CODE_AICI"
--- Înseamnă că ai copiat NUMELE fișierului, nu CONȚINUTUL!
+-- ❌ NU COPIA COD CU "..." (trei puncte)!
+-- ✅ COPIAZĂ CODUL COMPLET (TOATE cele 113 linii)!
+--
+-- ERORI COMUNE:
+-- - "syntax error at or near SQL_CODE_AICI" = ai copiat NUMELE
+-- - "syntax error at or near .." = ai copiat cod cu ... (placeholders)
+--
+-- SOLUȚIE: Copiază TOT din ACEST fișier, fără ... (placeholders)!
 --
 -- ============================================================
 -- SQL CODE PENTRU INVOICE - COPIAZĂ ȘI RULEAZĂ ÎN SUPABASE
@@ -20,8 +26,10 @@
 -- 4. Lipește în SQL Editor (Ctrl+V) / Paste in SQL Editor (Ctrl+V)
 -- 5. Apasă "Run" / Click "Run"
 -- 
--- Trebuie să vezi codul SQL de mai jos, NU doar numele fișierului!
--- You must see the SQL code below, NOT just the filename!
+-- VERIFICĂ: Trebuie să vezi:
+-- - TOT codul SQL de mai jos (113 linii)
+-- - NU doar numele fișierului
+-- - NU cod cu "..." (trei puncte)
 -- 
 -- ============================================================
 
