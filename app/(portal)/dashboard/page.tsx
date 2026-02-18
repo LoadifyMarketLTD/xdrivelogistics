@@ -60,7 +60,7 @@ export default function DashboardPage() {
         // Fetch accepted bids/loads
         const { data: acceptedBids, error: acceptedError } = await supabase
           .from('job_bids')
-          .select('*')
+          .select('*, job:jobs!job_bids_job_id_fkey(*)')
           .eq('bidder_company_id', companyId)
           .eq('status', 'accepted')
         
