@@ -17,8 +17,8 @@ export default function DiagnosticsPage() {
   useEffect(() => {
     const runDiagnostics = async () => {
       const timestamp = new Date().toISOString()
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+      const url = import.meta.env.VITE_SUPABASE_URL || ''
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
       
       // Extract domain from URL
       let urlDomain = ''
@@ -117,7 +117,7 @@ export default function DiagnosticsPage() {
         </h2>
         <div style={{ lineHeight: '1.8' }}>
           <div>
-            <strong>NEXT_PUBLIC_SUPABASE_URL:</strong>{' '}
+            <strong>VITE_SUPABASE_URL:</strong>{' '}
             <span style={{ color: diagnostics.hasUrl ? '#4ade80' : '#ff6b6b' }}>
               {diagnostics.hasUrl ? '✓ Present' : '✗ MISSING'}
             </span>
@@ -129,7 +129,7 @@ export default function DiagnosticsPage() {
           )}
           
           <div style={{ marginTop: '10px' }}>
-            <strong>NEXT_PUBLIC_SUPABASE_ANON_KEY:</strong>{' '}
+            <strong>VITE_SUPABASE_ANON_KEY:</strong>{' '}
             <span style={{ color: diagnostics.anonKeyPrefix !== 'MISSING' ? '#4ade80' : '#ff6b6b' }}>
               {diagnostics.anonKeyPrefix !== 'MISSING' ? '✓ Present' : '✗ MISSING'}
             </span>

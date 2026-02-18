@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 
 // Check if we're in a browser environment (runtime) vs build time
 const isBrowser = typeof window !== 'undefined'
@@ -11,8 +11,8 @@ if (isBrowser && (!supabaseUrl || !supabaseAnonKey)) {
   throw new Error(
     '❌ Missing Supabase credentials!\n' +
     'Required environment variables:\n' +
-    '- NEXT_PUBLIC_SUPABASE_URL\n' +
-    '- NEXT_PUBLIC_SUPABASE_ANON_KEY\n\n' +
+    '- VITE_SUPABASE_URL\n' +
+    '- VITE_SUPABASE_ANON_KEY\n\n' +
     'Please set these in your Netlify environment variables.\n' +
     'See NETLIFY_SETUP.md for instructions.'
   )
