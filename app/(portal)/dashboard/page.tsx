@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
+import ErrorBanner from '@/components/ErrorBanner'
+import EmptyState from '@/components/EmptyState'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
@@ -27,6 +29,7 @@ export default function DashboardPage() {
     revenue: 0,
   })
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!companyId) return
@@ -36,6 +39,7 @@ export default function DashboardPage() {
     const fetchData = async () => {
       try {
         setLoading(true)
+        setError(null)
         
         // Fetch all jobs for total loads
         const { data: allJobs, error: allJobsError } = await supabase
@@ -89,6 +93,9 @@ export default function DashboardPage() {
         })
       } catch (err: any) {
         console.error('Error fetching dashboard data:', err)
+        if (mounted) {
+          setError(err.message || 'Failed to load dashboard data')
+        }
       } finally {
         if (mounted) {
           setLoading(false)
@@ -112,6 +119,25 @@ export default function DashboardPage() {
   }
 
   return (
+    <div style={{ maxWidth: '1400px' }}>
+      {error && (
+        <ErrorBanner 
+          error={error} 
+          onRetry={() => window.location.reload()}
+          onDismiss={() => setError(null)}
+        />
+      )}
+      
+      <h1 style={{
+        fontSize: '20px',
+        fontWeight: '700',
+        color: '#1f2937',
+        marginBottom: '20px',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px',
+      }}>
+        Dashboard
+      </h1>
     <div className="portal-layout">
       <div className="portal-header">
         <h1 className="portal-title">Dashboard</h1>
