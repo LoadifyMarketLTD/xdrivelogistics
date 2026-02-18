@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
+import ResponsiveContainer from '@/components/layout/ResponsiveContainer'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
@@ -161,35 +162,39 @@ export default function CompanySettingsPage() {
   }
 
   return (
-    <div className="portal-layout">
-      <div className="portal-header">
-        <h1 className="portal-title">Company Settings</h1>
+    <ResponsiveContainer maxWidth="md">
+      <div style={{ marginBottom: 'clamp(24px, 3vw, 32px)' }}>
+        <h1 style={{
+          fontSize: 'clamp(1.25rem, 2vw, 1.75rem)',
+          fontWeight: '700',
+          color: '#1f2937',
+          marginBottom: '8px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px',
+        }}>
+          Company Settings
+        </h1>
+        <p style={{
+          fontSize: 'clamp(0.875rem, 1.2vw, 1rem)',
+          color: '#6b7280',
+        }}>
+          Manage your company details and information.
+        </p>
       </div>
 
-      <main className="portal-main">
-        <div className="portal-card">
-          <div>
-            <h1 className="section-title">
-              Company Settings
-            </h1>
-            <p className="section-subtitle">
-              Manage your company details and information.
-            </p>
-          </div>
+      {error && (
+        <div className="alert alert-error">
+          {error}
+        </div>
+      )}
 
-          {error && (
-            <div className="alert alert-error">
-              {error}
-            </div>
-          )}
+      {success && (
+        <div className="alert alert-success">
+          ✓ Company details updated successfully!
+        </div>
+      )}
 
-          {success && (
-            <div className="alert alert-success">
-              ✓ Company details updated successfully!
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
             {/* Basic Information */}
             <div className="form-section">
               <h2 className="form-section-title">
@@ -368,8 +373,6 @@ export default function CompanySettingsPage() {
               </button>
             </div>
           </form>
-        </div>
-      </main>
-    </div>
+        </ResponsiveContainer>
   )
 }
