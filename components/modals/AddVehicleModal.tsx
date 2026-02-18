@@ -87,9 +87,17 @@ export default function AddVehicleModal({ companyId, onClose, onSuccess }: AddVe
                 className="form-input"
               >
                 <option value="">Select type...</option>
+                <option value="Moto">Moto</option>
+                <option value="Car">Car</option>
                 <option value="Van">Van</option>
-                <option value="Truck">Truck</option>
+                <option value="SWB">SWB (Short Wheel Base)</option>
+                <option value="MWB">MWB (Medium Wheel Base)</option>
+                <option value="LWB">LWB (Long Wheel Base)</option>
+                <option value="XLWB">XLWB (Extra Long Wheel Base)</option>
+                <option value="Luton Van">Luton Van</option>
+                <option value="Curtain Side">Curtain Side</option>
                 <option value="Lorry">Lorry</option>
+                <option value="Truck">Truck</option>
                 <option value="Trailer">Trailer</option>
               </select>
             </div>

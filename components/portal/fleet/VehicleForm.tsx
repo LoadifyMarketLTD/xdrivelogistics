@@ -81,11 +81,18 @@ export default function VehicleForm({ vehicle, onSave, onCancel }: VehicleFormPr
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', marginBottom: '6px' }}>Vehicle Type *</label>
               <select value={formData.vehicle_type} onChange={(e) => setFormData(prev => ({ ...prev, vehicle_type: e.target.value }))} className="portal-filter-input" style={{ width: '100%' }}>
+                <option value="Moto">Moto</option>
+                <option value="Car">Car</option>
                 <option value="Van">Van</option>
+                <option value="SWB">SWB (Short Wheel Base)</option>
+                <option value="MWB">MWB (Medium Wheel Base)</option>
+                <option value="LWB">LWB (Long Wheel Base)</option>
+                <option value="XLWB">XLWB (Extra Long Wheel Base)</option>
                 <option value="Luton Van">Luton Van</option>
+                <option value="Curtain Side">Curtain Side</option>
                 <option value="Lorry">Lorry</option>
                 <option value="Truck">Truck</option>
-                <option value="Car">Car</option>
+                <option value="Trailer">Trailer</option>
               </select>
             </div>
             
