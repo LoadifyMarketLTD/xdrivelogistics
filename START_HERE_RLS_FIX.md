@@ -1,5 +1,19 @@
 # 🚀 START HERE - Company Membership RLS Fix
 
+## ⚠️ IMPORTANT WARNING
+
+**DO NOT copy text with arrows (→) or numbered instructions!**
+
+Those are **explanations**, NOT SQL queries. They will cause syntax errors.
+
+**ONLY run the actual SQL files:**
+- `fix-company-membership-rls.sql` (the fix)
+- `diagnostic-company-membership.sql` (the verification)
+
+**Confused?** Read `SIMPLE_SQL_GUIDE.md` for step-by-step instructions.
+
+---
+
 ## ⚡ QUICK FIX (2 minutes)
 
 Your company membership is not being recognized by Row Level Security (RLS), blocking access to vehicles, loads, and drivers.
@@ -63,8 +77,10 @@ Your company membership is not being recognized by Row Level Security (RLS), blo
 2. ✅ Do you have active membership? (`company_memberships.status = 'active'`)
 3. ✅ Is your profile linked? (`profiles.company_id = company_id`)
 
-**Before:** Only checked #2 or #3 (not #1) → FALSE for creators  
-**After:** Checks ALL three conditions → TRUE for creators and members
+**Note:** The above are descriptions, not SQL to run!
+
+**Before:** Only checked #2 or #3 (not #1) = FALSE for creators  
+**After:** Checks ALL three conditions = TRUE for creators and members
 
 ### Adds Auto-Trigger:
 - When company is created → automatically creates membership
@@ -80,16 +96,19 @@ Your company membership is not being recognized by Row Level Security (RLS), blo
 ## 🔍 HOW TO VERIFY IT WORKED
 
 ### Expected Result in Diagnostic:
+
+**NOTE:** This is example output, not SQL to run!
+
 ```json
 {
   "company_membership_status": [
     {
       "company_id": "your-company-id",
       "company_name": "Your Company",
-      "is_member": true,           // ✅ Should be TRUE
-      "created_by_me": true,       // ✅ You created it
-      "in_memberships": true,      // ✅ Has membership record
-      "rls_status": "✅ TRUE - Access Granted"  // ✅ RLS allows access
+      "is_member": true,           // This should be TRUE
+      "created_by_me": true,       // You created it
+      "in_memberships": true,      // Has membership record
+      "rls_status": "Access Granted"  // RLS allows access
     }
   ]
 }

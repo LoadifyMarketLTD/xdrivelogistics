@@ -1,5 +1,17 @@
 # Company Membership RLS Fix - Complete Documentation
 
+## ⚠️ IMPORTANT: Do Not Run Documentation Text as SQL
+
+**This file contains explanations and examples.**
+
+**DO NOT copy text with arrows (→) or numbered instructions - those are NOT SQL!**
+
+**TO RUN THE FIX:** Open and run the file `fix-company-membership-rls.sql` in Supabase SQL Editor.
+
+**Confused about what to run?** Read `SIMPLE_SQL_GUIDE.md` first.
+
+---
+
 ## 🎯 PROBLEM SUMMARY
 
 **Issue:** `is_company_member(company_id)` returns **FALSE** when it should return **TRUE**, blocking Row Level Security (RLS) access to:
@@ -68,21 +80,30 @@
 
 ## 🔧 DEPLOYMENT STEPS
 
+**IMPORTANT:** The numbered steps below are instructions, NOT SQL queries!
+
 ### Step 1: Run the Fix
-```sql
--- In Supabase SQL Editor:
--- 1. Copy entire contents of fix-company-membership-rls.sql
--- 2. Execute
--- 3. Watch for success messages
+
+**In Supabase SQL Editor:**
+- Open the file `fix-company-membership-rls.sql` in a text editor
+- Copy the ENTIRE file contents
+- Paste into Supabase SQL Editor
+- Click the Run button
+- Wait for success messages
+
+**What you'll see:**
+```
+✅ Company Membership RLS Fix Applied Successfully!
 ```
 
 ### Step 2: Verify the Fix
-```sql
--- In Supabase SQL Editor:
--- 1. Copy entire contents of diagnostic-company-membership.sql  
--- 2. Execute
--- 3. Check is_member_result = TRUE
-```
+
+**In Supabase SQL Editor:**
+- Open the file `diagnostic-company-membership.sql` in a text editor
+- Copy the ENTIRE file contents
+- Paste into Supabase SQL Editor
+- Click the Run button
+- Check that `is_member_result` shows `TRUE`
 
 ### Step 3: Test RLS Access
 ```sql
