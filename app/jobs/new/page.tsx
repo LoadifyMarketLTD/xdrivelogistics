@@ -41,11 +41,53 @@ export default function PostJobPage() {
     }
   }, [authLoading, user, companyId, router])
 
+  // Round time to nearest 30-minute interval
+  const roundToNearest30Minutes = (datetimeValue: string): string => {
+    if (!datetimeValue) return ''
+    
+    try {
+      const date = new Date(datetimeValue)
+      const minutes = date.getMinutes()
+      
+      // Round to nearest 30 minutes (0 or 30)
+      const roundedMinutes = minutes < 15 ? 0 : minutes < 45 ? 30 : 0
+      const hourAdjustment = minutes >= 45 ? 1 : 0
+      
+      date.setMinutes(roundedMinutes)
+      date.setSeconds(0)
+      date.setMilliseconds(0)
+      date.setHours(date.getHours() + hourAdjustment)
+      
+      // Return in datetime-local format (YYYY-MM-DDTHH:MM)
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const mins = String(date.getMinutes()).padStart(2, '0')
+      
+      return `${year}-${month}-${day}T${hours}:${mins}`
+    } catch (error) {
+      console.error('Error rounding datetime:', error)
+      return datetimeValue
+    }
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }))
+    const { name, value } = e.target
+    
+    // For datetime fields, enforce 30-minute intervals
+    if (name === 'pickup_datetime' || name === 'delivery_datetime') {
+      const roundedValue = roundToNearest30Minutes(value)
+      setFormData(prev => ({
+        ...prev,
+        [name]: roundedValue
+      }))
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }))
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -211,6 +253,7 @@ export default function PostJobPage() {
                     name="pickup_datetime"
                     value={formData.pickup_datetime}
                     onChange={handleChange}
+                    step="1800"
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -221,6 +264,9 @@ export default function PostJobPage() {
                       fontSize: '14px'
                     }}
                   />
+                  <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
+                    Times are rounded to 30-minute intervals
+                  </div>
                 </div>
 
                 <div>
@@ -232,6 +278,7 @@ export default function PostJobPage() {
                     name="delivery_datetime"
                     value={formData.delivery_datetime}
                     onChange={handleChange}
+                    step="1800"
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -242,6 +289,9 @@ export default function PostJobPage() {
                       fontSize: '14px'
                     }}
                   />
+                  <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
+                    Times are rounded to 30-minute intervals
+                  </div>
                 </div>
               </div>
 
