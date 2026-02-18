@@ -2,6 +2,13 @@
 -- INVOICE SQL - To run in Supabase SQL Editor
 -- SQL pentru INVOICE - De rulat în Supabase SQL Editor
 -- ============================================================
+-- ✅ Safe to run: Folosește IF NOT EXISTS - nu va șterge date
+-- ✅ Idempotent: Poți rula de mai multe ori fără probleme
+-- ⚠️ Requires: Tabelele companies și jobs trebuie să existe deja
+-- ⚠️ Requires: Tabelul profiles trebuie să aibă coloana company_id
+--
+-- NOTĂ: Pentru versiune completă cu verificări, vezi SQL_CODE_AICI.sql
+-- ============================================================
 
 -- 1. CREATE INVOICES TABLE / CREEAZĂ TABELUL INVOICES
 -- ============================================================
@@ -24,6 +31,7 @@ CREATE TABLE IF NOT EXISTS public.invoices (
 );
 
 -- 2. AUTO-GENERATE INVOICE NUMBER / AUTO-GENEREAZĂ NUMĂRUL FACTURII
+-- Auto-generate invoice numbers (INV-2026-1001, INV-2026-1002, etc.)
 -- ============================================================
 CREATE SEQUENCE IF NOT EXISTS invoice_number_seq START 1001;
 
