@@ -84,7 +84,7 @@ export default function Footer() {
             fontSize: '1rem',
             opacity: 0.9,
           }}>
-            📞 07423 272138 | ✉️ contact@xdrivelogistics.co.uk
+            📞 07423 272138 | ✉️ xdrivelogisticsltd@gmail.com
           </div>
           <div style={{
             fontSize: '0.875rem',
@@ -159,7 +159,7 @@ export default function Footer() {
                 color: 'var(--text)',
               }}>
                 <div>📞 07423 272138</div>
-                <div>✉️ contact@xdrivelogistics.co.uk</div>
+                <div>✉️ xdrivelogisticsltd@gmail.com</div>
                 <div>📍 Blackburn, Lancashire, UK</div>
               </div>
             </div>

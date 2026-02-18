@@ -163,7 +163,7 @@
 - Heading: "Gata să Transformi Transportul?"
 - Description paragraph
 - CTAs: "Creează Cont Gratuit" + "Sună Acum"
-- Contact: 📞 07423 272138 | ✉️ contact@xdrivelogistics.co.uk
+- Contact: 📞 07423 272138 | ✉️ xdrivelogisticsltd@gmail.com
 - Benefits: ✓ Înregistrare gratuită • ✓ Fără comisioane ascunse • ✓ Anulare oricând
 
 **Main Footer**:
@@ -171,7 +171,7 @@
   - Logo
   - Description
   - 📞 07423 272138
-  - ✉️ contact@xdrivelogistics.co.uk
+  - ✉️ xdrivelogisticsltd@gmail.com
   - 📍 Blackburn, Lancashire, UK
 
 - **Companie Links**: Despre Noi, Echipa, Cariere, Blog
