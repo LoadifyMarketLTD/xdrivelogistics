@@ -39,14 +39,38 @@ WHERE table_name = 'jobs'
 ORDER BY ordinal_position;
 
 -- Step 2: Rename old columns if they exist
-ALTER TABLE public.jobs 
-  RENAME COLUMN company_id TO posted_by_company_id;
+-- Note: These will error if columns don't exist (already correct schema)
+-- If you get "column does not exist" errors, skip to Step 3
 
-ALTER TABLE public.jobs 
-  RENAME COLUMN pickup TO pickup_location;
+DO $$ 
+BEGIN
+  -- Rename company_id to posted_by_company_id if it exists
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'jobs' AND column_name = 'company_id'
+  ) THEN
+    ALTER TABLE public.jobs RENAME COLUMN company_id TO posted_by_company_id;
+    RAISE NOTICE 'Renamed company_id to posted_by_company_id';
+  END IF;
 
-ALTER TABLE public.jobs 
-  RENAME COLUMN delivery TO delivery_location;
+  -- Rename pickup to pickup_location if it exists
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'jobs' AND column_name = 'pickup'
+  ) THEN
+    ALTER TABLE public.jobs RENAME COLUMN pickup TO pickup_location;
+    RAISE NOTICE 'Renamed pickup to pickup_location';
+  END IF;
+
+  -- Rename delivery to delivery_location if it exists
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'jobs' AND column_name = 'delivery'
+  ) THEN
+    ALTER TABLE public.jobs RENAME COLUMN delivery TO delivery_location;
+    RAISE NOTICE 'Renamed delivery to delivery_location';
+  END IF;
+END $$;
 
 -- Step 3: Add missing budget column
 -- This combines price and cost into a single budget field
@@ -180,23 +204,41 @@ WHERE table_name = 'jobs'
 ORDER BY column_name;
 
 -- Test insert with new schema
-INSERT INTO public.jobs (
-  posted_by_company_id,
-  pickup_location,
-  delivery_location,
-  budget,
-  status
-) VALUES (
-  (SELECT id FROM public.companies LIMIT 1),  -- Use first company
-  'Test Location A',
-  'Test Location B',
-  100.00,
-  'open'
-)
-RETURNING id, status, budget;
-
--- If the insert succeeds, delete the test record:
--- DELETE FROM public.jobs WHERE pickup_location = 'Test Location A';
+-- NOTE: This requires at least one company to exist in the database
+DO $$
+DECLARE
+  test_company_id UUID;
+  test_job_id UUID;
+BEGIN
+  -- Get first company or skip if none exist
+  SELECT id INTO test_company_id FROM public.companies LIMIT 1;
+  
+  IF test_company_id IS NULL THEN
+    RAISE NOTICE 'No companies found - skipping test insert. Create a company first.';
+  ELSE
+    -- Insert test job
+    INSERT INTO public.jobs (
+      posted_by_company_id,
+      pickup_location,
+      delivery_location,
+      budget,
+      status
+    ) VALUES (
+      test_company_id,
+      'Test Location A',
+      'Test Location B',
+      100.00,
+      'open'
+    )
+    RETURNING id INTO test_job_id;
+    
+    RAISE NOTICE 'Test job created successfully with ID: %', test_job_id;
+    
+    -- Clean up test job
+    DELETE FROM public.jobs WHERE id = test_job_id;
+    RAISE NOTICE 'Test job deleted';
+  END IF;
+END $$;
 
 -- ============================================================
 -- POST-MIGRATION NOTES
