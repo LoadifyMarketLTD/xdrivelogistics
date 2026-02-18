@@ -85,7 +85,7 @@ if (!isMounted) {
       <div style={{ width: '220px', background: '#1f2937', position: 'fixed', height: '100vh' }}>
         <div style={{ padding: '20px 16px', borderBottom: '1px solid #374151' }}>
           <div style={{ fontSize: '16px', fontWeight: '700', color: '#d4af37' }}>
-            XDRIVE LOGISTICS
+            XDrive Logistics LTD
           </div>
         </div>
       </div>

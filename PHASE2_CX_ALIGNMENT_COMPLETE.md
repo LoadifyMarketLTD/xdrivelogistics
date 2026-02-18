@@ -274,7 +274,7 @@ useEffect(() => {
 ### Layout Structure ✅
 ```
 ┌────────────────────────────────────────────┐
-│ [XDRIVE LOGISTICS]                         │
+│ [XDrive Logistics LTD]                         │
 │ Transport Exchange                         │
 ├────────────────────────────────────────────┤
 │ Dashboard                                  │
