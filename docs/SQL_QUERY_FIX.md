@@ -11,7 +11,24 @@ LINE 10: cost_gbp,
 
 ## Root Cause
 
-The SQL query was using column names that don't exist in the actual database schema. The application uses the **marketplace schema** (`supabase-marketplace-schema.sql`), which has a different structure than what was assumed in the original query.
+The SQL query was using column names that don't exist in the actual database schema. 
+
+**IMPORTANT:** There are two different schema files in this repository:
+1. **`supabase-marketplace-schema.sql`** ⭐ **CORRECT - Use this one!**
+   - Has `budget` column
+   - Used by the application
+   - Includes marketplace/bidding features
+
+2. **`supabase-schema.sql`** ❌ **INCORRECT - Don't use!**
+   - Has `price` and `cost` columns (no `budget`)
+   - Legacy internal schema
+   - NOT compatible with current application
+
+If you deployed the wrong schema (`supabase-schema.sql`), you'll get errors like:
+- `column "budget" of relation "jobs" does not exist`
+- `column "posted_by_company_id" of relation "jobs" does not exist`
+
+**Solution:** Deploy the correct schema (`supabase-marketplace-schema.sql`) or add the missing column (see migration script below).
 
 ### Original Query (INCORRECT)
 

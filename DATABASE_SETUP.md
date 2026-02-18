@@ -14,19 +14,19 @@ This guide will help you set up the XDrive Logistics database with multi-tenant 
 1. Navigate to your Supabase project dashboard
 2. Go to **SQL Editor** from the left sidebar
 3. Click **New Query**
-4. Copy and paste the entire contents of `supabase-schema.sql` into the editor
+4. Copy and paste the entire contents of `supabase-marketplace-schema.sql` into the editor
 5. Click **Run** (or press Ctrl/Cmd + Enter)
 6. Wait for the success message: ✅ "Success. No rows returned"
 
 This will create:
 - `profiles` table (extends auth.users)
 - `companies` table (for multi-tenant support)
-- `drivers` table (company drivers)
-- `jobs` table (transport jobs)
-- `invoices` table (billing)
-- RPC function `create_company()` (for auto-creating companies)
+- `jobs` table (marketplace job postings with `budget` column)
+- `job_bids` table (bidding system)
 - Row Level Security (RLS) policies (for data isolation)
-- Auto-generated codes (JOB-1001, INV-2026-1001, etc.)
+- Helper functions for company management
+
+**Note:** Use `supabase-marketplace-schema.sql` (NOT `supabase-schema.sql`). The marketplace schema includes the `budget` column that the application requires.
 
 ## Step 2: Create Your First User
 
@@ -86,7 +86,7 @@ Make sure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are set
 
 ### Error: "relation does not exist"
 
-You need to run the `supabase-schema.sql` file in your Supabase SQL Editor.
+You need to run the `supabase-marketplace-schema.sql` file in your Supabase SQL Editor.
 
 ### Error: "User not authenticated"
 
@@ -156,12 +156,14 @@ const { data, error } = await supabase
 
 ### jobs
 - `id` (UUID, PK)
-- `company_id` (UUID, FK) - **REQUIRED**
-- `job_code` (VARCHAR) - Auto-generated (JOB-1001)
-- `pickup` (TEXT)
-- `delivery` (TEXT)
-- `price` (DECIMAL)
-- `status` (TEXT) - pending, confirmed, in-transit, delivered, cancelled
+- `posted_by_company_id` (UUID, FK) - **REQUIRED**
+- `pickup_location` (TEXT) - **REQUIRED**
+- `delivery_location` (TEXT) - **REQUIRED**
+- `budget` (NUMERIC) - Budget amount
+- `status` (TEXT) - open, assigned, in-transit, completed, cancelled
+- `vehicle_type` (TEXT) - Type of vehicle needed
+- `pickup_datetime` (TIMESTAMP)
+- `delivery_datetime` (TIMESTAMP)
 
 ### drivers
 - `id` (UUID, PK)

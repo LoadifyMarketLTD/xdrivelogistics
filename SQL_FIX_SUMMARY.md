@@ -2,11 +2,35 @@
 
 ## The Problem
 
+There are TWO possible errors you might encounter:
+
+### Error 1: Wrong Column Names
 ```
 Failed to run sql query: ERROR:  42703: column "cost_gbp" of relation "jobs" does not exist
-LINE 10:   cost_gbp,
-           ^
 ```
+
+### Error 2: Missing Budget Column
+```
+Failed to run sql query: ERROR:  42703: column "budget" of relation "jobs" does not exist
+```
+
+## Root Cause
+
+**You deployed the WRONG schema file!**
+
+This repository has TWO different schema files:
+
+| File | Status | Has budget? | Compatible? |
+|------|--------|-------------|-------------|
+| `supabase-marketplace-schema.sql` | ✅ CORRECT | ✅ Yes | ✅ Works with app |
+| `supabase-schema.sql` | ❌ WRONG | ❌ No (has price/cost) | ❌ Breaks app |
+
+**If you see "budget does not exist":** You deployed `supabase-schema.sql` instead of `supabase-marketplace-schema.sql`
+
+**Solution Options:**
+1. **Fresh start:** Drop tables and deploy correct schema (if no data yet)
+2. **Migrate:** Run `migration-fix-jobs-schema.sql` to convert existing data
+3. **Manual fix:** Add missing columns (see migration script)
 
 ## Visual Comparison
 
@@ -127,3 +151,73 @@ The application uses **supabase-marketplace-schema.sql** which focuses on market
 - `accepted_bid_id` (UUID)
 
 ⭐ = Most commonly used fields
+
+---
+
+## If You Deployed the Wrong Schema
+
+### Symptoms:
+- Error: `column "budget" of relation "jobs" does not exist`
+- Error: `column "posted_by_company_id" of relation "jobs" does not exist`
+- Application can't insert or query jobs
+
+### Quick Check:
+Run this query in Supabase SQL Editor:
+```sql
+SELECT column_name 
+FROM information_schema.columns 
+WHERE table_name = 'jobs' 
+  AND column_name IN ('budget', 'price', 'cost', 'posted_by_company_id', 'company_id');
+```
+
+**If you see:**
+- `price` and `cost` but NO `budget` → You have the wrong schema ❌
+- `budget` and `posted_by_company_id` → You have the correct schema ✅
+
+### Solution 1: Fresh Start (No Data Yet)
+```sql
+-- Drop everything and start fresh
+DROP TABLE IF EXISTS public.jobs CASCADE;
+DROP TABLE IF EXISTS public.job_bids CASCADE;
+
+-- Then run the entire supabase-marketplace-schema.sql file
+```
+
+### Solution 2: Migrate Existing Data
+Use the migration script:
+```sql
+-- Run this file in Supabase SQL Editor:
+-- migration-fix-jobs-schema.sql
+```
+
+The migration will:
+1. Rename `company_id` → `posted_by_company_id`
+2. Rename `pickup` → `pickup_location`
+3. Rename `delivery` → `delivery_location`
+4. Add `budget` column and copy from `price`
+5. Drop unused columns (`price`, `cost`, `job_code`, etc.)
+6. Add marketplace columns (`vehicle_type`, `load_details`, etc.)
+7. Update status constraints to match marketplace schema
+
+### Solution 3: Manual Column Add
+If you just need the budget column:
+```sql
+ALTER TABLE public.jobs ADD COLUMN budget NUMERIC;
+```
+
+### After Migration:
+Test that the application works:
+1. Try creating a new job via the UI
+2. Check that jobs display correctly in dashboard
+3. Verify job details show properly
+4. Test the loads/marketplace page
+
+---
+
+## Updated Documentation
+
+- ✅ **DATABASE_SETUP.md** - Now correctly points to marketplace schema
+- ✅ **migration-fix-jobs-schema.sql** - Migration script for existing databases
+- ✅ **docs/SQL_QUERY_FIX.md** - Updated with schema warning
+- ✅ **SQL_FIX_SUMMARY.md** - This file, now includes schema fix
+
