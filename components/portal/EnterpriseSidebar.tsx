@@ -129,7 +129,7 @@ export default function EnterpriseSidebar() {
         className="sidebar-footer"
         >
           <div>Version 1.0</div>
-          <div style={{ marginTop: '4px' }}>© 2026 XDrive</div>
+          <div style={{ marginTop: '4px' }}>© 2021 XDrive Logistics LTD</div>
         </div>
       </div>
 

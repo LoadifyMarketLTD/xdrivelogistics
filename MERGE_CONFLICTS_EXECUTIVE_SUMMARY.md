@@ -23,7 +23,7 @@ All 4 files have been analyzed and compared:
 | File | Main Branch | Our Branch | Recommendation |
 |------|-------------|------------|----------------|
 | **page.tsx** | More complete (tracking, POD, docs) | Simpler version | ✅ Use Main |
-| **PortalLayout.tsx** | Complete layout (© 2021) | Same layout (© 2026) | ⚠️ Use Main + fix year |
+| **PortalLayout.tsx** | Complete layout (© 2021) | Had incorrect year | ✅ Use Main |
 | **types.ts** | More types (User*, all tracking) | Fewer types | ✅ Use Main |
 | **SQL** | Good migration (wrong branding) | Good migration (correct branding) | ✅ Use Ours |
 
@@ -32,8 +32,7 @@ All 4 files have been analyzed and compared:
 ### Quick Answer
 
 ```
-✅ Accept Main: page.tsx, types.ts  
-⚠️ Accept Main + Edit: PortalLayout.tsx (fix copyright year)
+✅ Accept Main: page.tsx, PortalLayout.tsx, types.ts  
 ✅ Keep Ours: migration-delivery-tracking.sql
 ```
 
@@ -46,7 +45,6 @@ All 4 files have been analyzed and compared:
 - Production-ready code quality
 
 **Our Branch Contributes:**
-- Current copyright year (2026)
 - Correct company branding in SQL
 - Better database enum handling
 
@@ -86,7 +84,7 @@ All 4 files have been analyzed and compared:
 2. **For each conflicted file, click "Resolve conflicts"**
 3. **Follow the table:**
    - `page.tsx`: Click "Accept incoming change"
-   - `PortalLayout.tsx`: Click "Accept incoming change", then edit to change 2021 → 2026
+   - `PortalLayout.tsx`: Click "Accept incoming change" (© 2021 is correct)
    - `types.ts`: Click "Accept incoming change"
    - `migration-delivery-tracking.sql`: Click "Accept current change"
 4. **Mark as resolved and commit**
@@ -110,7 +108,7 @@ After resolution, you will have:
 
 ✅ **Correct Branding**
 - Company name: "XDrive Logistics LTD" (proper casing)
-- Copyright year: 2026 (current)
+- Copyright year: 2021 (company founding year)
 - Consistent throughout codebase
 
 ✅ **Comprehensive Types**
@@ -129,7 +127,7 @@ After merging, verify:
 
 - [ ] `npm run build` succeeds
 - [ ] `npx tsc --noEmit` passes
-- [ ] Copyright shows "© 2026 XDrive Logistics LTD"
+- [ ] Copyright shows "© 2021 XDrive Logistics LTD" (company founding year)
 - [ ] SQL migration has "XDrive Logistics LTD" header
 - [ ] Job detail page displays tracking events
 - [ ] POD information loads correctly

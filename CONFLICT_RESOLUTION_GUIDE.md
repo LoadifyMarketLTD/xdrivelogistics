@@ -37,15 +37,15 @@ These conflicts arise because both branches have unrelated histories (grafted br
 
 #### 2. components/layout/PortalLayout.tsx
 
-**Main Branch Version:**
+**Main Branch Version (RECOMMENDED):**
 - Complete portal layout
-- Copyright: © 2021 XDrive Logistics LTD ❌ (outdated)
+- Copyright: © 2021 XDrive Logistics LTD ✅ (company founding year)
 
 **Our Branch Version:**
 - Same layout structure
-- Copyright: © 2026 XDrive Logistics LTD ✅ (correct)
+- Had incorrect copyright year
 
-**Resolution:** Use main branch version BUT update copyright year to 2026.
+**Resolution:** Use main branch version - it has the correct copyright (2021).
 
 #### 3. lib/types.ts
 
@@ -89,10 +89,7 @@ When GitHub shows conflicts in the PR:
 
 2. **For `components/layout/PortalLayout.tsx`:**
    ```
-   Accept: Main branch version
-   Then manually edit line with copyright:
-   - Change: © 2021 XDrive Logistics LTD
-   - To: © 2026 XDrive Logistics LTD
+   Accept: Main branch version (correct copyright 2021)
    ```
 
 3. **For `lib/types.ts`:**
@@ -117,9 +114,6 @@ git checkout main -- app/(portal)/loads/[id]/page.tsx
 git checkout main -- lib/types.ts
 git checkout main -- components/layout/PortalLayout.tsx
 git checkout HEAD -- migration-delivery-tracking.sql
-
-# Fix copyright year in PortalLayout.tsx
-sed -i 's/© 2021 XDrive Logistics LTD/© 2026 XDrive Logistics LTD/' components/layout/PortalLayout.tsx
 
 # Add resolved files
 git add app/(portal)/loads/[id]/page.tsx
@@ -148,7 +142,7 @@ After resolving conflicts:
    Should show no type errors.
 
 3. **Verify Branding:**
-   - Copyright year should be 2026
+   - Copyright year should be 2021 (company founding year)
    - Company name should be "XDrive Logistics LTD" (not "XDRIVE LOGISTICS")
 
 4. **Test Key Features:**
@@ -159,8 +153,7 @@ After resolving conflicts:
 ## Summary
 
 The main branch has more complete implementations of the tracking system features. Our branch contributes:
-- Updated copyright year (2026)
-- Correct SQL migration headers
+- Correct SQL migration headers and branding
 - Better enum handling in SQL
 
 The recommended approach is to use main's implementations and apply our branding/year updates on top.

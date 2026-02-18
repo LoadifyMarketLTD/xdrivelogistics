@@ -7,7 +7,7 @@ When merging `copilot/add-delivery-tracking-system` into `main`, there are confl
 | File | Resolution | Action Required |
 |------|------------|-----------------|
 | `app/(portal)/loads/[id]/page.tsx` | ✅ Use **main** version | Accept main (more features) |
-| `components/layout/PortalLayout.tsx` | ⚠️ Use **main** + fix | Accept main, then change `© 2021` to `© 2026` |
+| `components/layout/PortalLayout.tsx` | ✅ Use **main** version | Accept main (© 2021 is correct) |
 | `lib/types.ts` | ✅ Use **main** version | Accept main (more types) |
 | `migration-delivery-tracking.sql` | ✅ Use **our** version | Accept ours (correct branding) |
 
@@ -35,15 +35,12 @@ These files from main are more complete and should be used:
 
 **Action:** Accept incoming changes from main.
 
-### Step 2: Fix Copyright Year
+### Step 2: Accept Portal Layout
 
-#### ⚠️ components/layout/PortalLayout.tsx
-**Issue:** Main has outdated copyright year.
+#### ✅ components/layout/PortalLayout.tsx
+**Why:** Main version is correct with © 2021 (company founding year).
 
-**Action:**
-1. Accept incoming changes from main
-2. Find line: `<div>© 2021 XDrive Logistics LTD</div>`
-3. Change to: `<div>© 2026 XDrive Logistics LTD</div>`
+**Action:** Accept incoming changes from main.
 
 ### Step 3: Keep Our SQL Migration
 
@@ -66,11 +63,7 @@ Click: "Accept incoming change" (main's version)
 
 ### For components/layout/PortalLayout.tsx
 ```
-1. Click: "Accept incoming change" (main's version)
-2. Click the pencil icon to edit
-3. Find: © 2021 XDrive Logistics LTD
-4. Change to: © 2026 XDrive Logistics LTD
-5. Save
+Click: "Accept incoming change" (main's version with © 2021)
 ```
 
 ### For lib/types.ts
@@ -104,10 +97,7 @@ git checkout --theirs components/layout/PortalLayout.tsx
 # 2. Keep our SQL migration:
 git checkout --ours migration-delivery-tracking.sql
 
-# 3. Fix copyright year:
-sed -i 's/© 2021 XDrive Logistics LTD/© 2026 XDrive Logistics LTD/' components/layout/PortalLayout.tsx
-
-# 4. Stage all resolved files:
+# 3. Stage all resolved files:
 git add app/(portal)/loads/[id]/page.tsx
 git add components/layout/PortalLayout.tsx
 git add lib/types.ts
@@ -143,7 +133,7 @@ npx tsc --noEmit
 Expected: ✅ No TypeScript errors
 
 ### 3. Visual Checks
-- [ ] Copyright footer shows "© 2026 XDrive Logistics LTD"
+- [ ] Copyright footer shows "© 2021 XDrive Logistics LTD" (company founding year)
 - [ ] Loads detail page displays all tracking info
 - [ ] SQL migration has "XDrive Logistics LTD" in header (not "XDRIVE")
 
@@ -162,7 +152,6 @@ Expected: ✅ No TypeScript errors
 ✅ Better error handling patterns
 
 ### From Our Branch (Current):
-✅ Updated copyright year (2026)
 ✅ Correct SQL migration headers and branding
 ✅ Enhanced enum handling in database
 
@@ -183,8 +172,8 @@ npm run build
 ### Issue: TypeScript errors about missing types
 **Solution:** Ensure you accepted main's lib/types.ts (it has all needed types)
 
-### Issue: Copyright year wrong after merge
-**Solution:** Manually edit PortalLayout.tsx to change 2021 → 2026
+### Issue: Copyright year showing wrong value
+**Solution:** Ensure PortalLayout.tsx has © 2021 XDrive Logistics LTD (company founding year)
 
 ## Summary
 
