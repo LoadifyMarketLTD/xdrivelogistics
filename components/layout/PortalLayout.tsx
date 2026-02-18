@@ -96,7 +96,8 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
     return (
       <div style={{
         display: 'flex',
-        minHeight: '100vh',
+        height: '100vh',
+        overflow: 'hidden',
         background: '#f4f5f7',
       }}>
         {/* Left Sidebar - Initial render without mobile detection */}
@@ -128,6 +129,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           marginLeft: '220px',
           display: 'flex',
           flexDirection: 'column',
+          height: '100vh',
         }}>
           <div style={{
             height: '56px',
@@ -149,7 +151,8 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   return (
     <div style={{
       display: 'flex',
-      minHeight: '100vh',
+      height: '100vh',
+      overflow: 'hidden',
       background: '#f4f5f7',
     }}>
       {/* Mobile Menu Toggle */}
@@ -287,6 +290,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         marginLeft: isMobile ? '0' : '220px',
         display: 'flex',
         flexDirection: 'column',
+        height: '100vh',
       }}>
         {/* Top Navigation Bar */}
         <div style={{
