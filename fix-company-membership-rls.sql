@@ -12,12 +12,16 @@
 BEGIN;
 
 -- ============================================================
--- STEP 1: DROP OLD FUNCTION (allow parameter changes)
+-- STEP 1: UPDATE is_company_member() FUNCTION
 -- ============================================================
-DROP FUNCTION IF EXISTS public.is_company_member(uuid);
+-- NOTE: We use CREATE OR REPLACE instead of DROP + CREATE
+-- because many RLS policies depend on this function.
+-- Since the signature is unchanged (uuid -> boolean),
+-- PostgreSQL can update the function in place.
+-- ============================================================
 
 -- ============================================================
--- STEP 2: CREATE ROBUST is_company_member() FUNCTION
+-- CREATE ROBUST is_company_member() FUNCTION
 -- ============================================================
 -- This function checks MULTIPLE conditions to be compatible with both schemas:
 -- 1. User created the company (companies.created_by = auth.uid())
@@ -59,7 +63,7 @@ COMMENT ON FUNCTION public.is_company_member(uuid) IS
 'Returns TRUE if user has access to company via: (1) created_by, (2) active membership, or (3) profile company_id link. Compatible with both marketplace and portal schemas.';
 
 -- ============================================================
--- STEP 3: AUTO-CREATE MEMBERSHIP WHEN COMPANY IS CREATED
+-- STEP 2: AUTO-CREATE MEMBERSHIP WHEN COMPANY IS CREATED
 -- ============================================================
 -- Ensures company creator automatically gets owner membership
 -- ============================================================
@@ -122,7 +126,7 @@ COMMENT ON FUNCTION public.auto_create_company_membership() IS
 'Automatically creates membership or profile link when company is created. Works with both schemas.';
 
 -- ============================================================
--- STEP 4: SYNC EXISTING COMPANIES (ONE-TIME FIX)
+-- STEP 3: SYNC EXISTING COMPANIES (ONE-TIME FIX)
 -- ============================================================
 -- For companies that already exist, ensure memberships are created
 -- ============================================================
@@ -203,7 +207,7 @@ BEGIN
 END $$;
 
 -- ============================================================
--- STEP 5: VERIFICATION QUERIES
+-- STEP 4: VERIFICATION QUERIES
 -- ============================================================
 
 -- Show summary of fixes
