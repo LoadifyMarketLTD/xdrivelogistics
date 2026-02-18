@@ -1,543 +1,524 @@
 -- ============================================================
--- XDrive Logistics LTD - DELIVERY TRACKING SYSTEM MIGRATION
--- Phase 1: Database Schema Extensions
--- Run this in Supabase SQL Editor AFTER main schema
+-- XDRIVE LOGISTICS LTD - DELIVERY TRACKING SYSTEM
+-- Migration to add comprehensive tracking features
 -- ============================================================
 
 -- ============================================================
--- 0. FIX STATUS COLUMN IF USING ENUM TYPE
+-- 1. EXTEND JOBS TABLE WITH DELIVERY TRACKING FIELDS
 -- ============================================================
--- Check if jobs.status is using an ENUM type and fix it if needed
-DO $$
-DECLARE
-  status_type TEXT;
-  constraint_def TEXT;
+
+-- Add detailed location fields
+ALTER TABLE public.jobs 
+  ADD COLUMN IF NOT EXISTS pickup_address_line1 TEXT,
+  ADD COLUMN IF NOT EXISTS pickup_postcode TEXT,
+  ADD COLUMN IF NOT EXISTS pickup_city TEXT,
+  ADD COLUMN IF NOT EXISTS delivery_address_line1 TEXT,
+  ADD COLUMN IF NOT EXISTS delivery_postcode TEXT,
+  ADD COLUMN IF NOT EXISTS delivery_city TEXT;
+
+-- Add distance and packaging details
+ALTER TABLE public.jobs
+  ADD COLUMN IF NOT EXISTS distance_miles NUMERIC,
+  ADD COLUMN IF NOT EXISTS packaging TEXT,
+  ADD COLUMN IF NOT EXISTS dimensions TEXT, -- Format: "LxWxH cm"
+  ADD COLUMN IF NOT EXISTS requested_vehicle_type TEXT; -- What was requested
+
+-- Add company and booking details
+ALTER TABLE public.jobs
+  ADD COLUMN IF NOT EXISTS booked_by_company_name TEXT,
+  ADD COLUMN IF NOT EXISTS booked_by_company_ref TEXT, -- e.g., "GB 122846"
+  ADD COLUMN IF NOT EXISTS booked_by_phone TEXT,
+  ADD COLUMN IF NOT EXISTS load_id TEXT UNIQUE; -- External load ID
+
+-- Add payment and rate details
+ALTER TABLE public.jobs
+  ADD COLUMN IF NOT EXISTS agreed_rate NUMERIC, -- Actual agreed rate
+  ADD COLUMN IF NOT EXISTS payment_terms TEXT, -- e.g., "30 Days (From Invoice)"
+  ADD COLUMN IF NOT EXISTS smartpay_enabled BOOLEAN DEFAULT false;
+
+-- Add customer references
+ALTER TABLE public.jobs
+  ADD COLUMN IF NOT EXISTS your_ref TEXT, -- Customer's reference
+  ADD COLUMN IF NOT EXISTS cust_ref TEXT, -- System customer reference
+  ADD COLUMN IF NOT EXISTS items INTEGER; -- Number of items
+
+-- Add vehicle and driver assignment
+ALTER TABLE public.jobs
+  ADD COLUMN IF NOT EXISTS vehicle_ref TEXT, -- Driver name or vehicle ID
+  ADD COLUMN IF NOT EXISTS assigned_driver_id UUID REFERENCES auth.users(id);
+
+-- Add completion details
+ALTER TABLE public.jobs
+  ADD COLUMN IF NOT EXISTS completed_by_name TEXT,
+  ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP WITH TIME ZONE;
+
+-- Add load notes
+ALTER TABLE public.jobs
+  ADD COLUMN IF NOT EXISTS load_notes TEXT,
+  ADD COLUMN IF NOT EXISTS pod_required BOOLEAN DEFAULT false; -- POD requirements
+
+-- Generate load_id if not exists
+CREATE SEQUENCE IF NOT EXISTS load_id_seq START 79000000;
+
+CREATE OR REPLACE FUNCTION generate_load_id()
+RETURNS TRIGGER AS $$
 BEGIN
-  -- Check the data type of the status column
-  SELECT data_type INTO status_type
-  FROM information_schema.columns
-  WHERE table_schema = 'public'
-    AND table_name = 'jobs'
-    AND column_name = 'status';
-
-  -- If it's a user-defined type (enum), we need to handle it
-  IF status_type = 'USER-DEFINED' THEN
-    -- Get the enum type name
-    SELECT udt_name INTO status_type
-    FROM information_schema.columns
-    WHERE table_schema = 'public'
-      AND table_name = 'jobs'
-      AND column_name = 'status';
-    
-    -- Check if 'completed' exists in the enum
-    IF NOT EXISTS (
-      SELECT 1 FROM pg_enum e
-      JOIN pg_type t ON e.enumtypid = t.oid
-      WHERE t.typname = status_type
-        AND e.enumlabel = 'completed'
-    ) THEN
-      -- Add 'completed' to the enum if it doesn't exist
-      EXECUTE format('ALTER TYPE %I ADD VALUE IF NOT EXISTS ''completed''', status_type);
-    END IF;
-    
-  ELSIF status_type = 'text' OR status_type = 'character varying' THEN
-    -- If it's TEXT/VARCHAR, ensure the CHECK constraint allows 'completed'
-    -- Drop existing constraint if it exists and doesn't include 'completed'
-    SELECT conname INTO constraint_def
-    FROM pg_constraint
-    WHERE conrelid = 'public.jobs'::regclass
-      AND conname LIKE '%status%'
-      AND contype = 'c'
-      AND NOT (consrc LIKE '%completed%' OR pg_get_constraintdef(oid) LIKE '%completed%');
-    
-    IF constraint_def IS NOT NULL THEN
-      EXECUTE format('ALTER TABLE public.jobs DROP CONSTRAINT IF EXISTS %I', constraint_def);
-      
-      -- Add new constraint that includes 'completed'
-      ALTER TABLE public.jobs ADD CONSTRAINT jobs_status_check 
-        CHECK (status IN ('open', 'assigned', 'in-transit', 'completed', 'cancelled'));
-    END IF;
+  IF NEW.load_id IS NULL OR NEW.load_id = '' THEN
+    NEW.load_id := NEXTVAL('load_id_seq')::TEXT;
   END IF;
-END $$;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS set_load_id ON public.jobs;
+CREATE TRIGGER set_load_id
+  BEFORE INSERT ON public.jobs
+  FOR EACH ROW
+  EXECUTE FUNCTION generate_load_id();
 
 -- ============================================================
--- 1. ADD TRACKING FIELDS TO JOBS TABLE
--- ============================================================
-
--- Add tracking timestamp fields
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS on_my_way TIMESTAMP WITH TIME ZONE;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS loaded_at TIMESTAMP WITH TIME ZONE;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS on_site_pickup TIMESTAMP WITH TIME ZONE;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS on_site_delivery TIMESTAMP WITH TIME ZONE;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS delivered_on TIMESTAMP WITH TIME ZONE;
-
--- Add POD (Proof of Delivery) fields
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS received_by TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS left_at TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS no_of_items INTEGER;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS delivery_status TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS pod_notes TEXT;
-
--- Add payment and rate fields
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS payment_terms TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS smartpay_enabled BOOLEAN DEFAULT false;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS agreed_rate NUMERIC;
-
--- Add vehicle and customer reference fields
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS vehicle_ref TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS your_ref TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS cust_ref TEXT;
-
--- Add packaging and dimensions fields
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS packaging TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS length_cm NUMERIC;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS width_cm NUMERIC;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS height_cm NUMERIC;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS distance_miles NUMERIC;
-
--- Add booked_by company information
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS booked_by_company_name TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS booked_by_company_phone TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS booked_by_company_email TEXT;
-
--- Add pickup/delivery full address fields
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS pickup_address_line1 TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS pickup_address_line2 TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS pickup_city TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS pickup_postcode TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS pickup_country TEXT DEFAULT 'UK';
-
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS delivery_address_line1 TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS delivery_address_line2 TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS delivery_city TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS delivery_postcode TEXT;
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS delivery_country TEXT DEFAULT 'UK';
-
--- Add assigned vehicle type field
-ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS assigned_vehicle_type TEXT;
-
--- Create indexes for new fields
-CREATE INDEX IF NOT EXISTS idx_jobs_delivery_status ON public.jobs(delivery_status);
-CREATE INDEX IF NOT EXISTS idx_jobs_pickup_postcode ON public.jobs(pickup_postcode);
-CREATE INDEX IF NOT EXISTS idx_jobs_delivery_postcode ON public.jobs(delivery_postcode);
-CREATE INDEX IF NOT EXISTS idx_jobs_vehicle_ref ON public.jobs(vehicle_ref);
-
--- ============================================================
--- 2. CREATE JOB_TRACKING_EVENTS TABLE
+-- 2. JOB TRACKING EVENTS TABLE
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.job_tracking_events (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   job_id UUID NOT NULL REFERENCES public.jobs(id) ON DELETE CASCADE,
-  event_type TEXT NOT NULL CHECK (event_type IN ('created', 'assigned', 'on_my_way', 'loaded', 'on_site_pickup', 'on_site_delivery', 'delivered', 'completed', 'cancelled', 'note_added', 'document_uploaded')),
-  event_timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  event_type TEXT NOT NULL CHECK (event_type IN (
+    'on_my_way_to_pickup',
+    'on_site_pickup',
+    'loaded',
+    'on_my_way_to_delivery',
+    'on_site_delivery',
+    'delivered'
+  )),
+  event_time TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   user_id UUID REFERENCES auth.users(id),
-  company_id UUID REFERENCES public.companies(id),
-  event_data JSONB,
-  notes TEXT,
-  location TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_tracking_job_id ON public.job_tracking_events(job_id);
-CREATE INDEX IF NOT EXISTS idx_tracking_timestamp ON public.job_tracking_events(event_timestamp DESC);
-CREATE INDEX IF NOT EXISTS idx_tracking_event_type ON public.job_tracking_events(event_type);
-
--- ============================================================
--- 3. CREATE JOB_DOCUMENTS TABLE
--- ============================================================
-CREATE TABLE IF NOT EXISTS public.job_documents (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  job_id UUID NOT NULL REFERENCES public.jobs(id) ON DELETE CASCADE,
-  document_type TEXT NOT NULL CHECK (document_type IN ('pod', 'invoice', 'photo', 'signature', 'cmr', 'other')),
-  file_name TEXT NOT NULL,
-  file_url TEXT NOT NULL,
-  file_size INTEGER,
-  mime_type TEXT,
-  uploaded_by UUID REFERENCES auth.users(id),
-  uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  user_name TEXT, -- Cached for display
   notes TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_documents_job_id ON public.job_documents(job_id);
-CREATE INDEX IF NOT EXISTS idx_documents_type ON public.job_documents(document_type);
-CREATE INDEX IF NOT EXISTS idx_documents_uploaded_at ON public.job_documents(uploaded_at DESC);
+-- Indexes for tracking events
+CREATE INDEX IF NOT EXISTS idx_tracking_events_job_id ON public.job_tracking_events(job_id);
+CREATE INDEX IF NOT EXISTS idx_tracking_events_type ON public.job_tracking_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_tracking_events_time ON public.job_tracking_events(event_time DESC);
 
 -- ============================================================
--- 4. CREATE JOB_NOTES TABLE
+-- 3. PROOF OF DELIVERY (POD) TABLE
 -- ============================================================
-CREATE TABLE IF NOT EXISTS public.job_notes (
+CREATE TABLE IF NOT EXISTS public.proof_of_delivery (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  job_id UUID NOT NULL REFERENCES public.jobs(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES auth.users(id),
-  note_type TEXT DEFAULT 'general' CHECK (note_type IN ('general', 'internal', 'customer', 'driver', 'alert')),
-  note_text TEXT NOT NULL,
-  is_internal BOOLEAN DEFAULT false,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_notes_job_id ON public.job_notes(job_id);
-CREATE INDEX IF NOT EXISTS idx_notes_created_at ON public.job_notes(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_notes_type ON public.job_notes(note_type);
-
--- ============================================================
--- 5. CREATE JOB_FEEDBACK TABLE
--- ============================================================
-CREATE TABLE IF NOT EXISTS public.job_feedback (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  job_id UUID NOT NULL REFERENCES public.jobs(id) ON DELETE CASCADE,
-  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
-  feedback_text TEXT,
-  given_by_company_id UUID NOT NULL REFERENCES public.companies(id),
-  given_to_company_id UUID NOT NULL REFERENCES public.companies(id),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_feedback_job_id ON public.job_feedback(job_id);
-CREATE INDEX IF NOT EXISTS idx_feedback_given_to ON public.job_feedback(given_to_company_id);
-CREATE INDEX IF NOT EXISTS idx_feedback_rating ON public.job_feedback(rating);
-
--- ============================================================
--- 6. CREATE JOB_INVOICES TABLE
--- ============================================================
-CREATE TABLE IF NOT EXISTS public.job_invoices (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  job_id UUID NOT NULL REFERENCES public.jobs(id) ON DELETE CASCADE,
-  invoice_number TEXT UNIQUE NOT NULL,
-  invoice_date DATE NOT NULL,
-  due_date DATE,
-  amount NUMERIC NOT NULL,
-  vat_amount NUMERIC,
-  total_amount NUMERIC NOT NULL,
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'sent', 'paid', 'overdue', 'cancelled')),
-  payment_method TEXT,
-  paid_date DATE,
-  notes TEXT,
+  job_id UUID NOT NULL UNIQUE REFERENCES public.jobs(id) ON DELETE CASCADE,
+  delivered_on TIMESTAMP WITH TIME ZONE NOT NULL,
+  received_by TEXT NOT NULL, -- Name of person who received
+  left_at TEXT, -- Where goods were left (e.g., "Goods Inwards")
+  no_of_items INTEGER,
+  delivery_status TEXT NOT NULL DEFAULT 'Completed Delivery' CHECK (delivery_status IN (
+    'Completed Delivery',
+    'Partial Delivery',
+    'Failed Delivery',
+    'Refused',
+    'Left Safe'
+  )),
+  delivery_notes TEXT,
+  signature_url TEXT, -- Link to signature image if captured
+  photo_urls TEXT[], -- Array of photo URLs
   created_by UUID REFERENCES auth.users(id),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Indexes
+-- Index for POD
+CREATE INDEX IF NOT EXISTS idx_pod_job_id ON public.proof_of_delivery(job_id);
+
+-- ============================================================
+-- 4. JOB DOCUMENTS TABLE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.job_documents (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  job_id UUID NOT NULL REFERENCES public.jobs(id) ON DELETE CASCADE,
+  document_type TEXT NOT NULL CHECK (document_type IN (
+    'POD',
+    'Invoice',
+    'Delivery Note',
+    'CMR',
+    'Photo',
+    'Other'
+  )),
+  document_url TEXT NOT NULL,
+  document_name TEXT NOT NULL,
+  uploaded_by UUID REFERENCES auth.users(id),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Indexes for documents
+CREATE INDEX IF NOT EXISTS idx_documents_job_id ON public.job_documents(job_id);
+CREATE INDEX IF NOT EXISTS idx_documents_type ON public.job_documents(document_type);
+
+-- ============================================================
+-- 5. JOB NOTES/HISTORY TABLE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.job_notes (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  job_id UUID NOT NULL REFERENCES public.jobs(id) ON DELETE CASCADE,
+  note_type TEXT NOT NULL CHECK (note_type IN (
+    'General',
+    'Status Update',
+    'Customer Communication',
+    'Internal',
+    'Issue',
+    'Resolution'
+  )),
+  note_text TEXT NOT NULL,
+  is_internal BOOLEAN DEFAULT false, -- Hide from customer if true
+  created_by UUID REFERENCES auth.users(id),
+  created_by_name TEXT, -- Cached for display
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Indexes for notes
+CREATE INDEX IF NOT EXISTS idx_notes_job_id ON public.job_notes(job_id);
+CREATE INDEX IF NOT EXISTS idx_notes_created_at ON public.job_notes(created_at DESC);
+
+-- ============================================================
+-- 6. JOB FEEDBACK TABLE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.job_feedback (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  job_id UUID NOT NULL REFERENCES public.jobs(id) ON DELETE CASCADE,
+  from_company_id UUID REFERENCES public.companies(id),
+  rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+  feedback_text TEXT,
+  feedback_type TEXT CHECK (feedback_type IN ('Positive', 'Neutral', 'Negative')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Indexes for feedback
+CREATE INDEX IF NOT EXISTS idx_feedback_job_id ON public.job_feedback(job_id);
+CREATE INDEX IF NOT EXISTS idx_feedback_company ON public.job_feedback(from_company_id);
+
+-- ============================================================
+-- 7. INVOICES TABLE EXTENSION
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.job_invoices (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  job_id UUID NOT NULL REFERENCES public.jobs(id) ON DELETE CASCADE,
+  invoice_number TEXT UNIQUE NOT NULL,
+  invoice_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  due_date DATE NOT NULL,
+  amount NUMERIC NOT NULL,
+  vat_amount NUMERIC DEFAULT 0,
+  total_amount NUMERIC NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN (
+    'pending',
+    'sent',
+    'paid',
+    'overdue',
+    'cancelled'
+  )),
+  payment_terms TEXT,
+  smartpay_transaction_id TEXT, -- If paid via SmartPay
+  invoice_url TEXT, -- PDF URL
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  paid_at TIMESTAMP WITH TIME ZONE
+);
+
+-- Indexes for invoices
 CREATE INDEX IF NOT EXISTS idx_invoices_job_id ON public.job_invoices(job_id);
-CREATE INDEX IF NOT EXISTS idx_invoices_number ON public.job_invoices(invoice_number);
 CREATE INDEX IF NOT EXISTS idx_invoices_status ON public.job_invoices(status);
 CREATE INDEX IF NOT EXISTS idx_invoices_due_date ON public.job_invoices(due_date);
 
--- ============================================================
--- 7. HELPER FUNCTIONS
--- ============================================================
+-- Auto-generate invoice number
+CREATE SEQUENCE IF NOT EXISTS invoice_number_seq START 1000;
 
--- Function to add tracking event
-CREATE OR REPLACE FUNCTION public.add_tracking_event(
-  p_job_id UUID,
-  p_event_type TEXT,
-  p_notes TEXT DEFAULT NULL,
-  p_location TEXT DEFAULT NULL,
-  p_event_data JSONB DEFAULT NULL
-)
-RETURNS UUID AS $$
-DECLARE
-  v_event_id UUID;
-  v_user_id UUID;
-  v_company_id UUID;
+CREATE OR REPLACE FUNCTION generate_invoice_number()
+RETURNS TRIGGER AS $$
 BEGIN
-  -- Get current user and company
-  v_user_id := auth.uid();
-  v_company_id := (SELECT company_id FROM public.profiles WHERE id = v_user_id);
-  
-  -- Insert tracking event
-  INSERT INTO public.job_tracking_events (
-    job_id, 
-    event_type, 
-    event_timestamp,
-    user_id, 
-    company_id, 
-    event_data, 
-    notes, 
-    location
-  )
-  VALUES (
-    p_job_id,
-    p_event_type,
-    NOW(),
-    v_user_id,
-    v_company_id,
-    p_event_data,
-    p_notes,
-    p_location
-  )
-  RETURNING id INTO v_event_id;
-  
-  RETURN v_event_id;
+  IF NEW.invoice_number IS NULL OR NEW.invoice_number = '' THEN
+    NEW.invoice_number := 'INV-' || TO_CHAR(CURRENT_DATE, 'YYYY') || '-' || 
+                          LPAD(NEXTVAL('invoice_number_seq')::TEXT, 6, '0');
+  END IF;
+  RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql;
 
--- Function to update job POD
-CREATE OR REPLACE FUNCTION public.update_job_pod(
-  p_job_id UUID,
-  p_received_by TEXT,
-  p_left_at TEXT DEFAULT NULL,
-  p_no_of_items INTEGER DEFAULT NULL,
-  p_delivery_status TEXT DEFAULT 'delivered',
-  p_pod_notes TEXT DEFAULT NULL
-)
-RETURNS VOID AS $$
-BEGIN
-  -- Update job POD fields
-  UPDATE public.jobs
-  SET 
-    received_by = p_received_by,
-    left_at = p_left_at,
-    no_of_items = p_no_of_items,
-    delivery_status = p_delivery_status,
-    pod_notes = p_pod_notes,
-    delivered_on = NOW(),
-    status = 'completed',
-    updated_at = NOW()
-  WHERE id = p_job_id;
-  
-  -- Add tracking event
-  PERFORM add_tracking_event(
-    p_job_id,
-    'delivered',
-    p_pod_notes,
-    NULL,
-    jsonb_build_object(
-      'received_by', p_received_by,
-      'left_at', p_left_at,
-      'no_of_items', p_no_of_items,
-      'delivery_status', p_delivery_status
-    )
-  );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Function to update job status with tracking
-CREATE OR REPLACE FUNCTION public.update_job_status(
-  p_job_id UUID,
-  p_new_status TEXT,
-  p_notes TEXT DEFAULT NULL
-)
-RETURNS VOID AS $$
-BEGIN
-  -- Update job status
-  UPDATE public.jobs
-  SET 
-    status = p_new_status,
-    updated_at = NOW()
-  WHERE id = p_job_id;
-  
-  -- Add tracking event based on status
-  PERFORM add_tracking_event(
-    p_job_id,
-    CASE p_new_status
-      WHEN 'open' THEN 'created'
-      WHEN 'assigned' THEN 'assigned'
-      WHEN 'in-transit' THEN 'on_my_way'
-      WHEN 'completed' THEN 'completed'
-      WHEN 'delivered' THEN 'delivered'
-      WHEN 'cancelled' THEN 'cancelled'
-      ELSE 'note_added'
-    END,
-    p_notes
-  );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+DROP TRIGGER IF EXISTS set_invoice_number ON public.job_invoices;
+CREATE TRIGGER set_invoice_number
+  BEFORE INSERT ON public.job_invoices
+  FOR EACH ROW
+  EXECUTE FUNCTION generate_invoice_number();
 
 -- ============================================================
--- 8. CREATE JOBS_WITH_TRACKING VIEW
--- ============================================================
-CREATE OR REPLACE VIEW public.jobs_with_tracking AS
-SELECT 
-  j.*,
-  -- Company information
-  poster_company.name as poster_company_name,
-  poster_company.phone as poster_company_phone,
-  poster_company.email as poster_company_email,
-  assigned_company.name as assigned_company_name,
-  assigned_company.phone as assigned_company_phone,
-  -- Count related records
-  (SELECT COUNT(*) FROM public.job_tracking_events WHERE job_id = j.id) as tracking_events_count,
-  (SELECT COUNT(*) FROM public.job_documents WHERE job_id = j.id) as documents_count,
-  (SELECT COUNT(*) FROM public.job_notes WHERE job_id = j.id) as notes_count,
-  -- Latest tracking event
-  (SELECT event_type FROM public.job_tracking_events WHERE job_id = j.id ORDER BY event_timestamp DESC LIMIT 1) as latest_event_type,
-  (SELECT event_timestamp FROM public.job_tracking_events WHERE job_id = j.id ORDER BY event_timestamp DESC LIMIT 1) as latest_event_timestamp
-FROM public.jobs j
-LEFT JOIN public.companies poster_company ON j.posted_by_company_id = poster_company.id
-LEFT JOIN public.companies assigned_company ON j.assigned_company_id = assigned_company.id;
-
--- ============================================================
--- 9. ROW LEVEL SECURITY (RLS) POLICIES
+-- 8. ROW LEVEL SECURITY (RLS) POLICIES
 -- ============================================================
 
 -- Enable RLS on new tables
 ALTER TABLE public.job_tracking_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.proof_of_delivery ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.job_documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.job_notes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.job_feedback ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.job_invoices ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies for job_tracking_events
-CREATE POLICY "Users can view tracking events for jobs they're involved in"
+-- Allow authenticated users to view tracking events for jobs they're involved with
+CREATE POLICY "Users can view tracking events for their company jobs"
   ON public.job_tracking_events FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM public.jobs j
-      WHERE j.id = job_tracking_events.job_id
-      AND (
-        j.posted_by_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-        OR j.assigned_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-      )
+    job_id IN (
+      SELECT id FROM public.jobs 
+      WHERE posted_by_company_id = public.current_user_company_id()
+         OR assigned_company_id = public.current_user_company_id()
     )
   );
 
-CREATE POLICY "Users can insert tracking events for their jobs"
+-- Allow users to create tracking events for assigned jobs
+CREATE POLICY "Users can create tracking events for assigned jobs"
   ON public.job_tracking_events FOR INSERT
   WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.jobs j
-      WHERE j.id = job_tracking_events.job_id
-      AND (
-        j.posted_by_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-        OR j.assigned_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-      )
+    job_id IN (
+      SELECT id FROM public.jobs 
+      WHERE assigned_company_id = public.current_user_company_id()
     )
   );
 
--- RLS Policies for job_documents
-CREATE POLICY "Users can view documents for jobs they're involved in"
+-- POD policies (similar pattern)
+CREATE POLICY "Users can view POD for their jobs"
+  ON public.proof_of_delivery FOR SELECT
+  USING (
+    job_id IN (
+      SELECT id FROM public.jobs 
+      WHERE posted_by_company_id = public.current_user_company_id()
+         OR assigned_company_id = public.current_user_company_id()
+    )
+  );
+
+CREATE POLICY "Assigned companies can create/update POD"
+  ON public.proof_of_delivery FOR ALL
+  USING (
+    job_id IN (
+      SELECT id FROM public.jobs 
+      WHERE assigned_company_id = public.current_user_company_id()
+    )
+  );
+
+-- Documents policies
+CREATE POLICY "Users can view documents for their jobs"
   ON public.job_documents FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM public.jobs j
-      WHERE j.id = job_documents.job_id
-      AND (
-        j.posted_by_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-        OR j.assigned_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-      )
+    job_id IN (
+      SELECT id FROM public.jobs 
+      WHERE posted_by_company_id = public.current_user_company_id()
+         OR assigned_company_id = public.current_user_company_id()
     )
   );
 
 CREATE POLICY "Users can upload documents for their jobs"
   ON public.job_documents FOR INSERT
   WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.jobs j
-      WHERE j.id = job_documents.job_id
-      AND (
-        j.posted_by_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-        OR j.assigned_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-      )
+    job_id IN (
+      SELECT id FROM public.jobs 
+      WHERE posted_by_company_id = public.current_user_company_id()
+         OR assigned_company_id = public.current_user_company_id()
     )
   );
 
--- RLS Policies for job_notes
-CREATE POLICY "Users can view notes for jobs they're involved in"
+-- Notes policies
+CREATE POLICY "Users can view non-internal notes for their jobs"
   ON public.job_notes FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM public.jobs j
-      WHERE j.id = job_notes.job_id
-      AND (
-        j.posted_by_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-        OR j.assigned_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-      )
+    job_id IN (
+      SELECT id FROM public.jobs 
+      WHERE posted_by_company_id = public.current_user_company_id()
+         OR assigned_company_id = public.current_user_company_id()
     )
+    AND (is_internal = false OR created_by = auth.uid())
   );
 
-CREATE POLICY "Users can add notes to their jobs"
+CREATE POLICY "Users can create notes for their jobs"
   ON public.job_notes FOR INSERT
   WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.jobs j
-      WHERE j.id = job_notes.job_id
-      AND (
-        j.posted_by_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-        OR j.assigned_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-      )
+    job_id IN (
+      SELECT id FROM public.jobs 
+      WHERE posted_by_company_id = public.current_user_company_id()
+         OR assigned_company_id = public.current_user_company_id()
     )
   );
 
--- RLS Policies for job_feedback
-CREATE POLICY "Users can view feedback for jobs they're involved in"
+-- Feedback policies
+CREATE POLICY "Users can view feedback for their jobs"
   ON public.job_feedback FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM public.jobs j
-      WHERE j.id = job_feedback.job_id
-      AND (
-        j.posted_by_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-        OR j.assigned_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-      )
+    job_id IN (
+      SELECT id FROM public.jobs 
+      WHERE posted_by_company_id = public.current_user_company_id()
+         OR assigned_company_id = public.current_user_company_id()
     )
   );
 
-CREATE POLICY "Companies can submit feedback for completed jobs"
+CREATE POLICY "Users can leave feedback for completed jobs"
   ON public.job_feedback FOR INSERT
   WITH CHECK (
-    given_by_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-    AND EXISTS (
-      SELECT 1 FROM public.jobs j
-      WHERE j.id = job_feedback.job_id
-      AND j.status IN ('completed', 'delivered')
-      AND (
-        j.posted_by_company_id = given_by_company_id
-        OR j.assigned_company_id = given_by_company_id
-      )
+    job_id IN (
+      SELECT id FROM public.jobs 
+      WHERE (posted_by_company_id = public.current_user_company_id()
+         OR assigned_company_id = public.current_user_company_id())
+        AND status = 'completed'
     )
   );
 
--- RLS Policies for job_invoices
-CREATE POLICY "Users can view invoices for jobs they're involved in"
+-- Invoice policies
+CREATE POLICY "Users can view invoices for their jobs"
   ON public.job_invoices FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM public.jobs j
-      WHERE j.id = job_invoices.job_id
-      AND (
-        j.posted_by_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-        OR j.assigned_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-      )
+    job_id IN (
+      SELECT id FROM public.jobs 
+      WHERE posted_by_company_id = public.current_user_company_id()
+         OR assigned_company_id = public.current_user_company_id()
     )
   );
 
-CREATE POLICY "Job posters can manage invoices"
-  ON public.job_invoices FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.jobs j
-      WHERE j.id = job_invoices.job_id
-      AND j.assigned_company_id = (SELECT company_id FROM public.profiles WHERE id = auth.uid())
+CREATE POLICY "Posting companies can create invoices"
+  ON public.job_invoices FOR INSERT
+  WITH CHECK (
+    job_id IN (
+      SELECT id FROM public.jobs 
+      WHERE posted_by_company_id = public.current_user_company_id()
     )
   );
 
 -- ============================================================
--- 10. UPDATE TRIGGERS
+-- 9. HELPER FUNCTIONS FOR TRACKING
 -- ============================================================
 
--- Add update trigger for job_notes
-DROP TRIGGER IF EXISTS update_job_notes_updated_at ON public.job_notes;
-CREATE TRIGGER update_job_notes_updated_at
-  BEFORE UPDATE ON public.job_notes
-  FOR EACH ROW
-  EXECUTE FUNCTION public.update_updated_at_column();
+-- Function to record a tracking event
+CREATE OR REPLACE FUNCTION public.record_tracking_event(
+  p_job_id UUID,
+  p_event_type TEXT,
+  p_notes TEXT DEFAULT NULL
+)
+RETURNS UUID AS $$
+DECLARE
+  v_event_id UUID;
+  v_user_name TEXT;
+BEGIN
+  -- Get user's name
+  SELECT full_name INTO v_user_name
+  FROM public.profiles
+  WHERE id = auth.uid();
 
--- Add update trigger for job_invoices
-DROP TRIGGER IF EXISTS update_job_invoices_updated_at ON public.job_invoices;
-CREATE TRIGGER update_job_invoices_updated_at
-  BEFORE UPDATE ON public.job_invoices
-  FOR EACH ROW
-  EXECUTE FUNCTION public.update_updated_at_column();
+  -- Insert tracking event
+  INSERT INTO public.job_tracking_events (
+    job_id,
+    event_type,
+    event_time,
+    user_id,
+    user_name,
+    notes
+  ) VALUES (
+    p_job_id,
+    p_event_type,
+    NOW(),
+    auth.uid(),
+    v_user_name,
+    p_notes
+  )
+  RETURNING id INTO v_event_id;
+
+  -- Update job status based on event type
+  IF p_event_type = 'loaded' THEN
+    UPDATE public.jobs SET status = 'in-transit' WHERE id = p_job_id;
+  ELSIF p_event_type = 'delivered' THEN
+    UPDATE public.jobs 
+    SET status = 'completed',
+        completed_at = NOW(),
+        completed_by_name = v_user_name
+    WHERE id = p_job_id;
+  END IF;
+
+  RETURN v_event_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to create POD
+CREATE OR REPLACE FUNCTION public.create_proof_of_delivery(
+  p_job_id UUID,
+  p_received_by TEXT,
+  p_left_at TEXT DEFAULT NULL,
+  p_no_of_items INTEGER DEFAULT NULL,
+  p_delivery_status TEXT DEFAULT 'Completed Delivery',
+  p_delivery_notes TEXT DEFAULT NULL
+)
+RETURNS UUID AS $$
+DECLARE
+  v_pod_id UUID;
+BEGIN
+  INSERT INTO public.proof_of_delivery (
+    job_id,
+    delivered_on,
+    received_by,
+    left_at,
+    no_of_items,
+    delivery_status,
+    delivery_notes,
+    created_by
+  ) VALUES (
+    p_job_id,
+    NOW(),
+    p_received_by,
+    p_left_at,
+    p_no_of_items,
+    p_delivery_status,
+    p_delivery_notes,
+    auth.uid()
+  )
+  ON CONFLICT (job_id) 
+  DO UPDATE SET
+    delivered_on = NOW(),
+    received_by = EXCLUDED.received_by,
+    left_at = EXCLUDED.left_at,
+    no_of_items = EXCLUDED.no_of_items,
+    delivery_status = EXCLUDED.delivery_status,
+    delivery_notes = EXCLUDED.delivery_notes,
+    updated_at = NOW()
+  RETURNING id INTO v_pod_id;
+
+  -- Also record delivered tracking event
+  PERFORM public.record_tracking_event(p_job_id, 'delivered', p_delivery_notes);
+
+  RETURN v_pod_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================================
--- MIGRATION COMPLETE
+-- 10. VIEWS FOR EASY DATA ACCESS
 -- ============================================================
--- All tracking fields, tables, and policies are now in place.
--- Next: Update TypeScript types and create UI components.
+
+-- Complete job view with all tracking data
+CREATE OR REPLACE VIEW public.jobs_with_tracking AS
+SELECT 
+  j.*,
+  pc.name as posted_by_company_name,
+  pc.phone as posted_by_company_phone,
+  ac.name as assigned_company_name,
+  ac.phone as assigned_company_phone,
+  pod.delivered_on,
+  pod.received_by,
+  pod.left_at as pod_left_at,
+  pod.delivery_status as pod_delivery_status,
+  pod.delivery_notes as pod_notes,
+  (SELECT COUNT(*) FROM public.job_tracking_events WHERE job_id = j.id) as tracking_event_count,
+  (SELECT COUNT(*) FROM public.job_documents WHERE job_id = j.id) as document_count,
+  (SELECT COUNT(*) FROM public.job_notes WHERE job_id = j.id) as note_count
+FROM public.jobs j
+LEFT JOIN public.companies pc ON j.posted_by_company_id = pc.id
+LEFT JOIN public.companies ac ON j.assigned_company_id = ac.id
+LEFT JOIN public.proof_of_delivery pod ON j.id = pod.job_id;
+
+-- Grant access to view
+GRANT SELECT ON public.jobs_with_tracking TO authenticated;
+
+COMMENT ON TABLE public.job_tracking_events IS 'Real-time tracking events for job delivery lifecycle';
+COMMENT ON TABLE public.proof_of_delivery IS 'Proof of delivery records with recipient and delivery details';
+COMMENT ON TABLE public.job_documents IS 'Documents attached to jobs (POD, invoices, photos, etc.)';
+COMMENT ON TABLE public.job_notes IS 'Notes and history for jobs';
+COMMENT ON TABLE public.job_feedback IS 'Feedback ratings between companies';
+COMMENT ON TABLE public.job_invoices IS 'Invoices generated for completed jobs';

@@ -1,4 +1,4 @@
-// Database types for XDrive Logistics - Public Marketplace
+// Database types for XDrive Logistics LTD - Public Marketplace
 
 export interface Profile {
   id: string
@@ -10,6 +10,56 @@ export interface Profile {
   is_active: boolean
   created_at: string
   updated_at: string
+  
+  // Extended profile fields
+  first_name: string | null
+  last_name: string | null
+  phone_2: string | null
+  job_title: string | null
+  department: string | null
+  time_zone: string
+  is_driver: boolean
+  web_login_allowed: boolean
+  email_visible_to_members: boolean
+  has_mobile_account: boolean
+  mobile_option: string
+  username: string | null
+  logo_url: string | null
+  interface_language: string
+}
+
+export interface UserSettings {
+  id: string
+  user_id: string
+  show_notification_bar: boolean
+  enable_load_alerts: boolean
+  send_booking_confirmation: boolean
+  enroute_alert_hours: number
+  alert_distance_uk_miles: number
+  alert_distance_euro_miles: number
+  despatch_group: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface UserRole {
+  id: string
+  user_id: string
+  role_name: 'Company Admin' | 'Company User' | 'Finance Director' | 
+             'Finance Bookkeeper' | 'Driver' | 'Dispatcher' | 'Viewer'
+  granted_at: string
+}
+
+export interface UserProfileComplete extends Profile {
+  show_notification_bar: boolean
+  enable_load_alerts: boolean
+  send_booking_confirmation: boolean
+  enroute_alert_hours: number
+  alert_distance_uk_miles: number
+  alert_distance_euro_miles: number
+  despatch_group: string | null
+  company_name: string | null
+  roles: string[] | null
 }
 
 export interface Company {
@@ -34,7 +84,7 @@ export interface Driver {
   updated_at: string
 }
 
-// PUBLIC MARKETPLACE JOB
+// PUBLIC MARKETPLACE JOB - Extended for Delivery Tracking
 export interface Job {
   id: string
   created_at: string
@@ -53,58 +103,45 @@ export interface Job {
   assigned_company_id: string | null
   accepted_bid_id: string | null
   
-  // Tracking timestamps
-  on_my_way?: string | null
-  loaded_at?: string | null
-  on_site_pickup?: string | null
-  on_site_delivery?: string | null
-  delivered_on?: string | null
+  // Extended tracking fields
+  pickup_address_line1: string | null
+  pickup_postcode: string | null
+  pickup_city: string | null
+  delivery_address_line1: string | null
+  delivery_postcode: string | null
+  delivery_city: string | null
+  distance_miles: number | null
+  packaging: string | null
+  dimensions: string | null
+  requested_vehicle_type: string | null
   
-  // POD (Proof of Delivery) fields
-  received_by?: string | null
-  left_at?: string | null
-  no_of_items?: number | null
-  delivery_status?: string | null
-  pod_notes?: string | null
+  // Company and booking details
+  booked_by_company_name: string | null
+  booked_by_company_ref: string | null
+  booked_by_phone: string | null
+  load_id: string | null
   
-  // Payment and rate fields
-  payment_terms?: string | null
-  smartpay_enabled?: boolean | null
-  agreed_rate?: number | null
+  // Payment and rates
+  agreed_rate: number | null
+  payment_terms: string | null
+  smartpay_enabled: boolean
   
-  // Vehicle and customer references
-  vehicle_ref?: string | null
-  your_ref?: string | null
-  cust_ref?: string | null
+  // References
+  your_ref: string | null
+  cust_ref: string | null
+  items: number | null
   
-  // Packaging and dimensions
-  packaging?: string | null
-  length_cm?: number | null
-  width_cm?: number | null
-  height_cm?: number | null
-  distance_miles?: number | null
+  // Assignment
+  vehicle_ref: string | null
+  assigned_driver_id: string | null
   
-  // Booked by company information
-  booked_by_company_name?: string | null
-  booked_by_company_phone?: string | null
-  booked_by_company_email?: string | null
+  // Completion
+  completed_by_name: string | null
+  completed_at: string | null
   
-  // Pickup address fields
-  pickup_address_line1?: string | null
-  pickup_address_line2?: string | null
-  pickup_city?: string | null
-  pickup_postcode?: string | null
-  pickup_country?: string | null
-  
-  // Delivery address fields
-  delivery_address_line1?: string | null
-  delivery_address_line2?: string | null
-  delivery_city?: string | null
-  delivery_postcode?: string | null
-  delivery_country?: string | null
-  
-  // Assigned vehicle type
-  assigned_vehicle_type?: string | null
+  // Notes
+  load_notes: string | null
+  pod_required: boolean
 }
 
 // MARKETPLACE BID
@@ -148,97 +185,179 @@ export interface BidWithJob extends JobBid {
   job?: Job
 }
 
-// DELIVERY TRACKING TYPES
-
+// Tracking Events
 export interface TrackingEvent {
   id: string
   job_id: string
-  event_type: 'created' | 'assigned' | 'on_my_way' | 'loaded' | 'on_site_pickup' | 'on_site_delivery' | 'delivered' | 'completed' | 'cancelled' | 'note_added' | 'document_uploaded'
-  event_timestamp: string
-  user_id?: string | null
-  company_id?: string | null
-  event_data?: any | null
-  notes?: string | null
-  location?: string | null
+  event_type: 'on_my_way_to_pickup' | 'on_site_pickup' | 'loaded' | 
+              'on_my_way_to_delivery' | 'on_site_delivery' | 'delivered'
+  event_time: string
+  user_id: string | null
+  user_name: string | null
+  notes: string | null
   created_at: string
 }
 
+// Proof of Delivery
 export interface ProofOfDelivery {
-  received_by: string
-  left_at?: string | null
-  no_of_items?: number | null
-  delivery_status: string
-  pod_notes?: string | null
+  id: string
+  job_id: string
   delivered_on: string
-}
-
-export interface JobDocument {
-  id: string
-  job_id: string
-  document_type: 'pod' | 'invoice' | 'photo' | 'signature' | 'cmr' | 'other'
-  file_name: string
-  file_url: string
-  file_size?: number | null
-  mime_type?: string | null
-  uploaded_by?: string | null
-  uploaded_at: string
-  notes?: string | null
-  created_at: string
-}
-
-export interface JobNote {
-  id: string
-  job_id: string
-  user_id: string
-  note_type: 'general' | 'internal' | 'customer' | 'driver' | 'alert'
-  note_text: string
-  is_internal: boolean
+  received_by: string
+  left_at: string | null
+  no_of_items: number | null
+  delivery_status: 'Completed Delivery' | 'Partial Delivery' | 'Failed Delivery' | 'Refused' | 'Left Safe'
+  delivery_notes: string | null
+  signature_url: string | null
+  photo_urls: string[] | null
+  created_by: string | null
   created_at: string
   updated_at: string
 }
 
-export interface JobFeedback {
+// Job Documents
+export interface JobDocument {
   id: string
   job_id: string
-  rating: number
-  feedback_text?: string | null
-  given_by_company_id: string
-  given_to_company_id: string
+  document_type: 'POD' | 'Invoice' | 'Delivery Note' | 'CMR' | 'Photo' | 'Other'
+  document_url: string
+  document_name: string
+  uploaded_by: string | null
   created_at: string
 }
 
+// Job Notes
+export interface JobNote {
+  id: string
+  job_id: string
+  note_type: 'General' | 'Status Update' | 'Customer Communication' | 'Internal' | 'Issue' | 'Resolution'
+  note_text: string
+  is_internal: boolean
+  created_by: string | null
+  created_by_name: string | null
+  created_at: string
+}
+
+// Job Feedback
+export interface JobFeedback {
+  id: string
+  job_id: string
+  from_company_id: string | null
+  rating: number | null
+  feedback_text: string | null
+  feedback_type: 'Positive' | 'Neutral' | 'Negative' | null
+  created_at: string
+}
+
+// Job Invoice
 export interface JobInvoice {
   id: string
   job_id: string
   invoice_number: string
   invoice_date: string
-  due_date?: string | null
+  due_date: string
   amount: number
-  vat_amount?: number | null
+  vat_amount: number
   total_amount: number
   status: 'pending' | 'sent' | 'paid' | 'overdue' | 'cancelled'
-  payment_method?: string | null
-  paid_date?: string | null
-  notes?: string | null
-  created_by?: string | null
+  payment_terms: string | null
+  smartpay_transaction_id: string | null
+  invoice_url: string | null
   created_at: string
-  updated_at: string
+  paid_at: string | null
 }
 
+// Complete Job with all tracking data
 export interface JobWithTracking extends Job {
-  poster_company_name?: string | null
-  poster_company_phone?: string | null
-  poster_company_email?: string | null
-  assigned_company_name?: string | null
-  assigned_company_phone?: string | null
-  tracking_events_count?: number | null
-  documents_count?: number | null
-  notes_count?: number | null
-  latest_event_type?: string | null
-  latest_event_timestamp?: string | null
+  posted_by_company_name: string | null
+  posted_by_company_phone: string | null
+  assigned_company_name: string | null
+  assigned_company_phone: string | null
   tracking_events?: TrackingEvent[]
+  proof_of_delivery?: ProofOfDelivery
   documents?: JobDocument[]
   notes?: JobNote[]
   feedback?: JobFeedback[]
-  invoices?: JobInvoice[]
+  invoice?: JobInvoice
+  tracking_event_count: number
+  document_count: number
+  note_count: number
+}
+
+// Vehicle Types - Fleet Management
+export interface Vehicle {
+  id: string
+  company_id: string
+  vehicle_type: string
+  registration: string
+  make: string | null
+  model: string | null
+  year: number | null
+  notes: string | null
+  is_available: boolean
+  created_at: string
+  updated_at: string
+  
+  // Enhanced tracking fields
+  driver_name: string | null
+  current_status: string
+  current_location: string | null
+  last_tracked_at: string | null
+  future_position: string | null
+  future_journey: string | null
+  advertise_to: string
+  notify_when: string | null
+  is_tracked: boolean
+  vehicle_size: string | null
+  
+  // Detailed vehicle fields
+  telematics_id: string | null
+  vehicle_reference: string | null // What others can see
+  internal_reference: string | null // What you can see
+  body_type: string | null
+  notify_when_tracked: boolean
+  vin: string | null
+  has_livery: boolean
+  has_tail_lift: boolean
+  has_hiab: boolean
+  has_trailer: boolean
+  has_moffet_mounty: boolean
+  loading_capacity_m3: number | null
+  length_m: number | null
+  width_m: number | null
+  height_m: number | null
+  max_weight_kg: number | null
+}
+
+export interface VehicleDocument {
+  id: string
+  vehicle_id: string
+  document_name: string
+  document_url: string
+  expiry_date: string | null
+  uploaded_at: string
+  uploaded_by: string | null
+  created_at: string
+}
+
+export interface VehicleTrackingHistory {
+  id: string
+  vehicle_id: string
+  location: string
+  status: string | null
+  tracked_at: string
+  notes: string | null
+  created_at: string
+}
+
+export interface VehicleWithTracking extends Vehicle {
+  company_name: string | null
+  company_phone: string | null
+  tracking_count: number
+}
+
+export interface VehicleWithDetails extends Vehicle {
+  company_name: string | null
+  document_count: number
+  expired_documents_count: number
 }
