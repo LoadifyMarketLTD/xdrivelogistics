@@ -20,7 +20,11 @@ export default function PostJobPage() {
     delivery_datetime: '',
     vehicle_type: '',
     load_details: '',
+    cargo_type: '',
     pallets: '',
+    boxes: '',
+    bags: '',
+    items: '',
     weight_kg: '',
     budget: ''
   })
@@ -70,10 +74,23 @@ export default function PostJobPage() {
       if (formData.pickup_datetime) jobData.pickup_datetime = formData.pickup_datetime
       if (formData.delivery_datetime) jobData.delivery_datetime = formData.delivery_datetime
       if (formData.vehicle_type) jobData.vehicle_type = formData.vehicle_type
-      if (formData.load_details) jobData.load_details = formData.load_details
       if (formData.pallets) jobData.pallets = parseInt(formData.pallets)
       if (formData.weight_kg) jobData.weight_kg = parseFloat(formData.weight_kg)
       if (formData.budget) jobData.budget = parseFloat(formData.budget)
+      
+      // Build comprehensive load details with cargo info
+      let cargoInfo = []
+      if (formData.cargo_type) cargoInfo.push(`Cargo Type: ${formData.cargo_type}`)
+      if (formData.pallets) cargoInfo.push(`Pallets: ${formData.pallets}`)
+      if (formData.boxes) cargoInfo.push(`Boxes: ${formData.boxes}`)
+      if (formData.bags) cargoInfo.push(`Bags: ${formData.bags}`)
+      if (formData.items) cargoInfo.push(`Items: ${formData.items}`)
+      if (formData.weight_kg) cargoInfo.push(`Weight: ${formData.weight_kg} kg`)
+      
+      const cargoDetails = cargoInfo.length > 0 ? cargoInfo.join(' | ') : ''
+      const userDetails = formData.load_details ? formData.load_details : ''
+      
+      jobData.load_details = [cargoDetails, userDetails].filter(Boolean).join('\n\n')
 
       const { data, error } = await supabase
         .from('jobs')
@@ -256,7 +273,39 @@ export default function PostJobPage() {
                 </select>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+              {/* Cargo Type Selector */}
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
+                  Cargo Type
+                </label>
+                <select
+                  name="cargo_type"
+                  value={formData.cargo_type}
+                  onChange={handleChange}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '6px',
+                    color: '#2C3E50',
+                    fontSize: '14px'
+                  }}
+                >
+                  <option value="">Select cargo type</option>
+                  <option value="Palletized">Palletized</option>
+                  <option value="Boxed">Boxed/Cartons</option>
+                  <option value="Bagged">Bagged/Sacks</option>
+                  <option value="Loose">Loose Items</option>
+                  <option value="Furniture">Furniture</option>
+                  <option value="Equipment">Equipment</option>
+                  <option value="Mixed">Mixed Load</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              {/* Cargo Quantities Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                     Pallets
@@ -280,6 +329,77 @@ export default function PostJobPage() {
                   />
                 </div>
 
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
+                    Boxes
+                  </label>
+                  <input
+                    type="number"
+                    name="boxes"
+                    value={formData.boxes}
+                    onChange={handleChange}
+                    min="0"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '6px',
+                      color: '#2C3E50',
+                      fontSize: '14px'
+                    }}
+                    placeholder="0"
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
+                    Bags
+                  </label>
+                  <input
+                    type="number"
+                    name="bags"
+                    value={formData.bags}
+                    onChange={handleChange}
+                    min="0"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '6px',
+                      color: '#2C3E50',
+                      fontSize: '14px'
+                    }}
+                    placeholder="0"
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
+                    Items
+                  </label>
+                  <input
+                    type="number"
+                    name="items"
+                    value={formData.items}
+                    onChange={handleChange}
+                    min="0"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '6px',
+                      color: '#2C3E50',
+                      fontSize: '14px'
+                    }}
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                     Weight (kg)
