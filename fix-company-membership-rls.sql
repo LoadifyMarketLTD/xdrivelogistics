@@ -54,7 +54,7 @@ AS $$
   OR EXISTS (
     SELECT 1
     FROM public.profiles p
-    WHERE (p.id = auth.uid() OR p.user_id = auth.uid())
+    WHERE p.id = auth.uid()
       AND p.company_id = p_company_id
   );
 $$;
@@ -103,7 +103,7 @@ BEGIN
     -- Update creator's profile to link to company
     UPDATE public.profiles 
     SET company_id = NEW.id 
-    WHERE (id = NEW.created_by OR user_id = NEW.created_by) 
+    WHERE id = NEW.created_by 
       AND company_id IS NULL;
     
     RAISE NOTICE 'Auto-linked profile for user % to company %', NEW.created_by, NEW.id;
@@ -187,13 +187,13 @@ BEGIN
       WHERE c.created_by IS NOT NULL
         AND NOT EXISTS (
           SELECT 1 FROM public.profiles p
-          WHERE (p.id = c.created_by OR p.user_id = c.created_by)
+          WHERE p.id = c.created_by
             AND p.company_id = c.id
         )
     LOOP
       UPDATE public.profiles 
       SET company_id = company_record.id 
-      WHERE (id = company_record.created_by OR user_id = company_record.created_by)
+      WHERE id = company_record.created_by
         AND company_id IS NULL;
       
       rows_affected := rows_affected + 1;
@@ -229,7 +229,7 @@ SELECT
   END AS rls_status
 FROM public.companies c
 WHERE c.created_by = auth.uid()
-   OR EXISTS(SELECT 1 FROM public.profiles WHERE (id = auth.uid() OR user_id = auth.uid()) AND company_id = c.id)
+   OR EXISTS(SELECT 1 FROM public.profiles WHERE id = auth.uid() AND company_id = c.id)
    OR EXISTS(SELECT 1 FROM public.company_memberships WHERE user_id = auth.uid() AND company_id = c.id)
 ORDER BY c.created_at DESC;
 

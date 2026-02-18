@@ -12,8 +12,8 @@ SELECT
   (SELECT email FROM auth.users WHERE id = auth.uid()) AS current_user_email,
   
   -- 2. Profile Info (if using marketplace schema)
-  (SELECT company_id FROM public.profiles WHERE user_id = auth.uid() OR id = auth.uid()) AS profile_company_id,
-  (SELECT role FROM public.profiles WHERE user_id = auth.uid() OR id = auth.uid()) AS profile_role,
+  (SELECT company_id FROM public.profiles WHERE id = auth.uid()) AS profile_company_id,
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) AS profile_role,
   
   -- 3. Companies Created by Current User
   (SELECT json_agg(json_build_object('id', id, 'name', name, 'created_at', created_at))
@@ -36,12 +36,12 @@ SELECT
      'company_name', c.name,
      'is_member', public.is_company_member(c.id),
      'created_by_me', c.created_by = auth.uid(),
-     'in_profile', EXISTS(SELECT 1 FROM public.profiles WHERE (user_id = auth.uid() OR id = auth.uid()) AND company_id = c.id),
+     'in_profile', EXISTS(SELECT 1 FROM public.profiles WHERE id = auth.uid() AND company_id = c.id),
      'in_memberships', EXISTS(SELECT 1 FROM public.company_memberships WHERE user_id = auth.uid() AND company_id = c.id AND status = 'active')
    ))
    FROM public.companies c
    WHERE c.created_by = auth.uid() 
-      OR EXISTS(SELECT 1 FROM public.profiles WHERE (user_id = auth.uid() OR id = auth.uid()) AND company_id = c.id)
+      OR EXISTS(SELECT 1 FROM public.profiles WHERE id = auth.uid() AND company_id = c.id)
       OR EXISTS(SELECT 1 FROM public.company_memberships WHERE user_id = auth.uid() AND company_id = c.id)
   ) AS company_membership_status;
 
