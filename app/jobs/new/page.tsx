@@ -50,8 +50,17 @@ export default function PostJobPage() {
       const minutes = date.getMinutes()
       
       // Round to nearest 30 minutes (0 or 30)
-      const roundedMinutes = minutes < 15 ? 0 : minutes < 45 ? 30 : 0
-      const hourAdjustment = minutes >= 45 ? 1 : 0
+      let roundedMinutes: number
+      let hourAdjustment = 0
+      
+      if (minutes < 15) {
+        roundedMinutes = 0
+      } else if (minutes < 45) {
+        roundedMinutes = 30
+      } else {
+        roundedMinutes = 0
+        hourAdjustment = 1
+      }
       
       date.setMinutes(roundedMinutes)
       date.setSeconds(0)
@@ -59,13 +68,7 @@ export default function PostJobPage() {
       date.setHours(date.getHours() + hourAdjustment)
       
       // Return in datetime-local format (YYYY-MM-DDTHH:MM)
-      const year = date.getFullYear()
-      const month = String(date.getMonth() + 1).padStart(2, '0')
-      const day = String(date.getDate()).padStart(2, '0')
-      const hours = String(date.getHours()).padStart(2, '0')
-      const mins = String(date.getMinutes()).padStart(2, '0')
-      
-      return `${year}-${month}-${day}T${hours}:${mins}`
+      return date.toISOString().slice(0, 16)
     } catch (error) {
       console.error('Error rounding datetime:', error)
       return datetimeValue
@@ -76,18 +79,14 @@ export default function PostJobPage() {
     const { name, value } = e.target
     
     // For datetime fields, enforce 30-minute intervals
-    if (name === 'pickup_datetime' || name === 'delivery_datetime') {
-      const roundedValue = roundToNearest30Minutes(value)
-      setFormData(prev => ({
-        ...prev,
-        [name]: roundedValue
-      }))
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }))
-    }
+    const processedValue = (name === 'pickup_datetime' || name === 'delivery_datetime') 
+      ? roundToNearest30Minutes(value)
+      : value
+    
+    setFormData(prev => ({
+      ...prev,
+      [name]: processedValue
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
