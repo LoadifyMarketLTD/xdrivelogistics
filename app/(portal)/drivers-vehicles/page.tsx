@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
+import AddDriverModal from '@/components/modals/AddDriverModal'
+import AddVehicleModal from '@/components/modals/AddVehicleModal'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
@@ -32,52 +34,44 @@ export default function DriversVehiclesPage() {
   const [drivers, setDrivers] = useState<Driver[]>([])
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [loading, setLoading] = useState(true)
+  const [showAddDriver, setShowAddDriver] = useState(false)
+  const [showAddVehicle, setShowAddVehicle] = useState(false)
 
-  useEffect(() => {
+  const fetchData = async () => {
     if (!companyId) return
     
-    let mounted = true
-
-    const fetchData = async () => {
-      try {
-        setLoading(true)
-        
-        // Fetch drivers
-        const { data: driversData, error: driversError } = await supabase
-          .from('drivers')
-          .select('*')
-          .eq('company_id', companyId)
-          .order('created_at', { ascending: false })
-        
-        if (driversError) throw driversError
-        
-        // Fetch vehicles
-        const { data: vehiclesData, error: vehiclesError } = await supabase
-          .from('vehicles')
-          .select('*')
-          .eq('company_id', companyId)
-          .order('created_at', { ascending: false })
-        
-        if (vehiclesError) throw vehiclesError
-        
-        if (!mounted) return
-        
-        setDrivers(driversData || [])
-        setVehicles(vehiclesData || [])
-      } catch (err: any) {
-        console.error('Error fetching data:', err)
-      } finally {
-        if (mounted) {
-          setLoading(false)
-        }
-      }
+    try {
+      setLoading(true)
+      
+      // Fetch drivers
+      const { data: driversData, error: driversError } = await supabase
+        .from('drivers')
+        .select('*')
+        .eq('company_id', companyId)
+        .order('created_at', { ascending: false })
+      
+      if (driversError) throw driversError
+      
+      // Fetch vehicles
+      const { data: vehiclesData, error: vehiclesError } = await supabase
+        .from('vehicles')
+        .select('*')
+        .eq('company_id', companyId)
+        .order('created_at', { ascending: false })
+      
+      if (vehiclesError) throw vehiclesError
+      
+      setDrivers(driversData || [])
+      setVehicles(vehiclesData || [])
+    } catch (err: any) {
+      console.error('Error fetching data:', err)
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchData()
-
-    return () => {
-      mounted = false
-    }
   }, [companyId])
 
   if (loading) {
@@ -101,7 +95,7 @@ export default function DriversVehiclesPage() {
             <div className="section-header">
               <h2>Drivers ({drivers.length})</h2>
               <button
-                onClick={() => window.alert('Add driver functionality coming soon')}
+                onClick={() => setShowAddDriver(true)}
                 className="btn-primary"
               >
                 + Add Driver
@@ -147,7 +141,7 @@ export default function DriversVehiclesPage() {
             <div className="section-header">
               <h2>Vehicles ({vehicles.length})</h2>
               <button
-                onClick={() => window.alert('Add vehicle functionality coming soon')}
+                onClick={() => setShowAddVehicle(true)}
                 className="btn-primary"
               >
                 + Add Vehicle
@@ -192,6 +186,29 @@ export default function DriversVehiclesPage() {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      {showAddDriver && companyId && (
+        <AddDriverModal
+          companyId={companyId}
+          onClose={() => setShowAddDriver(false)}
+          onSuccess={() => {
+            fetchData()
+            setShowAddDriver(false)
+          }}
+        />
+      )}
+
+      {showAddVehicle && companyId && (
+        <AddVehicleModal
+          companyId={companyId}
+          onClose={() => setShowAddVehicle(false)}
+          onSuccess={() => {
+            fetchData()
+            setShowAddVehicle(false)
+          }}
+        />
+      )}
     </div>
   )
 }
