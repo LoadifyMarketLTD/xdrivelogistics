@@ -92,7 +92,7 @@ export default function CompanyOnboardingPage() {
         <div className="container">
           <div className="platform-nav">
             <div className="platform-brand">
-              <span className="platform-brand-accent">XDrive</span> Company Onboarding
+              <span className="platform-brand-accent">XDrive Logistics LTD</span> Company Onboarding
             </div>
           </div>
         </div>
@@ -120,7 +120,7 @@ export default function CompanyOnboardingPage() {
                 Create Your Company Profile
               </h1>
               <p style={{ fontSize: '15px', color: '#94a3b8', lineHeight: '1.6' }}>
-                Enter your company details to start using the XDrive Marketplace.
+                Enter your company details to start using the XDrive Logistics LTD Marketplace.
               </p>
             </div>
 

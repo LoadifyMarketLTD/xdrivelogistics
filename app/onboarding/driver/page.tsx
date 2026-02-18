@@ -95,7 +95,7 @@ export default function DriverOnboardingPage() {
         <div className="container">
           <div className="platform-nav">
             <div className="platform-brand">
-              <span className="platform-brand-accent">XDrive</span> Driver Onboarding
+              <span className="platform-brand-accent">XDrive Logistics LTD</span> Driver Onboarding
             </div>
           </div>
         </div>

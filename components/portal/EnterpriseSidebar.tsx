@@ -52,7 +52,7 @@ export default function EnterpriseSidebar() {
             color: '#d4af37',
             letterSpacing: '0.5px',
           }}>
-            XDRIVE LOGISTICS
+            XDrive Logistics LTD
           </div>
           <div style={{
             fontSize: '11px',
@@ -129,7 +129,7 @@ export default function EnterpriseSidebar() {
         className="sidebar-footer"
         >
           <div>Version 1.0</div>
-          <div style={{ marginTop: '4px' }}>© 2026 XDrive</div>
+          <div style={{ marginTop: '4px' }}>© 2026 XDrive Logistics LTD</div>
         </div>
       </div>
 

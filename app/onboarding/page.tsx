@@ -84,7 +84,7 @@ export default function OnboardingPage() {
         <div className="container">
           <div className="platform-nav">
             <div className="platform-brand">
-              <span className="platform-brand-accent">XDrive</span> Onboarding
+              <span className="platform-brand-accent">XDrive Logistics LTD</span> Onboarding
             </div>
           </div>
         </div>
@@ -109,7 +109,7 @@ export default function OnboardingPage() {
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>🚚</div>
               <h1 style={{ fontSize: '28px', marginBottom: '12px', color: '#fff' }}>
-                Welcome to XDrive Marketplace
+                Welcome to XDrive Logistics LTD Marketplace
               </h1>
               <p style={{ fontSize: '15px', color: '#94a3b8', lineHeight: '1.6' }}>
                 To post jobs and bid on transport opportunities, you need to create your company profile.

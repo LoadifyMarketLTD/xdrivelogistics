@@ -1,6 +1,6 @@
-# XDrive Logistics Website
+# XDrive Logistics LTD Website
 
-A modern, single-page website for XDrive Logistics - UK dedicated transport services.
+A modern, single-page website for XDrive Logistics LTD - UK dedicated transport services.
 
 ## Overview
 
@@ -187,7 +187,7 @@ See [SECURITY.md](SECURITY.md) for:
 
 ## Contact
 
-**XDrive Logistics**
+**XDrive Logistics LTD**
 - 📱 WhatsApp: +44 7423 272138
 - 📧 Email: xdrivelogisticsltd@gmail.com
 - 🌐 Website: https://xdrivelogistics.co.uk
@@ -196,4 +196,4 @@ See [SECURITY.md](SECURITY.md) for:
 
 © 2021 - 2026 XDrive Logistics LTD. All rights reserved.
 
-This website is proprietary software owned by XDrive Logistics / Loadify Market LTD.
+This website is proprietary software owned by XDrive Logistics LTD / Loadify Market LTD.

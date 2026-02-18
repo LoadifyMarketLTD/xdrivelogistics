@@ -41,13 +41,13 @@ export default function ClientScripts() {
     const emailLink = document.getElementById("emailLink");
 
     if (waLink) {
-      waLink.setAttribute('href', `https://wa.me/${CONTACT.whatsappNumber.replace(/\D/g, "")}?text=${encodeURIComponent("Hi XDrive Logistics, I'd like a quote. Pickup: ___ | Drop-off: ___ | Date: ___ | Load: ___")}`);
+      waLink.setAttribute('href', `https://wa.me/${CONTACT.whatsappNumber.replace(/\D/g, "")}?text=${encodeURIComponent("Hi XDrive Logistics LTD, I'd like a quote. Pickup: ___ | Drop-off: ___ | Date: ___ | Load: ___")}`);
     }
     if (phoneLink) {
       phoneLink.setAttribute('href', `tel:${CONTACT.phoneNumber}`);
     }
     if (emailLink) {
-      emailLink.setAttribute('href', `mailto:${CONTACT.email}?subject=${encodeURIComponent("Quote Request — XDrive Logistics")}&body=${encodeURIComponent("Hello XDrive Logistics,%0D%0A%0D%0APickup:%0D%0ADrop-off:%0D%0AService:%0D%0AVehicle:%0D%0ADate:%0D%0ALoad details:%0D%0A%0D%0AContact:%0D%0A")}`);
+      emailLink.setAttribute('href', `mailto:${CONTACT.email}?subject=${encodeURIComponent("Quote Request — XDrive Logistics LTD")}&body=${encodeURIComponent("Hello XDrive Logistics LTD,%0D%0A%0D%0APickup:%0D%0ADrop-off:%0D%0AService:%0D%0AVehicle:%0D%0ADate:%0D%0ALoad details:%0D%0A%0D%0AContact:%0D%0A")}`);
     }
 
     // Show details text

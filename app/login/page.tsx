@@ -75,7 +75,7 @@ export default function LoginPage() {
               color: '#1f2937',
               margin: '0 0 8px 0'
             }}>
-              Welcome to <span style={{ color: '#C8A64D' }}>XDrive</span>
+              Welcome to <span style={{ color: '#C8A64D' }}>XDrive Logistics LTD</span>
             </h1>
             <p style={{
               fontSize: '15px',

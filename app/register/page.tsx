@@ -91,7 +91,7 @@ export default function RegisterPage() {
               color: '#1f2937',
               margin: '0 0 8px 0'
             }}>
-              Join <span style={{ color: '#C8A64D' }}>XDrive</span>
+              Join <span style={{ color: '#C8A64D' }}>XDrive Logistics LTD</span>
             </h1>
             <p style={{
               fontSize: '15px',

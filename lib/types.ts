@@ -1,4 +1,4 @@
-// Database types for XDrive Logistics - Public Marketplace
+// Database types for XDrive Logistics LTD - Public Marketplace
 
 export interface Profile {
   id: string

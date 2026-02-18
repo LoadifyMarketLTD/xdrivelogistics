@@ -119,7 +119,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
               color: '#d4af37',
               letterSpacing: '0.5px',
             }}>
-              XDRIVE LOGISTICS
+              XDrive Logistics LTD
             </div>
           </div>
         </div>
@@ -212,7 +212,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             color: '#d4af37',
             letterSpacing: '0.5px',
           }}>
-            XDRIVE LOGISTICS
+            XDrive Logistics LTD
           </div>
           <div style={{
             fontSize: '11px',
@@ -277,7 +277,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           fontSize: '11px',
           color: '#9ca3af',
         }}>
-          <div>© 2026 XDrive Logistics</div>
+          <div>© 2026 XDrive Logistics LTD</div>
         </div>
       </div>
 
