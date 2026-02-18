@@ -1,5 +1,5 @@
 -- ============================================================
--- XDRIVE LOGISTICS - SUPABASE DATABASE SETUP
+-- XDrive Logistics LTD - SUPABASE DATABASE SETUP
 -- Complete SQL Script for Initial Setup
 -- Run this in Supabase SQL Editor
 -- ============================================================

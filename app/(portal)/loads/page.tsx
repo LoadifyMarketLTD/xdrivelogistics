@@ -476,17 +476,29 @@ export default function LoadsPage() {
                             {load.distance_miles && <span>📍 {load.distance_miles} miles</span>}
                           </div>
                         </div>
-                        {load.status === 'open' && (
+                        <div style={{ display: 'flex', gap: '8px' }}>
                           <button
                             onClick={(e) => {
                               e.stopPropagation()
-                              handlePlaceBid(load)
+                              router.push(`/loads/${load.id}`)
                             }}
-                            className="btn-quote"
+                            className="btn-secondary"
+                            style={{ padding: '8px 16px', fontSize: '14px' }}
                           >
-                            Quote Now
+                            View Details
                           </button>
-                        )}
+                          {load.status === 'open' && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handlePlaceBid(load)
+                              }}
+                              className="btn-quote"
+                            >
+                              Quote Now
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
 

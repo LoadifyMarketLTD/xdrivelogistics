@@ -743,7 +743,7 @@ The portal structure is:
 
 **LEFT SIDE** (220px fixed):
 - Dark charcoal sidebar (#1f2937)
-- White "XDRIVE LOGISTICS" branding at top
+- White "XDrive Logistics LTD" branding at top
 - Flat menu items in vertical list
 - Active item: Gold left border + lighter background
 - Hover: Slightly lighter background

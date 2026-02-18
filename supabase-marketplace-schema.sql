@@ -1,5 +1,5 @@
 -- ============================================================
--- XDRIVE LOGISTICS - PUBLIC MARKETPLACE SCHEMA
+-- XDrive Logistics LTD - PUBLIC MARKETPLACE SCHEMA
 -- Courier Exchange Style - All Jobs Public
 -- Run this in Supabase SQL Editor
 -- ============================================================

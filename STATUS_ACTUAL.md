@@ -1,4 +1,4 @@
-# 📍 STATUS ACTUAL - PROIECT XDRIVE LOGISTICS
+# 📍 STATUS ACTUAL - PROIECT XDrive Logistics LTD
 
 **Data:** 2026-02-17  
 **Întrebare:** În ce stadiu suntem?  
