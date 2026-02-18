@@ -22,11 +22,11 @@ import { cookies } from 'next/headers'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
     const supabase = createRouteHandlerClient({ cookies })
-    const { jobId } = params
+    const { jobId } = await params
 
     // Get authenticated user
     const { data: { session }, error: authError } = await supabase.auth.getSession()

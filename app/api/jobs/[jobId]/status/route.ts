@@ -29,11 +29,11 @@ interface StatusUpdateRequest {
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
     const supabase = createRouteHandlerClient({ cookies })
-    const { jobId } = params
+    const { jobId } = await params
 
     // Get current user
     const {
@@ -184,11 +184,11 @@ export async function POST(
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
     const supabase = createRouteHandlerClient({ cookies })
-    const { jobId } = params
+    const { jobId } = await params
 
     // Get current user
     const {
