@@ -1,6 +1,7 @@
 [build]
   command = "npm run build:all"
-  publish = ".next"
+  # Note: Do not specify 'publish' when using @netlify/plugin-nextjs
+  # The plugin handles deployment automatically
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
