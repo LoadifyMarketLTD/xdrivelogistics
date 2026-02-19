@@ -16,8 +16,10 @@ export default function PostJobPage() {
   const [formData, setFormData] = useState({
     pickup_location: '',
     delivery_location: '',
-    pickup_datetime: '',
-    delivery_datetime: '',
+    pickup_date: '',
+    pickup_time: '',
+    delivery_date: '',
+    delivery_time: '',
     vehicle_type: '',
     load_details: '',
     cargo_type: '',
@@ -27,6 +29,13 @@ export default function PostJobPage() {
     items: '',
     weight_kg: '',
     budget: ''
+  })
+
+  // Generate 30-minute time slots: 00:00, 00:30, 01:00, ... 23:30
+  const timeSlots = Array.from({ length: 48 }, (_, i) => {
+    const h = Math.floor(i / 2).toString().padStart(2, '0')
+    const m = i % 2 === 0 ? '00' : '30'
+    return `${h}:${m}`
   })
 
   useEffect(() => {
@@ -41,52 +50,9 @@ export default function PostJobPage() {
     }
   }, [authLoading, user, companyId, router])
 
-  // Round time to nearest 30-minute interval
-  const roundToNearest30Minutes = (datetimeValue: string): string => {
-    if (!datetimeValue) return ''
-    
-    try {
-      const date = new Date(datetimeValue)
-      const minutes = date.getMinutes()
-      
-      // Round to nearest 30 minutes (0 or 30)
-      let roundedMinutes: number
-      let hourAdjustment = 0
-      
-      if (minutes < 15) {
-        roundedMinutes = 0
-      } else if (minutes < 45) {
-        roundedMinutes = 30
-      } else {
-        roundedMinutes = 0
-        hourAdjustment = 1
-      }
-      
-      date.setMinutes(roundedMinutes)
-      date.setSeconds(0)
-      date.setMilliseconds(0)
-      date.setHours(date.getHours() + hourAdjustment)
-      
-      // Return in datetime-local format (YYYY-MM-DDTHH:MM)
-      return date.toISOString().slice(0, 16)
-    } catch (error) {
-      console.error('Error rounding datetime:', error)
-      return datetimeValue
-    }
-  }
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    
-    // For datetime fields, enforce 30-minute intervals
-    const processedValue = (name === 'pickup_datetime' || name === 'delivery_datetime') 
-      ? roundToNearest30Minutes(value)
-      : value
-    
-    setFormData(prev => ({
-      ...prev,
-      [name]: processedValue
-    }))
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -112,26 +78,17 @@ export default function PostJobPage() {
         status: 'open'
       }
 
-      if (formData.pickup_datetime) jobData.pickup_datetime = formData.pickup_datetime
-      if (formData.delivery_datetime) jobData.delivery_datetime = formData.delivery_datetime
+      if (formData.pickup_date && formData.pickup_time) jobData.pickup_datetime = `${formData.pickup_date}T${formData.pickup_time}`
+      if (formData.delivery_date && formData.delivery_time) jobData.delivery_datetime = `${formData.delivery_date}T${formData.delivery_time}`
       if (formData.vehicle_type) jobData.vehicle_type = formData.vehicle_type
+      if (formData.cargo_type) jobData.cargo_type = formData.cargo_type
       if (formData.pallets) jobData.pallets = parseInt(formData.pallets)
+      if (formData.boxes) jobData.boxes = parseInt(formData.boxes)
+      if (formData.bags) jobData.bags = parseInt(formData.bags)
+      if (formData.items) jobData.items = parseInt(formData.items)
       if (formData.weight_kg) jobData.weight_kg = parseFloat(formData.weight_kg)
       if (formData.budget) jobData.budget = parseFloat(formData.budget)
-      
-      // Build comprehensive load details with cargo info
-      const cargoInfo = []
-      if (formData.cargo_type) cargoInfo.push(`Cargo Type: ${formData.cargo_type}`)
-      if (formData.pallets) cargoInfo.push(`Pallets: ${formData.pallets}`)
-      if (formData.boxes) cargoInfo.push(`Boxes: ${formData.boxes}`)
-      if (formData.bags) cargoInfo.push(`Bags: ${formData.bags}`)
-      if (formData.items) cargoInfo.push(`Items: ${formData.items}`)
-      if (formData.weight_kg) cargoInfo.push(`Weight: ${formData.weight_kg} kg`)
-      
-      const cargoDetails = cargoInfo.length > 0 ? cargoInfo.join(' | ') : ''
-      const userDetails = formData.load_details ? formData.load_details : ''
-      
-      jobData.load_details = [cargoDetails, userDetails].filter(Boolean).join('\n\n')
+      if (formData.load_details) jobData.load_details = formData.load_details
 
       const { data, error } = await supabase
         .from('jobs')
@@ -247,22 +204,42 @@ export default function PostJobPage() {
                   <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                     Pickup Date & Time
                   </label>
-                  <input
-                    type="datetime-local"
-                    name="pickup_datetime"
-                    value={formData.pickup_datetime}
-                    onChange={handleChange}
-                    step="1800"
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      backgroundColor: '#FFFFFF',
-                      border: '1px solid #E5E7EB',
-                      borderRadius: '6px',
-                      color: '#2C3E50',
-                      fontSize: '14px'
-                    }}
-                  />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <input
+                      type="date"
+                      name="pickup_date"
+                      value={formData.pickup_date}
+                      onChange={handleChange}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #E5E7EB',
+                        borderRadius: '6px',
+                        color: '#2C3E50',
+                        fontSize: '14px'
+                      }}
+                    />
+                    <select
+                      name="pickup_time"
+                      value={formData.pickup_time}
+                      onChange={handleChange}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #E5E7EB',
+                        borderRadius: '6px',
+                        color: '#2C3E50',
+                        fontSize: '14px'
+                      }}
+                    >
+                      <option value="">Select time</option>
+                      {timeSlots.map(t => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
                   <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
                     Times are rounded to 30-minute intervals
                   </div>
@@ -272,22 +249,42 @@ export default function PostJobPage() {
                   <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#2C3E50' }}>
                     Delivery Date & Time
                   </label>
-                  <input
-                    type="datetime-local"
-                    name="delivery_datetime"
-                    value={formData.delivery_datetime}
-                    onChange={handleChange}
-                    step="1800"
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      backgroundColor: '#FFFFFF',
-                      border: '1px solid #E5E7EB',
-                      borderRadius: '6px',
-                      color: '#2C3E50',
-                      fontSize: '14px'
-                    }}
-                  />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <input
+                      type="date"
+                      name="delivery_date"
+                      value={formData.delivery_date}
+                      onChange={handleChange}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #E5E7EB',
+                        borderRadius: '6px',
+                        color: '#2C3E50',
+                        fontSize: '14px'
+                      }}
+                    />
+                    <select
+                      name="delivery_time"
+                      value={formData.delivery_time}
+                      onChange={handleChange}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #E5E7EB',
+                        borderRadius: '6px',
+                        color: '#2C3E50',
+                        fontSize: '14px'
+                      }}
+                    >
+                      <option value="">Select time</option>
+                      {timeSlots.map(t => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
                   <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
                     Times are rounded to 30-minute intervals
                   </div>
