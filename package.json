@@ -7,11 +7,14 @@
     "node": "20.x"
   },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "vite",
+    "dev:portal": "next dev",
+    "build": "npm run build:landing && npm run build:portal",
+    "build:landing": "tsc -b tsconfig.app.json && vite build",
+    "build:portal": "next build",
+    "start": "vite preview",
     "lint": "eslint .",
-    "preview": "next start"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
