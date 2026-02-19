@@ -1,8 +1,6 @@
 -- ============================================================
--- INVOICE SYSTEM - QUICK START SQL
--- SISTEM FACTURI - SQL PORNIRE RAPIDĂ
--- Minimal version - copy and paste in Supabase SQL Editor
--- Versiune minimală - copiază și lipește în Supabase SQL Editor
+-- INVOICE SQL - To run in Supabase SQL Editor
+-- SQL pentru INVOICE - De rulat în Supabase SQL Editor
 -- ============================================================
 -- ✅ Safe to run: Folosește IF NOT EXISTS - nu va șterge date
 -- ✅ Idempotent: Poți rula de mai multe ori fără probleme
@@ -93,14 +91,14 @@ CREATE POLICY "Users can manage company invoices"
 -- Tabelul de facturi este acum gata de utilizare!
 -- 
 -- You can now:
--- - Create invoices linked to jobs
--- - Track invoice status (pending, sent, paid, overdue, cancelled)
--- - Auto-generate invoice numbers (INV-2026-1001, INV-2026-1002, etc.)
--- - Manage invoices with Row Level Security
+-- - Create invoices
+-- - Track invoice status
+-- - Auto-generate invoice numbers
+-- - Link invoices to jobs
 -- 
 -- Acum poți:
--- - Crea facturi legate de joburi
--- - Urmări statusul facturilor (pending, sent, paid, overdue, cancelled)
--- - Auto-generare numere facturi (INV-2026-1001, INV-2026-1002, etc.)
--- - Gestiona facturi cu Row Level Security
+-- - Crea facturi
+-- - Urmări statusul facturilor
+-- - Auto-genera numere de facturi
+-- - Lega facturi de joburi
 -- ============================================================

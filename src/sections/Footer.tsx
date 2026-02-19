@@ -55,9 +55,9 @@ export function Footer() {
                 <Phone className="w-4 h-4 text-orange-500" />
                 <span>07423 272138</span>
               </a>
-              <a href="mailto:xdrivelogisticsltd@gmail.com" className="flex items-center gap-3 text-muted-foreground hover:text-white transition-colors">
+              <a href="mailto:contact@xdrivelogistics.co.uk" className="flex items-center gap-3 text-muted-foreground hover:text-white transition-colors">
                 <Mail className="w-4 h-4 text-orange-500" />
-                <span>xdrivelogisticsltd@gmail.com</span>
+                <span>contact@xdrivelogistics.co.uk</span>
               </a>
               <div className="flex items-center gap-3 text-muted-foreground">
                 <MapPin className="w-4 h-4 text-orange-500" />
@@ -131,8 +131,8 @@ export function Footer() {
         {/* Company Info */}
         <div className="mt-8 pt-8 border-t border-border text-center">
           <p className="text-xs text-muted-foreground">
-            XDrive Logistics Ltd. | Înregistrată în Anglia și Țara Galilor | Company Number: 13171804 |
-            VAT: GB375949535 | Adresă: 101 Cornelian Street Blackburn BB1 9QL
+            XDrive Logistics Ltd. | Înregistrată în Anglia și Țara Galilor | Company Number: 13185532 |
+            VAT: GB372319642 | Adresă: Unit 1, Furthergate Industrial Estate, Blackburn BB1 3BD
           </p>
         </div>
       </div>

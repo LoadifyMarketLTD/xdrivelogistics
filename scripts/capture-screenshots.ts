@@ -12,8 +12,8 @@
  *   - Press Enter in the terminal to continue after login
  * 
  * Environment Variables Required:
- *   - NEXT_PUBLIC_SUPABASE_URL
- *   - NEXT_PUBLIC_SUPABASE_ANON_KEY
+ *   - VITE_SUPABASE_URL
+ *   - VITE_SUPABASE_ANON_KEY
  * 
  * Security:
  *   - NO credentials are hardcoded

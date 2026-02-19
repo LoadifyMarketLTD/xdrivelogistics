@@ -5,8 +5,6 @@ import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
 import AddDriverModal from '@/components/modals/AddDriverModal'
 import AddVehicleModal from '@/components/modals/AddVehicleModal'
-import ResponsiveContainer from '@/components/layout/ResponsiveContainer'
-import ResponsiveGrid from '@/components/layout/ResponsiveGrid'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
@@ -85,16 +83,15 @@ export default function DriversVehiclesPage() {
   }
 
   return (
-    <ResponsiveContainer maxWidth="xl">
-      <div className="portal-layout">
-        <div className="portal-header">
-          <h1 className="portal-title">Drivers & Vehicles</h1>
-        </div>
+    <div className="portal-layout">
+      <div className="portal-header">
+        <h1 className="portal-title">Drivers & Vehicles</h1>
+      </div>
 
-        <div className="portal-main">
-          <ResponsiveGrid columns={{ mobile: 1, tablet: 1, desktop: 2, wide: 2, ultrawide: 2 }}>
-            {/* Drivers Section */}
-            <div>
+      <div className="portal-main">
+        <div className="two-column-grid">
+          {/* Drivers Section */}
+          <div>
             <div className="section-header">
               <h2>Drivers ({drivers.length})</h2>
               <button
@@ -187,7 +184,7 @@ export default function DriversVehiclesPage() {
               </div>
             </div>
           </div>
-        </ResponsiveGrid>
+        </div>
       </div>
 
       {/* Modals */}
@@ -212,7 +209,6 @@ export default function DriversVehiclesPage() {
           }}
         />
       )}
-      </div>
-    </ResponsiveContainer>
+    </div>
   )
 }

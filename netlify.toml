@@ -1,12 +1,7 @@
 [build]
-  command = "npm run build"
-  publish = "dist"
+command = "npm run build"
+publish = "dist"
 
-# SPA redirect - ensures client-side routing works
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-[functions]
-  directory = "netlify/functions"
+# Note: SPA redirects are handled via public/_redirects file
+# (more standard than [[redirects]] in netlify.toml for Vite projects)
+# No [functions] section - directory doesn't exist and causes 503 errors
