@@ -99,6 +99,33 @@ create table if not exists public.driver_vehicle_assignments (
 );
 
 -- 4) Loads / Jobs
+
+-- Marketplace job postings (queried by the app as public.jobs)
+create table if not exists public.jobs (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  posted_by_company_id uuid not null references public.companies(id) on delete cascade,
+  status text not null default 'open'
+    check (status in ('open', 'assigned', 'in-transit', 'completed', 'cancelled')),
+  pickup_location text not null,
+  delivery_location text not null,
+  pickup_datetime timestamptz,
+  delivery_datetime timestamptz,
+  vehicle_type text,
+  load_details text,
+  pallets integer,
+  weight_kg numeric,
+  budget numeric,
+  assigned_company_id uuid references public.companies(id),
+  accepted_bid_id uuid
+);
+
+create index if not exists idx_jobs_status on public.jobs(status);
+create index if not exists idx_jobs_created_at on public.jobs(created_at desc);
+create index if not exists idx_jobs_posted_by on public.jobs(posted_by_company_id);
+create index if not exists idx_jobs_assigned_to on public.jobs(assigned_company_id);
+
 create table if not exists public.loads (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
@@ -279,7 +306,7 @@ do $$
 declare
   t text;
 begin
-  foreach t in array array['profiles','companies','drivers','vehicles','driver_vehicle_assignments','loads','job_bids','live_availability','return_journeys','diary_entries','quotes']
+  foreach t in array array['profiles','companies','drivers','vehicles','driver_vehicle_assignments','jobs','loads','job_bids','live_availability','return_journeys','diary_entries','quotes']
   loop
     -- create trigger only if table exists
     if exists (select 1 from information_schema.tables where table_schema='public' and table_name=t) then
@@ -322,6 +349,7 @@ alter table public.drivers enable row level security;
 alter table public.vehicles enable row level security;
 alter table public.driver_vehicle_assignments enable row level security;
 
+alter table public.jobs enable row level security;
 alter table public.loads enable row level security;
 alter table public.job_bids enable row level security;
 
@@ -427,6 +455,32 @@ begin
     execute format('create policy "%s_delete_company" on public.%I for delete using (public.is_company_member(company_id));', tbl, tbl);
   end loop;
 end $$;
+
+-- JOBS: poster company can manage their own jobs; all authenticated users can view open jobs
+drop policy if exists "jobs_select_open_or_company" on public.jobs;
+create policy "jobs_select_open_or_company"
+on public.jobs for select
+using (
+  status = 'open'
+  or public.is_company_member(posted_by_company_id)
+  or public.is_company_member(assigned_company_id)
+);
+
+drop policy if exists "jobs_insert_company" on public.jobs;
+create policy "jobs_insert_company"
+on public.jobs for insert
+with check (public.is_company_member(posted_by_company_id));
+
+drop policy if exists "jobs_update_company" on public.jobs;
+create policy "jobs_update_company"
+on public.jobs for update
+using (public.is_company_member(posted_by_company_id))
+with check (public.is_company_member(posted_by_company_id));
+
+drop policy if exists "jobs_delete_company" on public.jobs;
+create policy "jobs_delete_company"
+on public.jobs for delete
+using (public.is_company_member(posted_by_company_id));
 
 -- LOADS: members can create/update/delete their company loads;
 -- select rule: allow members to see published loads + their own company loads
