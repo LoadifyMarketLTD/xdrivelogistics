@@ -1,6 +1,8 @@
 # XDrive Logistics
 
-A modern logistics and courier exchange platform built with React, TypeScript, Vite, Next.js, and Supabase.
+A modern logistics and courier exchange platform built with React, TypeScript, and Supabase.
+
+This is a hybrid application that uses **Vite** for the landing page and **Next.js** for the portal application.
 
 ## 🔧 Environment Variables
 
