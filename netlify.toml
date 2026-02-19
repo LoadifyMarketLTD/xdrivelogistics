@@ -1,12 +1,11 @@
 [build]
   command = "npm run build:all"
-  publish = "dist"
   
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
 
-# Next.js plugin - auto-detects .next/ directory
+# Next.js plugin - handles deployment automatically
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
