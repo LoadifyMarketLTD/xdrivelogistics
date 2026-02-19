@@ -175,4 +175,64 @@ Once environment variables are properly configured:
 
 ---
 
-*Last updated: 2024-02-16*
+## 🚀 Build Caching Configuration
+
+### Next.js Build Cache
+
+The application uses the `@netlify/plugin-nextjs` plugin to enable Next.js-specific features and build caching. This plugin:
+
+- Automatically caches the `.next/cache` directory between builds
+- Speeds up subsequent builds by reusing compiled assets
+- Enables features like ISR (Incremental Static Regeneration), Server Actions, and image optimization
+
+### Plugin Configuration
+
+The plugin is configured in two places:
+
+1. **netlify.toml**: Specifies the plugin to use
+   ```toml
+   [[plugins]]
+   package = "@netlify/plugin-nextjs"
+   ```
+
+2. **package.json**: Installed as a devDependency for better performance
+   ```json
+   "@netlify/plugin-nextjs": "^5.15.8"
+   ```
+
+### Understanding Build Cache Warnings
+
+On the **first build** or after a cache clear, you might see:
+```
+⚠ No build cache found. Please configure build caching for faster rebuilds.
+```
+
+**This is normal!** It means:
+- This is the first build, so no cache exists yet
+- The cache was manually cleared
+- Dependencies changed significantly
+
+**On subsequent builds**, you should see:
+```
+✓ Restored Next.js cache
+✓ Build completed in [faster time]
+```
+
+The cache will be automatically restored and used for faster builds.
+
+### Cache Management
+
+Netlify manages caching automatically. If you need to force a clean build:
+
+1. Go to **Deploys** tab
+2. Click **Trigger deploy**
+3. Select **Clear cache and deploy**
+
+This is useful when:
+- Troubleshooting build issues
+- After updating build dependencies
+- After changing build configuration
+
+---
+
+*Last updated: 2026-02-19*

@@ -1,7 +1,19 @@
-[build]
-  command = "npm run build:all"
-  # Removed: publish = "dist" - conflicts with @netlify/plugin-nextjs
-  # Plugin requires exclusive deployment control
+# Netlify Configuration for XDrive Logistics
+# This project combines Vite (landing page) + Next.js (portal)
 
+[build]
+  # Build command compiles both landing page and portal
+  # 1. Builds Vite landing page to dist/
+  # 2. Integrates landing page into Next.js public/
+  # 3. Builds Next.js portal
+  command = "npm run build:all"
+  
+  # NOTE: Do not set 'publish' directory!
+  # The @netlify/plugin-nextjs plugin manages deployment automatically
+  # Setting 'publish' would conflict with the plugin's routing and SSR features
+
+# Next.js Runtime Plugin
+# Enables automatic caching, SSR, ISR, Server Actions, and image optimization
+# Plugin is also installed as devDependency in package.json for better performance
 [[plugins]]
   package = "@netlify/plugin-nextjs"
