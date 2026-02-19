@@ -1,22 +1,12 @@
-<<<<<<< HEAD
 import { useState, type FormEvent } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-=======
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
->>>>>>> fc40151c782e7b98764690e05d42936c52f67356
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-<<<<<<< HEAD
 import { Truck, Eye, EyeOff, Phone } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
-=======
-import { Truck, Eye, EyeOff, Phone, AlertCircle } from 'lucide-react';
-import { supabase } from '@/lib/supabaseClient';
->>>>>>> fc40151c782e7b98764690e05d42936c52f67356
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -26,7 +16,6 @@ interface LoginModalProps {
 export function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState('login');
-<<<<<<< HEAD
   const [isLoading, setIsLoading] = useState(false);
 
   // Login form state
@@ -52,34 +41,10 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-=======
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  
-  // Login form state
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  
-  // Register form state
-  const [registerEmail, setRegisterEmail] = useState('');
-  const [registerPassword, setRegisterPassword] = useState('');
-  const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(null);
-    setLoading(true);
-
-    try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
->>>>>>> fc40151c782e7b98764690e05d42936c52f67356
         email: loginEmail,
         password: loginPassword,
       });
 
-<<<<<<< HEAD
       if (error) {
         // Show specific error messages
         if (error.message.includes('Invalid login credentials')) {
@@ -173,65 +138,6 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
       toast.error('Eroare neașteptată la înregistrare');
     } finally {
       setIsLoading(false);
-=======
-      if (signInError) throw signInError;
-
-      if (data.user) {
-        // Success!
-        setSuccess('Autentificare reușită! Bine ai revenit!');
-        setLoginEmail('');
-        setLoginPassword('');
-        
-        // Close modal after 2 seconds
-        setTimeout(() => {
-          onClose();
-          setSuccess(null);
-        }, 2000);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Autentificare eșuată. Verifică email-ul și parola.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(null);
-
-    if (registerPassword !== registerConfirmPassword) {
-      setError('Parolele nu coincid');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: registerEmail,
-        password: registerPassword,
-      });
-
-      if (signUpError) throw signUpError;
-
-      if (data.user) {
-        setSuccess('Contul a fost creat! Verifică email-ul pentru confirmare.');
-        setRegisterEmail('');
-        setRegisterPassword('');
-        setRegisterConfirmPassword('');
-        
-        // Switch to login tab after 3 seconds
-        setTimeout(() => {
-          setActiveTab('login');
-          setSuccess(null);
-        }, 3000);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Înregistrare eșuată. Încearcă din nou.');
-    } finally {
-      setLoading(false);
->>>>>>> fc40151c782e7b98764690e05d42936c52f67356
     }
   };
 
@@ -252,23 +158,6 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-<<<<<<< HEAD
-=======
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 flex items-start gap-2">
-            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-500">{error}</p>
-          </div>
-        )}
-
-        {success && (
-          <div className="bg-green-500/10 border border-green-500/50 rounded-lg p-3 flex items-start gap-2">
-            <AlertCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-green-500">{success}</p>
-          </div>
-        )}
-
->>>>>>> fc40151c782e7b98764690e05d42936c52f67356
         <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="mt-4">
           <TabsList className="grid w-full grid-cols-2 bg-secondary">
             <TabsTrigger value="login" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
@@ -287,18 +176,11 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                   id="email"
                   type="email"
                   placeholder="nume@exemplu.com"
-<<<<<<< HEAD
                   className="bg-secondary border-border text-white placeholder:text-muted-foreground"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   disabled={isLoading}
                   required
-=======
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  required
-                  className="bg-secondary border-border text-white placeholder:text-muted-foreground"
->>>>>>> fc40151c782e7b98764690e05d42936c52f67356
                 />
               </div>
               <div className="space-y-2">
@@ -308,18 +190,11 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
-<<<<<<< HEAD
                     className="bg-secondary border-border text-white placeholder:text-muted-foreground pr-10"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     disabled={isLoading}
                     required
-=======
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    required
-                    className="bg-secondary border-border text-white placeholder:text-muted-foreground pr-10"
->>>>>>> fc40151c782e7b98764690e05d42936c52f67356
                   />
                   <button
                     type="button"
@@ -332,16 +207,12 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <label className="flex items-center gap-2 cursor-pointer">
-<<<<<<< HEAD
                   <input 
                     type="checkbox" 
                     className="rounded border-border bg-secondary"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
                   />
-=======
-                  <input type="checkbox" className="rounded border-border bg-secondary" />
->>>>>>> fc40151c782e7b98764690e05d42936c52f67356
                   <span className="text-muted-foreground">Ține-mă minte</span>
                 </label>
                 <a href="#" className="text-orange-500 hover:text-orange-400">
@@ -349,19 +220,11 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 </a>
               </div>
               <Button 
-<<<<<<< HEAD
                 type="submit"
                 className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-5"
                 disabled={isLoading}
               >
                 {isLoading ? 'Se procesează...' : 'Intră în Cont'}
-=======
-                type="submit" 
-                disabled={loading}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-5"
-              >
-                {loading ? 'Se încarcă...' : 'Intră în Cont'}
->>>>>>> fc40151c782e7b98764690e05d42936c52f67356
               </Button>
             </form>
           </TabsContent>
@@ -374,18 +237,11 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                   id="reg-email"
                   type="email"
                   placeholder="nume@exemplu.com"
-<<<<<<< HEAD
                   className="bg-secondary border-border text-white placeholder:text-muted-foreground"
                   value={registerEmail}
                   onChange={(e) => setRegisterEmail(e.target.value)}
                   disabled={isLoading}
                   required
-=======
-                  value={registerEmail}
-                  onChange={(e) => setRegisterEmail(e.target.value)}
-                  required
-                  className="bg-secondary border-border text-white placeholder:text-muted-foreground"
->>>>>>> fc40151c782e7b98764690e05d42936c52f67356
                 />
               </div>
               <div className="space-y-2">
@@ -395,20 +251,12 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                     id="reg-password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
-<<<<<<< HEAD
                     className="bg-secondary border-border text-white placeholder:text-muted-foreground pr-10"
                     value={registerPassword}
                     onChange={(e) => setRegisterPassword(e.target.value)}
                     disabled={isLoading}
                     required
                     minLength={6}
-=======
-                    value={registerPassword}
-                    onChange={(e) => setRegisterPassword(e.target.value)}
-                    required
-                    minLength={6}
-                    className="bg-secondary border-border text-white placeholder:text-muted-foreground pr-10"
->>>>>>> fc40151c782e7b98764690e05d42936c52f67356
                   />
                   <button
                     type="button"
@@ -425,7 +273,6 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                   id="reg-confirm"
                   type="password"
                   placeholder="••••••••"
-<<<<<<< HEAD
                   className="bg-secondary border-border text-white placeholder:text-muted-foreground"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -441,16 +288,6 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                   onChange={(e) => setAcceptTerms(e.target.checked)}
                   required
                 />
-=======
-                  value={registerConfirmPassword}
-                  onChange={(e) => setRegisterConfirmPassword(e.target.value)}
-                  required
-                  className="bg-secondary border-border text-white placeholder:text-muted-foreground"
-                />
-              </div>
-              <div className="flex items-start gap-2 text-sm">
-                <input type="checkbox" required className="rounded border-border bg-secondary mt-0.5" />
->>>>>>> fc40151c782e7b98764690e05d42936c52f67356
                 <span className="text-muted-foreground">
                   Sunt de acord cu{' '}
                   <a href="#" className="text-orange-500 hover:text-orange-400">Termenii și Condițiile</a>
@@ -460,17 +297,10 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
               </div>
               <Button 
                 type="submit"
-<<<<<<< HEAD
                 className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-5"
                 disabled={isLoading}
               >
                 {isLoading ? 'Se procesează...' : 'Creează Cont'}
-=======
-                disabled={loading}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-5"
-              >
-                {loading ? 'Se creează...' : 'Creează Cont'}
->>>>>>> fc40151c782e7b98764690e05d42936c52f67356
               </Button>
             </form>
           </TabsContent>

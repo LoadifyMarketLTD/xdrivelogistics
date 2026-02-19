@@ -4,8 +4,6 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-<<<<<<< HEAD
-=======
 
 /**
  * Adds three numbers together (A+B+C)
@@ -17,4 +15,3 @@ export function cn(...inputs: ClassValue[]) {
 export function sum(a: number, b: number, c: number): number {
   return a + b + c
 }
->>>>>>> fc40151c782e7b98764690e05d42936c52f67356
