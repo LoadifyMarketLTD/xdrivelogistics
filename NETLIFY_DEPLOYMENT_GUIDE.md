@@ -123,7 +123,7 @@ These are listed in `.gitignore`.
 2. **Configure Build Settings**
    - Build command: `npm run build:all`
    - Publish directory: Leave empty (plugin handles it)
-   - Node version: 20.x
+   - Node version: 20 or higher (>=20.0.0)
 
 3. **Add Environment Variables**
    - Go to Site settings → Environment variables
