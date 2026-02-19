@@ -241,7 +241,7 @@ export default function PostJobPage() {
                     </select>
                   </div>
                   <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
-                    Times are in 30-minute intervals
+                    Times are rounded to 30-minute intervals
                   </div>
                 </div>
 
@@ -286,7 +286,7 @@ export default function PostJobPage() {
                     </select>
                   </div>
                   <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
-                    Times are in 30-minute intervals
+                    Times are rounded to 30-minute intervals
                   </div>
                 </div>
               </div>
