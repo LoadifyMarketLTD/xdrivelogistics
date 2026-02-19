@@ -7,11 +7,11 @@
     "node": "20.x"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "start": "vite preview",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "next start"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -67,6 +67,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@netlify/plugin-nextjs": "^5.15.8",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
