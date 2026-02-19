@@ -98,9 +98,12 @@ npm run preview
 ## 📚 Documentation
 
 ### Environment Variables & API Keys
-- `CONFIGURARE_CHEI_SUPABASE.md` - 🇷🇴 **Complete Romanian guide** for Supabase API keys (ANON KEY explained!)
+- 🚀 **`VALORILE_PENTRU_NETLIFY.md`** - 🇷🇴 **Valorile exacte pentru Netlify** (Ready to copy-paste!)
+- 📋 **`TABEL_VALORI_NETLIFY.md`** - 🇷🇴 **Tabel rapid** cu toate cele 5 variabile
+- `CONFIGURARE_CHEI_SUPABASE.md` - 🇷🇴 Complete Romanian guide for Supabase API keys (ANON KEY explained!)
 - `SETARI_MEDIU_RO.md` - 🇷🇴 Romanian quick start guide for environment variables
 - `ENVIRONMENT_VARIABLES.md` - Comprehensive environment setup guide (English)
+- `SUPABASE_KEYS_SUMMARY.md` - Quick reference summary
 
 ### Deployment & Database
 - `NETLIFY_SETUP.md` - Netlify deployment configuration
