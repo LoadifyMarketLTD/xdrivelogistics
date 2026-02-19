@@ -31,9 +31,6 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
-    
-    console.log('LOGIN_CLICK');
-    console.log('LOGIN_SUBMIT', loginEmail);
 
     if (!loginEmail || !loginPassword) {
       toast.error('Vă rugăm să completați toate câmpurile');
@@ -47,8 +44,6 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
         email: loginEmail,
         password: loginPassword,
       });
-
-      console.log('LOGIN_RESULT', { error, data });
 
       if (error) {
         // Show specific error messages
@@ -64,7 +59,6 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
       if (data.user) {
         toast.success('Autentificare reușită! Bine ai revenit!');
-        console.log('LOGIN SUCCESS - redirecting to dashboard');
         
         // Close modal
         onClose();
@@ -77,10 +71,8 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
         // For now, just show success. In a real app with routing, use:
         // window.location.href = '/dashboard';
         // or with React Router: navigate('/dashboard');
-        console.log('✅ User logged in:', data.user.email);
       }
     } catch (err: any) {
-      console.error('LOGIN_ERROR', err);
       toast.error('Eroare neașteptată la autentificare');
     } finally {
       setIsLoading(false);
@@ -89,9 +81,6 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
-
-    console.log('REGISTER_CLICK');
-    console.log('REGISTER_SUBMIT', registerEmail);
 
     if (!registerEmail || !registerPassword || !confirmPassword) {
       toast.error('Vă rugăm să completați toate câmpurile');
@@ -124,8 +113,6 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
         },
       });
 
-      console.log('REGISTER_RESULT', { error, data });
-
       if (error) {
         if (error.message.includes('User already registered')) {
           toast.error('Acest email este deja înregistrat');
@@ -148,7 +135,6 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
         setActiveTab('login');
       }
     } catch (err: any) {
-      console.error('REGISTER_ERROR', err);
       toast.error('Eroare neașteptată la înregistrare');
     } finally {
       setIsLoading(false);
