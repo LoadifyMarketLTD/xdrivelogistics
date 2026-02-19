@@ -12,7 +12,7 @@ import '@/styles/portal.css'
 export const dynamic = 'force-dynamic'
 
 export default function FreightVisionPage() {
-  const { companyId } = useAuth()
+  const { companyId, user } = useAuth()
   const [stats, setStats] = useState({ totalJobs: 0, completedJobs: 0, totalRevenue: 0, activeBids: 0 })
   const [loading, setLoading] = useState(true)
   
@@ -26,7 +26,7 @@ export default function FreightVisionPage() {
         setLoading(true)
         
         const { data: jobs } = await supabase.from('jobs').select('*').eq('posted_by_company_id', companyId)
-        const { data: bids } = await supabase.from('job_bids').select('*').eq('bidder_company_id', companyId)
+        const { data: bids } = await supabase.from('job_bids').select('*').eq('bidder_id', user?.id)
         
         if (!mounted) return
         

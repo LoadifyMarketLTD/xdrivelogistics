@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic'
 interface Quote {
   id: string
   created_at: string
-  quote_amount: number
+  amount_gbp: number
   message: string | null
   status: string
   job: {
@@ -28,7 +28,7 @@ interface Quote {
 }
 
 export default function QuotesPage() {
-  const { companyId } = useAuth()
+  const { user } = useAuth()
   
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,7 +39,7 @@ export default function QuotesPage() {
   const [searchTerm, setSearchTerm] = useState('')
   
   useEffect(() => {
-    if (!companyId) return
+    if (!user?.id) return
     
     let mounted = true
     
@@ -52,7 +52,7 @@ export default function QuotesPage() {
           .select(`
             id,
             created_at,
-            quote_amount,
+            amount_gbp,
             message,
             status,
             job:jobs!job_bids_job_id_fkey(
@@ -64,7 +64,7 @@ export default function QuotesPage() {
               status
             )
           `)
-          .eq('bidder_company_id', companyId)
+          .eq('bidder_id', user.id)
           .order('created_at', { ascending: false })
         
         if (fetchError) throw fetchError
@@ -96,7 +96,7 @@ export default function QuotesPage() {
     return () => {
       mounted = false
     }
-  }, [companyId])
+  }, [user?.id])
   
   const handleWithdraw = async (quoteId: string) => {
     if (!confirm('Are you sure you want to withdraw this quote?')) return
@@ -123,7 +123,7 @@ export default function QuotesPage() {
   const stats = useMemo(() => {
     const total = quotes.length
     const accepted = quotes.filter(q => q.status === 'accepted').length
-    const totalValue = quotes.reduce((sum, q) => sum + q.quote_amount, 0)
+    const totalValue = quotes.reduce((sum, q) => sum + q.amount_gbp, 0)
     const acceptanceRate = total > 0 ? (accepted / total) * 100 : 0
     
     return {

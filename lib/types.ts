@@ -152,9 +152,8 @@ export interface JobBid {
   id: string
   created_at: string
   job_id: string
-  bidder_company_id: string
-  bidder_user_id: string
-  quote_amount: number
+  bidder_id: string
+  amount_gbp: number
   message: string | null
   status: 'submitted' | 'withdrawn' | 'rejected' | 'accepted'
 }
@@ -178,7 +177,7 @@ export interface JobFormData {
 
 export interface BidFormData {
   job_id: string
-  quote_amount: number
+  amount_gbp: number
   message?: string
 }
 

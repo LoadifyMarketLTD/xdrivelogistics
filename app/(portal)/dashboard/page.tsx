@@ -22,7 +22,7 @@ interface Job {
 }
 
 export default function DashboardPage() {
-  const { companyId } = useAuth()
+  const { companyId, user } = useAuth()
   const [recentJobs, setRecentJobs] = useState<Job[]>([])
   const [stats, setStats] = useState({
     totalLoads: 0,
@@ -50,11 +50,11 @@ export default function DashboardPage() {
         
         if (allJobsError) throw allJobsError
         
-        // Fetch active bids for this company
+        // Fetch active bids for this user
         const { data: bids, error: bidsError } = await supabase
           .from('job_bids')
           .select('*')
-          .eq('bidder_company_id', companyId)
+          .eq('bidder_id', user?.id)
           .eq('status', 'submitted')
         
         if (bidsError) throw bidsError
@@ -63,14 +63,14 @@ export default function DashboardPage() {
         const { data: acceptedBids, error: acceptedError } = await supabase
           .from('job_bids')
           .select('*, job:jobs!job_bids_job_id_fkey(*)')
-          .eq('bidder_company_id', companyId)
+          .eq('bidder_id', user?.id)
           .eq('status', 'accepted')
         
         if (acceptedError) throw acceptedError
         
         // Calculate revenue from accepted loads
         const revenue = acceptedBids?.reduce((sum, bid) => {
-          return sum + (bid.quote_amount || 0)
+          return sum + (bid.amount_gbp || 0)
         }, 0) || 0
         
         // Fetch recent jobs posted by this company
@@ -110,7 +110,7 @@ export default function DashboardPage() {
     return () => {
       mounted = false
     }
-  }, [companyId])
+  }, [companyId, user?.id])
 
   if (loading) {
     return (

@@ -6,7 +6,7 @@ import StatusPill from '../StatusPill'
 interface Quote {
   id: string
   created_at: string
-  quote_amount: number
+  amount_gbp: number
   message: string | null
   status: string
   job: {
@@ -125,7 +125,7 @@ export default function QuotesTable({ quotes, onWithdraw }: QuotesTableProps) {
                 }
               </td>
               <td style={{ padding: '12px 8px', textAlign: 'right', fontWeight: '600', color: 'var(--portal-text-primary)' }}>
-                {formatCurrency(quote.quote_amount)}
+                {formatCurrency(quote.amount_gbp)}
               </td>
               <td style={{ padding: '12px 8px', textAlign: 'center' }}>
                 <StatusPill 
