@@ -1,5 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
 
+// Placeholder values used when credentials are missing
+const PLACEHOLDER_URL = 'https://placeholder.supabase.co'
+const PLACEHOLDER_KEY = 'placeholder-key'
+
 // Support both Vite and Next.js environment variables
 const supabaseUrl = 
   typeof import.meta !== 'undefined' && import.meta.env
@@ -15,9 +19,8 @@ const supabaseAnonKey =
 const hasValidCredentials = 
   supabaseUrl && 
   supabaseAnonKey && 
-  supabaseUrl !== 'https://placeholder.supabase.co' &&
-  supabaseAnonKey !== 'placeholder-key' &&
-  supabaseUrl.includes('supabase.co')
+  supabaseUrl !== PLACEHOLDER_URL &&
+  supabaseAnonKey !== PLACEHOLDER_KEY
 
 if (!hasValidCredentials) {
   console.error(
@@ -33,8 +36,8 @@ if (!hasValidCredentials) {
 // Create Supabase client with proper credentials
 // If credentials are invalid, we still create the client but mark it as invalid
 export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-key'
+  supabaseUrl || PLACEHOLDER_URL,
+  supabaseAnonKey || PLACEHOLDER_KEY
 )
 
 // Export a flag to check if credentials are valid

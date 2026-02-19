@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { supabase, isSupabaseConfigured } from '@/lib/supabaseClient'
 import Link from 'next/link'
 
+const CONFIG_ERROR_MESSAGE = 'Configuration error: Invalid API credentials. Please contact support.'
+
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -18,7 +20,7 @@ export default function LoginPage() {
     const checkAuth = async () => {
       // Check if Supabase is properly configured
       if (!isSupabaseConfigured) {
-        setError('Configuration error: Invalid API credentials. Please contact support.')
+        setError(CONFIG_ERROR_MESSAGE)
         setChecking(false)
         return
       }
@@ -40,7 +42,7 @@ export default function LoginPage() {
 
     // Check if Supabase is properly configured
     if (!isSupabaseConfigured) {
-      setError('Configuration error: Invalid API credentials. Please contact support.')
+      setError(CONFIG_ERROR_MESSAGE)
       setLoading(false)
       return
     }
@@ -66,7 +68,7 @@ export default function LoginPage() {
       if (signInError) {
         // Check if the error is related to invalid API key
         if (signInError.message && signInError.message.toLowerCase().includes('api key')) {
-          setError('Configuration error: Invalid API credentials. Please contact support.')
+          setError(CONFIG_ERROR_MESSAGE)
         } else {
           setError('Invalid email or password. Please try again.')
         }
