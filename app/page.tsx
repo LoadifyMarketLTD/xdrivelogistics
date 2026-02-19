@@ -1,27 +1,49 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+// This page serves the Vite-built landing page
+// The actual HTML and assets are in public/ (copied from dist/ during build)
 
-export default function Home() {
-  const router = useRouter()
-  
+import { useEffect, useRef } from 'react'
+
+export default function LandingPage() {
+  const scriptLoaded = useRef(false)
+
   useEffect(() => {
-    // Redirect to portal dashboard
-    router.push('/dashboard')
-  }, [router])
-  
-  return (
-    <div style={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      height: '100vh',
-      background: '#f4f5f7'
-    }}>
-      <div style={{ textAlign: 'center', color: '#6b7280' }}>
-        <div style={{ fontSize: '16px' }}>Redirecting to portal...</div>
-      </div>
-    </div>
-  );
+    if (scriptLoaded.current) return
+    scriptLoaded.current = true
+
+    // Fetch and parse the Vite-built index.html to get the correct asset paths
+    fetch('/index.html')
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Failed to fetch index.html: ${res.status} ${res.statusText}`)
+        }
+        return res.text()
+      })
+      .then(html => {
+        // Extract CSS link
+        const cssMatch = html.match(/href="([^"]+\.css)"/)
+        if (cssMatch) {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = cssMatch[1]
+          document.head.appendChild(link)
+        }
+
+        // Extract JS script
+        const jsMatch = html.match(/src="([^"]+\.js)"/)
+        if (jsMatch) {
+          const script = document.createElement('script')
+          script.type = 'module'
+          script.src = jsMatch[1]
+          script.crossOrigin = 'anonymous'
+          document.body.appendChild(script)
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load landing page assets:', err)
+      })
+  }, [])
+
+  return <div id="root"></div>
 }

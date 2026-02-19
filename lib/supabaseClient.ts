@@ -1,17 +1,30 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Support both Vite and Next.js environment variables
+const supabaseUrl = 
+  typeof import.meta !== 'undefined' && import.meta.env
+    ? import.meta.env.VITE_SUPABASE_URL
+    : process.env.NEXT_PUBLIC_SUPABASE_URL
+
+const supabaseAnonKey = 
+  typeof import.meta !== 'undefined' && import.meta.env
+    ? import.meta.env.VITE_SUPABASE_ANON_KEY
+    : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    '❌ Missing Supabase credentials!\n' +
+  console.warn(
+    '⚠️  Missing Supabase credentials!\n' +
     'Required environment variables:\n' +
-    '- VITE_SUPABASE_URL\n' +
-    '- VITE_SUPABASE_ANON_KEY\n\n' +
+    '- VITE_SUPABASE_URL (Vite) or NEXT_PUBLIC_SUPABASE_URL (Next.js)\n' +
+    '- VITE_SUPABASE_ANON_KEY (Vite) or NEXT_PUBLIC_SUPABASE_ANON_KEY (Next.js)\n\n' +
     'Please set these in your Netlify environment variables.\n' +
-    'See NETLIFY_SETUP.md for instructions.'
+    'See NETLIFY_DEPLOYMENT_GUIDE.md for instructions.'
   )
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Use placeholder credentials during build to allow static page generation
+// At runtime on Netlify, actual environment variables will be available
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'placeholder-key'
+)

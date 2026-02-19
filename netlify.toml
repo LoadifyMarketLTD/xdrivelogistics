@@ -1,8 +1,7 @@
 [build]
-  command = "npm run build"
-  publish = "dist"
+  command = "npm run build:all"
+  # Removed: publish = "dist" - conflicts with @netlify/plugin-nextjs
+  # Plugin requires exclusive deployment control
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
