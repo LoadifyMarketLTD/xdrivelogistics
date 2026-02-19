@@ -43,9 +43,12 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
       });
 
       if (error) {
-        setLoginError('Email sau parolă greșită. Vă rugăm să încercați din nou.');
+        setLoginError(error.message || 'Email sau parolă greșită. Vă rugăm să încercați din nou.');
       } else if (data.user) {
-        // Successfully logged in - redirect to dashboard
+        // Successfully logged in - close modal and show success
+        onClose();
+        // Note: In production, use proper routing (React Router or Next.js router)
+        // For now, redirect to dashboard
         window.location.href = '/dashboard';
       }
     } catch (err) {
@@ -162,8 +165,8 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 </div>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="rounded border-border bg-secondary" />
+                <label htmlFor="remember-me" className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="remember-me" className="rounded border-border bg-secondary" />
                   <span className="text-muted-foreground">Ține-mă minte</span>
                 </label>
                 <a href="#" className="text-orange-500 hover:text-orange-400">
@@ -236,13 +239,13 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 />
               </div>
               <div className="flex items-start gap-2 text-sm">
-                <input type="checkbox" className="rounded border-border bg-secondary mt-0.5" required />
-                <span className="text-muted-foreground">
+                <input type="checkbox" id="terms-accept" className="rounded border-border bg-secondary mt-0.5" required />
+                <label htmlFor="terms-accept" className="text-muted-foreground">
                   Sunt de acord cu{' '}
                   <a href="#" className="text-orange-500 hover:text-orange-400">Termenii și Condițiile</a>
                   {' '}și{' '}
                   <a href="#" className="text-orange-500 hover:text-orange-400">Politica de Confidențialitate</a>
-                </span>
+                </label>
               </div>
               {registerError && (
                 <div className="p-3 rounded-md bg-red-500/10 border border-red-500/50 text-red-500 text-sm">
