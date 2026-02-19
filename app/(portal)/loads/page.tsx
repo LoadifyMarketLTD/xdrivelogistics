@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
+import ResponsiveContainer from '@/components/layout/ResponsiveContainer'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
@@ -267,7 +268,7 @@ export default function LoadsPage() {
   }
 
   return (
-    <>
+    <ResponsiveContainer maxWidth="xl">
       <div>
         {/* CX-Style Tabs Row */}
         <div className="loads-tabs">
@@ -607,6 +608,6 @@ export default function LoadsPage() {
           </div>
         </div>
       )}
-    </>
+    </ResponsiveContainer>
   )
 }

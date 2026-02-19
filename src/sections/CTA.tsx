@@ -63,9 +63,9 @@ export function CTA({ onLoginClick }: CTAProps) {
             <span>07423 272138</span>
           </a>
           <span className="hidden sm:inline">|</span>
-          <a href="mailto:contact@xdrivelogistics.co.uk" className="flex items-center gap-2 hover:text-white transition-colors">
+          <a href="mailto:xdrivelogisticsltd@gmail.com" className="flex items-center gap-2 hover:text-white transition-colors">
             <Mail className="w-4 h-4" />
-            <span>contact@xdrivelogistics.co.uk</span>
+            <span>xdrivelogisticsltd@gmail.com</span>
           </a>
         </div>
 

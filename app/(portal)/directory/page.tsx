@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import ResponsiveContainer from '@/components/layout/ResponsiveContainer'
+import ResponsiveGrid from '@/components/layout/ResponsiveGrid'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
@@ -146,7 +148,7 @@ export default function DirectoryPage() {
   }
 
   return (
-    <>
+    <ResponsiveContainer maxWidth="xl">
       <div>
         <div className="directory-header">
           <h1 className="directory-title">
@@ -346,6 +348,6 @@ export default function DirectoryPage() {
           </div>
         </div>
       )}
-    </>
+    </ResponsiveContainer>
   )
 }
