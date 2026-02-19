@@ -181,18 +181,19 @@ CREATE TABLE IF NOT EXISTS public.job_bids (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   job_id UUID REFERENCES public.jobs(id) ON DELETE CASCADE,
+  bidder_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   company_id UUID REFERENCES public.companies(id) ON DELETE CASCADE,
-  driver_id UUID REFERENCES public.drivers(id) ON DELETE SET NULL,
-  amount NUMERIC(12,2) NOT NULL,
-  currency TEXT DEFAULT 'EUR',
+  amount_gbp NUMERIC(12,2) NOT NULL,
   message TEXT,
-  accepted BOOLEAN DEFAULT false
+  status TEXT NOT NULL DEFAULT 'submitted'
+    CHECK (status IN ('submitted', 'withdrawn', 'rejected', 'accepted'))
 );
 
 -- Indexes
-CREATE INDEX IF NOT EXISTS idx_job_bids_job_id ON public.job_bids(job_id);
+CREATE INDEX IF NOT EXISTS idx_job_bids_job_id    ON public.job_bids(job_id);
+CREATE INDEX IF NOT EXISTS idx_job_bids_bidder_id ON public.job_bids(bidder_id);
 CREATE INDEX IF NOT EXISTS idx_job_bids_company_id ON public.job_bids(company_id);
-CREATE INDEX IF NOT EXISTS idx_job_bids_driver_id ON public.job_bids(driver_id);
+CREATE INDEX IF NOT EXISTS idx_job_bids_status    ON public.job_bids(status);
 
 DROP TRIGGER IF EXISTS set_updated_at_job_bids ON public.job_bids;
 CREATE TRIGGER set_updated_at_job_bids
@@ -350,7 +351,8 @@ DROP POLICY IF EXISTS "Users can view company bids" ON public.job_bids;
 CREATE POLICY "Users can view company bids"
   ON public.job_bids FOR SELECT
   USING (
-    company_id IN (
+    bidder_id = auth.uid()
+    OR company_id IN (
       SELECT company_id FROM public.profiles WHERE id = auth.uid()
     )
   );
@@ -359,7 +361,8 @@ DROP POLICY IF EXISTS "Users can manage company bids" ON public.job_bids;
 CREATE POLICY "Users can manage company bids"
   ON public.job_bids FOR ALL
   USING (
-    company_id IN (
+    bidder_id = auth.uid()
+    OR company_id IN (
       SELECT company_id FROM public.profiles WHERE id = auth.uid()
     )
   );
