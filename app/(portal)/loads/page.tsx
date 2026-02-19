@@ -111,7 +111,7 @@ export default function LoadsPage() {
   }, [fetchLoads])
 
   const filteredAndSortedLoads = useMemo(() => {
-    let filtered = loads.filter(load => {
+    const filtered = loads.filter(load => {
       // Tab filter
       if (activeTab === 'all-live') {
         // Show all open loads
