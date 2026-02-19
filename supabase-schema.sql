@@ -181,18 +181,19 @@ CREATE TABLE IF NOT EXISTS public.job_bids (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   job_id UUID REFERENCES public.jobs(id) ON DELETE CASCADE,
+  bidder_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   company_id UUID REFERENCES public.companies(id) ON DELETE CASCADE,
-  driver_id UUID REFERENCES public.drivers(id) ON DELETE SET NULL,
-  amount NUMERIC(12,2) NOT NULL,
-  currency TEXT DEFAULT 'EUR',
+  amount_gbp NUMERIC(12,2) NOT NULL,
   message TEXT,
-  accepted BOOLEAN DEFAULT false
+  status TEXT NOT NULL DEFAULT 'submitted'
+    CHECK (status IN ('submitted', 'withdrawn', 'rejected', 'accepted'))
 );
 
 -- Indexes
-CREATE INDEX IF NOT EXISTS idx_job_bids_job_id ON public.job_bids(job_id);
+CREATE INDEX IF NOT EXISTS idx_job_bids_job_id    ON public.job_bids(job_id);
+CREATE INDEX IF NOT EXISTS idx_job_bids_bidder_id ON public.job_bids(bidder_id);
 CREATE INDEX IF NOT EXISTS idx_job_bids_company_id ON public.job_bids(company_id);
-CREATE INDEX IF NOT EXISTS idx_job_bids_driver_id ON public.job_bids(driver_id);
+CREATE INDEX IF NOT EXISTS idx_job_bids_status    ON public.job_bids(status);
 
 DROP TRIGGER IF EXISTS set_updated_at_job_bids ON public.job_bids;
 CREATE TRIGGER set_updated_at_job_bids
@@ -201,7 +202,33 @@ CREATE TRIGGER set_updated_at_job_bids
   EXECUTE FUNCTION public.update_updated_at_column();
 
 -- ============================================================
--- 7. INVOICES TABLE
+-- 7. JOB_TRACKING_EVENTS TABLE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.job_tracking_events (
+  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  job_id      UUID NOT NULL REFERENCES public.jobs(id) ON DELETE CASCADE,
+  event_type  TEXT NOT NULL
+                CHECK (event_type IN (
+                  'on_my_way_to_pickup',
+                  'on_site_pickup',
+                  'loaded',
+                  'on_my_way_to_delivery',
+                  'on_site_delivery',
+                  'delivered'
+                )),
+  event_time  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  user_id     UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  user_name   TEXT,
+  notes       TEXT,
+  created_at  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_job_tracking_events_job_id     ON public.job_tracking_events(job_id);
+CREATE INDEX IF NOT EXISTS idx_job_tracking_events_event_type ON public.job_tracking_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_job_tracking_events_event_time ON public.job_tracking_events(event_time DESC);
+
+-- ============================================================
+-- 8. INVOICES TABLE
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.invoices (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -246,7 +273,7 @@ CREATE INDEX IF NOT EXISTS idx_invoices_job_id ON public.invoices(job_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_status ON public.invoices(status);
 
 -- ============================================================
--- 8. ROW LEVEL SECURITY (RLS) POLICIES
+-- 9. ROW LEVEL SECURITY (RLS) POLICIES
 -- ============================================================
 
 -- Enable RLS on all tables
@@ -255,6 +282,7 @@ ALTER TABLE public.companies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.drivers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.job_bids ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.job_tracking_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
 
 -- Profiles policies
@@ -350,7 +378,8 @@ DROP POLICY IF EXISTS "Users can view company bids" ON public.job_bids;
 CREATE POLICY "Users can view company bids"
   ON public.job_bids FOR SELECT
   USING (
-    company_id IN (
+    bidder_id = auth.uid()
+    OR company_id IN (
       SELECT company_id FROM public.profiles WHERE id = auth.uid()
     )
   );
@@ -359,13 +388,53 @@ DROP POLICY IF EXISTS "Users can manage company bids" ON public.job_bids;
 CREATE POLICY "Users can manage company bids"
   ON public.job_bids FOR ALL
   USING (
-    company_id IN (
+    bidder_id = auth.uid()
+    OR company_id IN (
       SELECT company_id FROM public.profiles WHERE id = auth.uid()
     )
   );
 
+-- Job tracking events policies
+DROP POLICY IF EXISTS "job_tracking_events_select" ON public.job_tracking_events;
+CREATE POLICY "job_tracking_events_select"
+  ON public.job_tracking_events FOR SELECT
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.jobs j
+      WHERE j.id = job_tracking_events.job_id
+        AND (
+          j.posted_by_company_id IN (
+            SELECT company_id FROM public.profiles WHERE id = auth.uid()
+          )
+          OR j.assigned_company_id IN (
+            SELECT company_id FROM public.profiles WHERE id = auth.uid()
+          )
+        )
+    )
+  );
+
+DROP POLICY IF EXISTS "job_tracking_events_insert" ON public.job_tracking_events;
+CREATE POLICY "job_tracking_events_insert"
+  ON public.job_tracking_events FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.jobs j
+      WHERE j.id = job_tracking_events.job_id
+        AND (
+          j.posted_by_company_id IN (
+            SELECT company_id FROM public.profiles WHERE id = auth.uid()
+          )
+          OR j.assigned_company_id IN (
+            SELECT company_id FROM public.profiles WHERE id = auth.uid()
+          )
+        )
+    )
+  );
+
 -- ============================================================
--- 9. HELPER FUNCTIONS
+-- 10. HELPER FUNCTIONS
 -- ============================================================
 
 -- Function to get current user's company_id
