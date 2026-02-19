@@ -1,8 +1,20 @@
 [build]
-  command = "npm run build"
+  command = "npm run build:all"
   publish = "dist"
+  
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
 
-# Redirect all portal routes to Next.js
+# Next.js plugin for portal routes
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+  
+[plugins.inputs]
+  # Publish Next.js from its build directory
+  publish = ".next"
+
+# Rewrite portal routes to Next.js function
 [[redirects]]
   from = "/login"
   to = "/.netlify/functions/___netlify-handler"
@@ -10,6 +22,11 @@
 
 [[redirects]]
   from = "/register"
+  to = "/.netlify/functions/___netlify-handler"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard"
   to = "/.netlify/functions/___netlify-handler"
   status = 200
 
@@ -34,6 +51,11 @@
   status = 200
 
 [[redirects]]
+  from = "/onboarding"
+  to = "/.netlify/functions/___netlify-handler"
+  status = 200
+
+[[redirects]]
   from = "/onboarding/*"
   to = "/.netlify/functions/___netlify-handler"
   status = 200
@@ -44,7 +66,17 @@
   status = 200
 
 [[redirects]]
+  from = "/loads"
+  to = "/.netlify/functions/___netlify-handler"
+  status = 200
+
+[[redirects]]
   from = "/loads/*"
+  to = "/.netlify/functions/___netlify-handler"
+  status = 200
+
+[[redirects]]
+  from = "/jobs"
   to = "/.netlify/functions/___netlify-handler"
   status = 200
 
@@ -54,7 +86,17 @@
   status = 200
 
 [[redirects]]
+  from = "/invoices"
+  to = "/.netlify/functions/___netlify-handler"
+  status = 200
+
+[[redirects]]
   from = "/invoices/*"
+  to = "/.netlify/functions/___netlify-handler"
+  status = 200
+
+[[redirects]]
+  from = "/users"
   to = "/.netlify/functions/___netlify-handler"
   status = 200
 
@@ -64,7 +106,17 @@
   status = 200
 
 [[redirects]]
+  from = "/my-fleet"
+  to = "/.netlify/functions/___netlify-handler"
+  status = 200
+
+[[redirects]]
   from = "/my-fleet/*"
+  to = "/.netlify/functions/___netlify-handler"
+  status = 200
+
+[[redirects]]
+  from = "/drivers-vehicles"
   to = "/.netlify/functions/___netlify-handler"
   status = 200
 
@@ -74,7 +126,17 @@
   status = 200
 
 [[redirects]]
+  from = "/directory"
+  to = "/.netlify/functions/___netlify-handler"
+  status = 200
+
+[[redirects]]
   from = "/directory/*"
+  to = "/.netlify/functions/___netlify-handler"
+  status = 200
+
+[[redirects]]
+  from = "/quotes"
   to = "/.netlify/functions/___netlify-handler"
   status = 200
 
@@ -84,7 +146,17 @@
   status = 200
 
 [[redirects]]
+  from = "/diary"
+  to = "/.netlify/functions/___netlify-handler"
+  status = 200
+
+[[redirects]]
   from = "/diary/*"
+  to = "/.netlify/functions/___netlify-handler"
+  status = 200
+
+[[redirects]]
+  from = "/m"
   to = "/.netlify/functions/___netlify-handler"
   status = 200
 
@@ -113,11 +185,8 @@
   to = "/.netlify/functions/___netlify-handler"
   status = 200
 
-# Fallback for landing page SPA
+# SPA fallback for landing page (everything else)
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
