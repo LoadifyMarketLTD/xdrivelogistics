@@ -150,50 +150,28 @@ CREATE INDEX IF NOT EXISTS idx_drivers_is_active ON public.drivers(is_active);
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.jobs (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-  job_code VARCHAR(20) UNIQUE NOT NULL,
-  customer_name TEXT,
-  customer_email TEXT,
-  customer_phone TEXT,
-  pickup TEXT NOT NULL,
-  pickup_postcode TEXT,
-  delivery TEXT NOT NULL,
-  delivery_postcode TEXT,
-  price DECIMAL(10,2) NOT NULL,
-  cost DECIMAL(10,2),
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'in-transit', 'delivered', 'cancelled')),
-  driver_id UUID REFERENCES public.drivers(id) ON DELETE SET NULL,
-  scheduled_date DATE,
-  scheduled_time TIME,
-  notes TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  posted_by_company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'assigned', 'in-transit', 'completed', 'cancelled')),
+  pickup_location TEXT NOT NULL,
+  delivery_location TEXT NOT NULL,
+  pickup_datetime TIMESTAMP WITH TIME ZONE,
+  delivery_datetime TIMESTAMP WITH TIME ZONE,
+  vehicle_type TEXT,
+  load_details TEXT,
+  pallets INTEGER,
+  weight_kg NUMERIC,
+  budget NUMERIC,
+  assigned_company_id UUID REFERENCES public.companies(id),
+  accepted_bid_id UUID
 );
 
--- Auto-generate job code
-CREATE SEQUENCE IF NOT EXISTS job_code_seq START 1001;
-
-CREATE OR REPLACE FUNCTION generate_job_code()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.job_code IS NULL OR NEW.job_code = '' THEN
-    NEW.job_code := 'JOB-' || LPAD(NEXTVAL('job_code_seq')::TEXT, 4, '0');
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS set_job_code ON public.jobs;
-CREATE TRIGGER set_job_code
-  BEFORE INSERT ON public.jobs
-  FOR EACH ROW
-  EXECUTE FUNCTION generate_job_code();
-
 -- Indexes
-CREATE INDEX IF NOT EXISTS idx_jobs_company_id ON public.jobs(company_id);
-CREATE INDEX IF NOT EXISTS idx_jobs_driver_id ON public.jobs(driver_id);
 CREATE INDEX IF NOT EXISTS idx_jobs_status ON public.jobs(status);
 CREATE INDEX IF NOT EXISTS idx_jobs_created_at ON public.jobs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_jobs_posted_by ON public.jobs(posted_by_company_id);
+CREATE INDEX IF NOT EXISTS idx_jobs_assigned_to ON public.jobs(assigned_company_id);
 
 -- ============================================================
 -- 6. INVOICES TABLE
@@ -306,7 +284,7 @@ DROP POLICY IF EXISTS "Users can view company jobs" ON public.jobs;
 CREATE POLICY "Users can view company jobs"
   ON public.jobs FOR SELECT
   USING (
-    company_id IN (
+    posted_by_company_id IN (
       SELECT company_id FROM public.profiles WHERE id = auth.uid()
     )
   );
@@ -315,7 +293,7 @@ DROP POLICY IF EXISTS "Users can manage company jobs" ON public.jobs;
 CREATE POLICY "Users can manage company jobs"
   ON public.jobs FOR ALL
   USING (
-    company_id IN (
+    posted_by_company_id IN (
       SELECT company_id FROM public.profiles WHERE id = auth.uid()
     )
   );
