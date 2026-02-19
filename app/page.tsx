@@ -12,24 +12,32 @@ export default function LandingPage() {
     if (scriptLoaded.current) return
     scriptLoaded.current = true
 
-    // Load Vite landing page CSS
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = '/assets/index-CCXABSC2.css'
-    document.head.appendChild(link)
+    // Fetch and parse the Vite-built index.html to get the correct asset paths
+    fetch('/index.html')
+      .then(res => res.text())
+      .then(html => {
+        // Extract CSS link
+        const cssMatch = html.match(/href="([^"]+\.css)"/)
+        if (cssMatch) {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = cssMatch[1]
+          document.head.appendChild(link)
+        }
 
-    // Load Vite landing page JS
-    const script = document.createElement('script')
-    script.type = 'module'
-    script.src = '/assets/index-Bd_MaviS.js'
-    script.crossOrigin = 'anonymous'
-    document.body.appendChild(script)
-
-    return () => {
-      // Cleanup
-      link.remove()
-      script.remove()
-    }
+        // Extract JS script
+        const jsMatch = html.match(/src="([^"]+\.js)"/)
+        if (jsMatch) {
+          const script = document.createElement('script')
+          script.type = 'module'
+          script.src = jsMatch[1]
+          script.crossOrigin = 'anonymous'
+          document.body.appendChild(script)
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load landing page assets:', err)
+      })
   }, [])
 
   return <div id="root"></div>
