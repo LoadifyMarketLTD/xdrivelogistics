@@ -55,66 +55,32 @@ CREATE INDEX IF NOT EXISTS idx_quotes_status ON public.quotes(status);
 CREATE INDEX IF NOT EXISTS idx_quotes_created_at ON public.quotes(created_at DESC);
 
 -- ============================================================
--- 3. JOBS TABLE (confirmed transport orders)
+-- 3. JOBS TABLE (marketplace job postings)
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.jobs (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  job_code VARCHAR(20) UNIQUE NOT NULL,
-  user_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
-  quote_id UUID REFERENCES public.quotes(id) ON DELETE SET NULL,
-  customer_name TEXT NOT NULL,
-  customer_email TEXT NOT NULL,
-  customer_phone TEXT NOT NULL,
-  pickup_location TEXT NOT NULL,
-  pickup_postcode TEXT,
-  pickup_contact TEXT,
-  dropoff_location TEXT NOT NULL,
-  dropoff_postcode TEXT,
-  dropoff_contact TEXT,
-  service_type TEXT NOT NULL,
-  vehicle_type TEXT NOT NULL,
-  price DECIMAL(10,2) NOT NULL,
-  cost DECIMAL(10,2),
-  profit DECIMAL(10,2) GENERATED ALWAYS AS (price - COALESCE(cost, 0)) STORED,
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'in-transit', 'delivered', 'cancelled', 'failed')),
-  scheduled_date DATE NOT NULL,
-  scheduled_time TIME,
-  actual_pickup_time TIMESTAMP WITH TIME ZONE,
-  actual_delivery_time TIMESTAMP WITH TIME ZONE,
-  driver_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
-  driver_notes TEXT,
-  load_details TEXT,
-  pod_signature TEXT, -- Proof of delivery signature (base64 or URL)
-  pod_photo TEXT, -- Proof of delivery photo URL
-  notes TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  posted_by_company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'assigned', 'in-transit', 'completed', 'cancelled')),
+  pickup_location TEXT NOT NULL,
+  delivery_location TEXT NOT NULL,
+  pickup_datetime TIMESTAMP WITH TIME ZONE,
+  delivery_datetime TIMESTAMP WITH TIME ZONE,
+  vehicle_type TEXT,
+  load_details TEXT,
+  pallets INTEGER,
+  weight_kg NUMERIC,
+  budget NUMERIC,
+  assigned_company_id UUID REFERENCES public.companies(id),
+  accepted_bid_id UUID
 );
 
--- Auto-generate job code
-CREATE OR REPLACE FUNCTION generate_job_code()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.job_code IS NULL THEN
-    NEW.job_code := 'JOB-' || LPAD(NEXTVAL('job_code_seq')::TEXT, 6, '0');
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE SEQUENCE IF NOT EXISTS job_code_seq START 1000;
-
-CREATE TRIGGER set_job_code
-  BEFORE INSERT ON public.jobs
-  FOR EACH ROW
-  EXECUTE FUNCTION generate_job_code();
-
 -- Indexes
-CREATE INDEX IF NOT EXISTS idx_jobs_user_id ON public.jobs(user_id);
-CREATE INDEX IF NOT EXISTS idx_jobs_driver_id ON public.jobs(driver_id);
 CREATE INDEX IF NOT EXISTS idx_jobs_status ON public.jobs(status);
-CREATE INDEX IF NOT EXISTS idx_jobs_scheduled_date ON public.jobs(scheduled_date);
 CREATE INDEX IF NOT EXISTS idx_jobs_created_at ON public.jobs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_jobs_posted_by ON public.jobs(posted_by_company_id);
+CREATE INDEX IF NOT EXISTS idx_jobs_assigned_to ON public.jobs(assigned_company_id);
 
 -- ============================================================
 -- 4. INVOICES TABLE
