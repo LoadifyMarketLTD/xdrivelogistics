@@ -1,7 +1,6 @@
 [build]
 command = "npm run build"
-publish = "dist"
+publish = ".next"
 
-# Note: SPA redirects are handled via public/_redirects file
-# (more standard than [[redirects]] in netlify.toml for Vite projects)
-# No [functions] section - directory doesn't exist and causes 503 errors
+[[plugins]]
+package = "@netlify/plugin-nextjs"
