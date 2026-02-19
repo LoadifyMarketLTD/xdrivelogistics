@@ -22,6 +22,25 @@ const nextConfig = {
       },
     ],
   },
+  
+  // Serve Vite landing page at root while allowing portal routes
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: '/',
+          destination: '/landing',
+          has: [
+            {
+              type: 'header',
+              key: 'accept',
+              value: '.*text/html.*',
+            },
+          ],
+        },
+      ],
+    }
+  },
 }
 
 export default nextConfig

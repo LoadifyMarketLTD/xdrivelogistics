@@ -1,27 +1,36 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+// This page serves the Vite-built landing page
+// The actual HTML and assets are in public/ (copied from dist/ during build)
 
-export default function Home() {
-  const router = useRouter()
-  
+import { useEffect, useRef } from 'react'
+
+export default function LandingPage() {
+  const scriptLoaded = useRef(false)
+
   useEffect(() => {
-    // Redirect to portal dashboard
-    router.push('/dashboard')
-  }, [router])
-  
-  return (
-    <div style={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      height: '100vh',
-      background: '#f4f5f7'
-    }}>
-      <div style={{ textAlign: 'center', color: '#6b7280' }}>
-        <div style={{ fontSize: '16px' }}>Redirecting to portal...</div>
-      </div>
-    </div>
-  );
+    if (scriptLoaded.current) return
+    scriptLoaded.current = true
+
+    // Load Vite landing page CSS
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = '/assets/index-CCXABSC2.css'
+    document.head.appendChild(link)
+
+    // Load Vite landing page JS
+    const script = document.createElement('script')
+    script.type = 'module'
+    script.src = '/assets/index-Bd_MaviS.js'
+    script.crossOrigin = 'anonymous'
+    document.body.appendChild(script)
+
+    return () => {
+      // Cleanup
+      link.remove()
+      script.remove()
+    }
+  }, [])
+
+  return <div id="root"></div>
 }
