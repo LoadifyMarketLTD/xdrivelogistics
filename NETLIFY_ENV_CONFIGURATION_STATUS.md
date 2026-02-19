@@ -27,10 +27,19 @@ The build process requires **BOTH** Vite and Next.js variables:
 
 ### Action 1: Fix VITE_SUPABASE_ANON_KEY (CRITICAL)
 
+**The correct anon key for this project is:**
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
+```
+
+**Steps to fix:**
 1. Go to [Supabase Dashboard → API Settings](https://app.supabase.com/project/jqxlauexhkonixtjvljw/settings/api)
-2. Locate the **"anon public"** key (NOT the publishable key)
-3. Copy the JWT token that looks like: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
-4. In Netlify, update `VITE_SUPABASE_ANON_KEY` with this JWT token
+2. Find the **"Project API keys"** section
+3. Locate the **"anon public"** key (NOT "Publishable keys" section)
+4. The key should be a JWT token as shown above
+5. In Netlify, update `VITE_SUPABASE_ANON_KEY` with this JWT token
+
+**Important**: The `sb_publishable_*` format is from a different section in Supabase dashboard and is NOT compatible with `@supabase/supabase-js` v2 client used in this project.
 
 ### Action 2: Add Missing Next.js Variables
 
@@ -48,12 +57,12 @@ After making changes, you should have **6 total variables**:
 
 #### Vite Variables (for landing page)
 - ✅ `VITE_SUPABASE_URL` → `https://jqxlauexhkonixtjvljw.supabase.co`
-- ⚠️ `VITE_SUPABASE_ANON_KEY` → `eyJhbGc...` (JWT, not `sb_publishable_*`)
+- ⚠️ `VITE_SUPABASE_ANON_KEY` → `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO` (JWT, not `sb_publishable_*`)
 - ✅ `VITE_SITE_URL` → `https://xdrivelogistics.co.uk`
 
 #### Next.js Variables (for portal)
 - 🆕 `NEXT_PUBLIC_SUPABASE_URL` → `https://jqxlauexhkonixtjvljw.supabase.co`
-- 🆕 `NEXT_PUBLIC_SUPABASE_ANON_KEY` → `eyJhbGc...` (JWT, same as Vite)
+- 🆕 `NEXT_PUBLIC_SUPABASE_ANON_KEY` → `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO` (JWT, same as Vite)
 - 🆕 `NEXT_PUBLIC_SITE_URL` → `https://xdrivelogistics.co.uk`
 
 ### Action 4: Configure for All Deploy Contexts

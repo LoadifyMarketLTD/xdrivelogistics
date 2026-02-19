@@ -37,11 +37,19 @@ Din captura de ecran pe care mi-ai trimis-o, am observat că în Netlify ai:
 
 ### Pasul 1: Obține Cheia Corectă de la Supabase
 
+**Cheia corectă pentru acest proiect este:**
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
+```
+
+**Unde o găsești:**
 1. Mergi la: https://app.supabase.com/project/jqxlauexhkonixtjvljw/settings/api
-2. Caută secțiunea **"Project API keys"**
-3. Găsește cheia etichetată **"anon public"** (NU "publishable key")
-4. Click pe "Reveal" pentru a vedea tokenul complet
-5. Copiază întreg tokenul JWT (începe cu `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`)
+2. Caută secțiunea **"Project API keys"** (NU "Management API keys")
+3. Găsește cheia etichetată **"anon public"** (NU "Publishable keys")
+4. Acesta este un token JWT (are 3 părți separate de puncte)
+5. Este cheia prezentată mai sus
+
+**⚠️ ATENȚIE**: Secțiunea "Publishable keys" conține chei cu formatul `sb_publishable_*`. Acestea NU funcționează cu biblioteca `@supabase/supabase-js` utilizată în acest proiect. Folosește DOAR cheia JWT "anon public"!
 
 ### Pasul 2: Actualizează în Netlify
 
