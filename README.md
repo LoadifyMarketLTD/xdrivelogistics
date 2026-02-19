@@ -8,19 +8,21 @@ This is a hybrid application that uses **Vite** for the landing page and **Next.
 
 This project requires the following environment variables to be set. These values are **public** and safe to expose in client-side code:
 
-### Required Environment Variables
+### Required Environment Variables (Next.js Portal)
 
 ```bash
 # Supabase Configuration
-VITE_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
-VITE_SITE_URL=http://localhost:5173
+NEXT_PUBLIC_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 **For Production (Netlify):**
 ```bash
-VITE_SITE_URL=https://xdrivelogistics.co.uk
+NEXT_PUBLIC_SITE_URL=https://xdrivelogistics.co.uk
 ```
+
+> **Note:** The portal application uses Next.js and requires `NEXT_PUBLIC_*` prefixed variables. The landing page uses Vite but does not require environment variables.
 
 ### Setup Instructions
 
@@ -46,11 +48,14 @@ npm install
 
 ### Development
 
+**Landing Page (Vite):**
 ```bash
 npm run dev
 ```
-
 This starts the Vite development server on `http://localhost:5173`
+
+**Portal Application (Next.js):**
+The portal is integrated with the landing page during build. For local development with the portal, you'll need to build and run Next.js separately in the project directory.
 
 ### Build
 
@@ -68,7 +73,8 @@ npm run preview
 
 ## 📚 Documentation
 
-- `ENVIRONMENT_VARIABLES.md` - Comprehensive environment setup guide
+- `SETARI_MEDIU_RO.md` - 🇷🇴 Romanian quick start guide for environment variables
+- `ENVIRONMENT_VARIABLES.md` - Comprehensive environment setup guide (English)
 - `NETLIFY_SETUP.md` - Netlify deployment configuration
 - `DATABASE_SETUP.md` - Database schema and migrations
 
