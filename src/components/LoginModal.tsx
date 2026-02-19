@@ -5,7 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Truck, Eye, EyeOff, Phone } from 'lucide-react';
-import { supabase } from '@/lib/supabaseClient';
+import { type AuthError } from '@supabase/supabase-js';
+import { supabase, isSupabaseConfigured } from '@/lib/supabaseClient';
+
+function isApiKeyError(error: AuthError): boolean {
+  return error.message != null && error.message.toLowerCase().includes('api key')
+}
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -36,6 +41,11 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setLoginError('');
     setLoginLoading(true);
 
+    if (!isSupabaseConfigured) {
+      window.location.href = '/login';
+      return;
+    }
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: loginEmail,
@@ -43,6 +53,10 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
       });
 
       if (error) {
+        if (isApiKeyError(error)) {
+          window.location.href = '/login';
+          return;
+        }
         setLoginError(error.message || 'Email sau parolă greșită. Vă rugăm să încercați din nou.');
       } else if (data.user) {
         // Successfully logged in - close modal and show success
@@ -65,6 +79,11 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setRegisterSuccess('');
     setRegisterLoading(true);
 
+    if (!isSupabaseConfigured) {
+      window.location.href = '/register';
+      return;
+    }
+
     // Validation
     if (registerPassword !== registerConfirmPassword) {
       setRegisterError('Parolele nu se potrivesc.');
@@ -85,6 +104,10 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
       });
 
       if (error) {
+        if (isApiKeyError(error)) {
+          window.location.href = '/register';
+          return;
+        }
         setRegisterError(error.message || 'A apărut o eroare la înregistrare.');
       } else if (data.user) {
         setRegisterSuccess('Contul a fost creat cu succes! Verificați emailul pentru confirmare.');
