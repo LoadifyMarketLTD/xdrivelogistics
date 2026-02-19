@@ -1,35 +1,43 @@
 # Environment Variables Configuration for XDrive Logistics
 
-## ⚠️ IMPORTANT: Next.js Environment Variables (NOT Vite)
+## ⚠️ IMPORTANT: Hybrid Application - Both Next.js AND Vite
 
-This application has been migrated from **Vite** to **Next.js**. 
+This application is a **HYBRID** system with:
+- **Next.js** for the portal/dashboard (requires `NEXT_PUBLIC_*` variables)
+- **Vite** for the landing page (requires `VITE_*` variables)
 
-## Correct Environment Variable Prefix: NEXT_PUBLIC_
+## Required Environment Variables - ALL 5 ARE NEEDED!
 
-### Required Environment Variables
+### Complete Variable List
 
 Set these in your Netlify environment variables (or .env.local for local development):
 
 ```bash
-# Supabase Configuration
+# ============================================================================
+# NEXT.JS PORTAL (Dashboard/Main Application)
+# ============================================================================
 NEXT_PUBLIC_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
-NEXT_PUBLIC_SITE_URL=https://xdrivelogistics.co.uk
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
+NEXT_PUBLIC_SITE_URL=https://xdrivelogistics.co.uk  # Production, use http://localhost:3000 for dev
+
+# ============================================================================
+# VITE LANDING PAGE (Legacy Landing Page)
+# ============================================================================
+VITE_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
 ```
 
-### ❌ OLD (Vite - NO LONGER USED):
-```bash
-VITE_SUPABASE_URL         # ❌ WRONG - Don't use this
-VITE_SUPABASE_ANON_KEY    # ❌ WRONG - Don't use this
-VITE_SITE_URL             # ❌ WRONG - Don't use this
-```
+### Why Both Sets?
 
-### ✅ NEW (Next.js - CORRECT):
-```bash
-NEXT_PUBLIC_SUPABASE_URL         # ✅ CORRECT
-NEXT_PUBLIC_SUPABASE_ANON_KEY    # ✅ CORRECT
-NEXT_PUBLIC_SITE_URL             # ✅ CORRECT
-```
+| Prefix | Used By | Purpose |
+|--------|---------|---------|
+| `NEXT_PUBLIC_*` | Next.js Portal | Main dashboard and application features |
+| `VITE_*` | Vite Landing Page | Public-facing landing/marketing page |
+
+**⚠️ Critical:** Without BOTH sets of variables:
+- Missing `NEXT_PUBLIC_*` = Portal/Dashboard won't work
+- Missing `VITE_*` = Landing page won't work
+- Both connect to the SAME Supabase project
 
 ## Netlify Deployment Configuration
 
@@ -37,13 +45,20 @@ NEXT_PUBLIC_SITE_URL             # ✅ CORRECT
 
 1. Go to your Netlify site dashboard
 2. Navigate to: **Site settings** → **Environment variables**
-3. Add the following variables for **ALL deploy contexts** (Production, Deploy Previews, Branch deploys):
+3. Add **ALL 5 variables** for **ALL deploy contexts** (Production, Deploy Previews, Branch deploys):
 
-| Variable Name | Value | Deploy Contexts |
-|--------------|-------|-----------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://jqxlauexhkonixtjvljw.supabase.co` | All |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key | All |
-| `NEXT_PUBLIC_SITE_URL` | `https://xdrivelogistics.co.uk` (production) or your deploy preview URL | All |
+| Variable Name | Value | Deploy Contexts | Used By |
+|--------------|-------|-----------------|---------|
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://jqxlauexhkonixtjvljw.supabase.co` | All | Next.js Portal |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO` | All | Next.js Portal |
+| `NEXT_PUBLIC_SITE_URL` | `https://xdrivelogistics.co.uk` | All | Next.js Portal |
+| `VITE_SUPABASE_URL` | `https://jqxlauexhkonixtjvljw.supabase.co` | All | Vite Landing Page |
+| `VITE_SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO` | All | Vite Landing Page |
+
+**Important Settings:**
+- ✅ Set for **"All scopes"**
+- ✅ Set for **"All deploy contexts"**
+- ❌ Do **NOT** mark as "Secret" (these are public client keys)
 
 ### Step 2: Clear Cache and Redeploy
 
@@ -63,11 +78,16 @@ Visit `https://your-site.netlify.app/diagnostics` after deployment to verify env
    cp .env.example .env.local
    ```
 
-2. Update `.env.local` with your values:
+2. The `.env.example` file already contains all 5 variables with correct values:
    ```bash
+   # Next.js Portal variables
    NEXT_PUBLIC_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key-here
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
    NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   
+   # Vite Landing Page variables  
+   VITE_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
+   VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
    ```
 
 3. Run the development server:
@@ -91,7 +111,13 @@ npm run start      # Start production server
 ## Common Issues
 
 ### Issue: "Missing Supabase credentials" error
-**Solution**: Make sure you set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (NOT the old `VITE_` prefixed variables)
+**Solution**: Make sure you set ALL 5 environment variables:
+- `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` for the Portal
+- `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` for the Landing Page
+- `NEXT_PUBLIC_SITE_URL` for authentication redirects
+
+### Issue: Landing page works but portal doesn't (or vice versa)
+**Solution**: You're missing one set of variables. Both `NEXT_PUBLIC_*` AND `VITE_*` are required.
 
 ### Issue: Environment variables not updating
 **Solution**: 
@@ -101,13 +127,23 @@ npm run start      # Start production server
 
 ### Issue: Variables work locally but not on Netlify
 **Solution**: 
-1. Check that variables are set in Netlify dashboard
+1. Check that ALL 5 variables are set in Netlify dashboard
 2. Make sure they're not marked as "secret" (they're public client keys)
 3. Clear cache and redeploy
 
-## Migration Notes
+## About This Hybrid Application
 
-This application was previously built with Vite and used `VITE_` prefixed environment variables accessed via `import.meta.env`.
+This application uses a **hybrid architecture**:
+
+- **Next.js Portal** (app/portal directory): The main application with authentication, dashboard, and business features
+  - Requires: `NEXT_PUBLIC_*` variables
+  - Build system: Next.js with `process.env.NEXT_PUBLIC_*`
+
+- **Vite Landing Page** (legacy): The public-facing marketing/landing page
+  - Requires: `VITE_*` variables  
+  - Build system: Vite with `import.meta.env.VITE_*`
+
+Both components connect to the **same Supabase project** (jqxlauexhkonixtjvljw) but use different environment variable prefixes due to their different build systems.
 
 **Changes made:**
 - Build system: Vite → Next.js

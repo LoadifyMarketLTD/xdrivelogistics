@@ -6,15 +6,30 @@ This is a hybrid application that uses **Vite** for the landing page and **Next.
 
 ## 🔧 Environment Variables
 
-This project requires the following environment variables to be set. These values are **public** and safe to expose in client-side code:
+This project is a **hybrid application** and requires **TWO sets of environment variables**:
+- **NEXT_PUBLIC_*** for the Next.js portal (main dashboard)
+- **VITE_*** for the Vite-based landing page
 
-### Required Environment Variables (Next.js Portal)
+All values are **public** and safe to expose in client-side code.
+
+### Required Environment Variables
 
 ```bash
-# Supabase Configuration
+# ============================================================================
+# NEXT.JS PORTAL (Dashboard/Main Application)
+# ============================================================================
 NEXT_PUBLIC_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
+
+# ANON KEY - This is the JWT token (NOT the sb_publishable_ format from Dashboard)
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
+
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# ============================================================================
+# VITE LANDING PAGE (Legacy landing page)
+# ============================================================================
+VITE_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
 ```
 
 **For Production (Netlify):**
@@ -22,7 +37,9 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_SITE_URL=https://xdrivelogistics.co.uk
 ```
 
-> **Note:** The portal application uses Next.js and requires `NEXT_PUBLIC_*` prefixed variables. The landing page uses Vite but does not require environment variables.
+> **Important:** Both NEXT_PUBLIC_* and VITE_* variables must be set for the application to work correctly. The Next.js portal and Vite landing page both connect to the same Supabase project but use different variable prefixes.
+> 
+> **❓ Which key is the ANON KEY?** See `CONFIGURARE_CHEI_SUPABASE.md` (🇷🇴 Romanian guide) for a detailed explanation of Supabase key formats.
 
 ### Setup Instructions
 
@@ -34,9 +51,16 @@ NEXT_PUBLIC_SITE_URL=https://xdrivelogistics.co.uk
 2. **The values are pre-configured** in `.env.example` - you can use them as-is for development
 
 3. **For Netlify deployment:**
-   - Add these environment variables in Netlify Dashboard → Site Settings → Environment Variables
-   - Set them for ALL deploy contexts (Production, Deploy Previews, Branch deploys)
-   - See `ENVIRONMENT_VARIABLES.md` for detailed deployment instructions
+   - Add **ALL 5 environment variables** in Netlify Dashboard → Site Settings → Environment Variables:
+     * `NEXT_PUBLIC_SUPABASE_URL`
+     * `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+     * `NEXT_PUBLIC_SITE_URL` (use `https://xdrivelogistics.co.uk`)
+     * `VITE_SUPABASE_URL`
+     * `VITE_SUPABASE_ANON_KEY`
+   - Set them for **ALL scopes** and **ALL deploy contexts** (Production, Deploy Previews, Branch deploys)
+   - **DO NOT** mark as "Secret" - these are public client keys
+   - After setting, trigger **"Clear cache and deploy"**
+   - See `CONFIGURARE_CHEI_SUPABASE.md` (🇷🇴 Romanian) or `ENVIRONMENT_VARIABLES.md` (English) for detailed instructions
 
 ## 🚀 Getting Started
 
@@ -73,8 +97,19 @@ npm run preview
 
 ## 📚 Documentation
 
+### Environment Variables & API Keys
+- ✅ **`NETLIFY_CONFIG_COMPLETE.md`** - 🇷🇴 **Configuration Complete!** Verification & next steps
+- 📋 **`POST_DEPLOYMENT_CHECKLIST.md`** - 🇷🇴 **What to do after configuring Netlify**
+- 🚀 **`VALORILE_PENTRU_NETLIFY.md`** - 🇷🇴 **Valorile exacte pentru Netlify** (Ready to copy-paste!)
+- 📋 **`TABEL_VALORI_NETLIFY.md`** - 🇷🇴 **Tabel rapid** cu toate cele 5 variabile
+- `CONFIGURARE_CHEI_SUPABASE.md` - 🇷🇴 Complete Romanian guide for Supabase API keys (ANON KEY explained!)
 - `SETARI_MEDIU_RO.md` - 🇷🇴 Romanian quick start guide for environment variables
 - `ENVIRONMENT_VARIABLES.md` - Comprehensive environment setup guide (English)
+- `SUPABASE_KEYS_SUMMARY.md` - Quick reference summary
+- `verify-env-vars.sh` - Bash script to verify environment variables locally
+
+### Deployment & Database
+- ✅ **`NETLIFY_CONFIG_COMPLETE.md`** - Post-configuration guide
 - `NETLIFY_SETUP.md` - Netlify deployment configuration
 - `DATABASE_SETUP.md` - Database schema and migrations
 

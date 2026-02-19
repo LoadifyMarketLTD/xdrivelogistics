@@ -1,16 +1,33 @@
 # 🚀 Setări Variabile de Mediu - XDrive Logistics
 
-## 📋 Variabilele Necesare
+## ⚠️ ATENȚIE: Aplicație Hibridă - Necesită 5 Variabile!
 
-Aplicația necesită următoarele variabile de mediu pentru a funcționa corect:
+Această aplicație este HIBRIDĂ și necesită DOUĂ seturi de variabile:
+- **NEXT_PUBLIC_*** pentru Portalul Next.js (dashboard-ul principal)
+- **VITE_*** pentru Landing Page-ul Vite (pagina de aterizare)
+
+## 📋 Variabilele Necesare - TOATE 5!
 
 ```bash
+# ============================================================================
+# PORTAL NEXT.JS (Dashboard-ul Principal)
+# ============================================================================
 NEXT_PUBLIC_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
 NEXT_PUBLIC_SITE_URL=https://xdrivelogistics.co.uk
+
+# ============================================================================
+# LANDING PAGE VITE (Pagina de Aterizare)
+# ============================================================================
+VITE_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
 ```
 
-**Important**: Acestea sunt chei publice client și NU sunt secrete. Sunt sigure pentru a fi expuse în browser.
+**Important**: 
+- Acestea sunt chei publice client și NU sunt secrete
+- Sunt sigure pentru a fi expuse în browser
+- Ambele seturi conectează la ACELAȘI proiect Supabase
+- Fără AMBELE seturi, aplicația NU va funcționa complet
 
 ---
 
@@ -22,14 +39,14 @@ NEXT_PUBLIC_SITE_URL=https://xdrivelogistics.co.uk
 2. Selectează site-ul tău: **xdrivelogistics**
 3. Mergi la: **Site settings** → **Environment variables**
 
-### Pasul 2: Adaugă Variabilele
+### Pasul 2: Adaugă TOATE cele 5 Variabile
 
-Pentru **FIECARE** dintre cele trei variabile de mai sus:
+Pentru **FIECARE** dintre cele 5 variabile de mai sus:
 
 1. Click pe **"Add a variable"** sau **"Add single variable"**
 2. **Key** (Cheie): Introdu numele variabilei (ex: `NEXT_PUBLIC_SUPABASE_URL`)
 3. **Value** (Valoare): Introdu valoarea corespunzătoare
-4. **Scopes** (Contexte): ✅ **BIFEAZĂ TOATE TREI**:
+4. **Scopes** (Contexte): ✅ **BIFEAZĂ "All scopes"** și **"All deploy contexts"**:
    - ✅ **Production** (deploy-uri pe branch-ul principal)
    - ✅ **Deploy Previews** (preview-uri pentru PR-uri)
    - ✅ **Branch deploys** (deploy-uri pe toate branch-urile)
@@ -38,13 +55,18 @@ Pentru **FIECARE** dintre cele trei variabile de mai sus:
 
 ### Pasul 3: Verifică Setările
 
-După ce ai adăugat toate cele trei variabile, verifică că ai:
+După ce ai adăugat toate cele **5 variabile**, verifică că ai:
 
-- ✅ `NEXT_PUBLIC_SUPABASE_URL` → Toate 3 contexte
-- ✅ `NEXT_PUBLIC_SUPABASE_ANON_KEY` → Toate 3 contexte
-- ✅ `NEXT_PUBLIC_SITE_URL` → Toate 3 contexte
+- ✅ `NEXT_PUBLIC_SUPABASE_URL` → Toate contexte
+- ✅ `NEXT_PUBLIC_SUPABASE_ANON_KEY` → Toate contexte
+- ✅ `NEXT_PUBLIC_SITE_URL` → Toate contexte
+- ✅ `VITE_SUPABASE_URL` → Toate contexte
+- ✅ `VITE_SUPABASE_ANON_KEY` → Toate contexte
 
-**Greșeală comună**: Setarea variabilelor doar pentru Production. Acest lucru va cauza erori în preview-urile PR-urilor!
+**Greșeală comună**: 
+- Lipsa variabilelor VITE_* → Landing page-ul nu va funcționa
+- Lipsa variabilelor NEXT_PUBLIC_* → Portalul nu va funcționa
+- Setarea doar pentru Production → Erori în preview-urile PR-urilor!
 
 ### Pasul 4: Șterge Cache-ul și Redeploy
 
@@ -67,12 +89,17 @@ Acest lucru asigură:
 cp .env.example .env.local
 ```
 
-### Pasul 2: Fișierul .env.local Va Conține:
+### Pasul 2: Fișierul .env.local Va Conține TOATE 5 Variabilele:
 
 ```bash
+# Portal Next.js
 NEXT_PUBLIC_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Landing Page Vite
+VITE_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
 ```
 
 ### Pasul 3: Pornește Serverul de Dezvoltare
