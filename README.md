@@ -98,14 +98,18 @@ npm run preview
 ## 📚 Documentation
 
 ### Environment Variables & API Keys
+- ✅ **`NETLIFY_CONFIG_COMPLETE.md`** - 🇷🇴 **Configuration Complete!** Verification & next steps
+- 📋 **`POST_DEPLOYMENT_CHECKLIST.md`** - 🇷🇴 **What to do after configuring Netlify**
 - 🚀 **`VALORILE_PENTRU_NETLIFY.md`** - 🇷🇴 **Valorile exacte pentru Netlify** (Ready to copy-paste!)
 - 📋 **`TABEL_VALORI_NETLIFY.md`** - 🇷🇴 **Tabel rapid** cu toate cele 5 variabile
 - `CONFIGURARE_CHEI_SUPABASE.md` - 🇷🇴 Complete Romanian guide for Supabase API keys (ANON KEY explained!)
 - `SETARI_MEDIU_RO.md` - 🇷🇴 Romanian quick start guide for environment variables
 - `ENVIRONMENT_VARIABLES.md` - Comprehensive environment setup guide (English)
 - `SUPABASE_KEYS_SUMMARY.md` - Quick reference summary
+- `verify-env-vars.sh` - Bash script to verify environment variables locally
 
 ### Deployment & Database
+- ✅ **`NETLIFY_CONFIG_COMPLETE.md`** - Post-configuration guide
 - `NETLIFY_SETUP.md` - Netlify deployment configuration
 - `DATABASE_SETUP.md` - Database schema and migrations
 
