@@ -1,3 +1,7 @@
 [build]
 command = "npm run build"
 publish = "dist"
+
+# Note: SPA redirects are handled via public/_redirects file
+# (more standard than [[redirects]] in netlify.toml for Vite projects)
+# No [functions] section - directory doesn't exist and causes 503 errors
