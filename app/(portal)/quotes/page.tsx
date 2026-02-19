@@ -7,6 +7,7 @@ import Panel from '@/components/portal/Panel'
 import QuotesStats from '@/components/portal/quotes/QuotesStats'
 import QuotesFilters from '@/components/portal/quotes/QuotesFilters'
 import QuotesTable from '@/components/portal/quotes/QuotesTable'
+import ResponsiveContainer from '@/components/layout/ResponsiveContainer'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
@@ -177,8 +178,9 @@ export default function QuotesPage() {
   }
   
   return (
-    <div className="portal-layout">
-      <div className="portal-header">
+    <ResponsiveContainer maxWidth="xl">
+      <div className="portal-layout">
+        <div className="portal-header">
         <h1 className="portal-title">Quotes</h1>
         <p className="page-description">Manage your quotes and bids</p>
       </div>
@@ -214,6 +216,7 @@ export default function QuotesPage() {
           />
         </Panel>
       </div>
-    </div>
+      </div>
+    </ResponsiveContainer>
   )
 }
