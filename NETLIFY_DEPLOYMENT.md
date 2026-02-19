@@ -46,8 +46,9 @@ ls -la .next/  # Next.js portal
   
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  [plugins.inputs]
-    publish = ".next"
+```
+
+**Important**: The Next.js plugin automatically detects `.next/` directory. No additional configuration is needed!
 ```
 
 ### How It Works
