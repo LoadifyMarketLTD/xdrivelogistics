@@ -175,4 +175,63 @@ Once environment variables are properly configured:
 
 ---
 
+## 🔄 Build Caching
+
+### How Build Caching Works
+
+The `@netlify/plugin-nextjs` plugin is now installed as a devDependency in `package.json`, which enables optimal build caching on Netlify.
+
+### Expected Behavior
+
+#### First Build After Changes
+The first deployment after merging these changes may show:
+```
+⚠️ Build cache not found
+```
+This is **normal and expected** - there is no cache yet on the first build.
+
+#### Subsequent Builds
+After the first successful build:
+- ✅ Build cache will be automatically restored from `.next/cache`
+- ✅ Compiled pages and static assets are reused
+- ✅ Build times are significantly faster (often 2-3x faster)
+- ✅ No more "Build cache not found" warnings
+
+### What Gets Cached
+
+The Next.js build cache includes:
+- Compiled pages and components
+- Static assets and images
+- Build artifacts from previous deployments
+- Dependencies and node modules
+
+### Cache Invalidation
+
+The cache is automatically invalidated when:
+- You change Next.js configuration (`next.config.js`)
+- You update dependencies in `package.json`
+- You manually trigger "Clear cache and deploy" in Netlify
+
+### Troubleshooting Cache Issues
+
+If builds are slower than expected:
+
+1. **Check if plugin is installed**: Verify `@netlify/plugin-nextjs` appears in `devDependencies`
+2. **Clear cache manually**: Go to Netlify → Deploys → Trigger deploy → Clear cache and deploy
+3. **Check build logs**: Look for "Restoring cached Next.js build" message in deployment logs
+
+### Why This Fix Was Needed
+
+**Before**: The plugin was only declared in `netlify.toml` but not installed in `package.json`
+- ❌ Netlify downloaded the plugin on every build
+- ❌ Build cache couldn't be properly managed
+- ❌ Slower build times
+
+**After**: Plugin is installed as a devDependency
+- ✅ Plugin is installed with other dependencies
+- ✅ Build cache works optimally
+- ✅ Faster, more efficient builds
+
+---
+
 *Last updated: 2024-02-16*

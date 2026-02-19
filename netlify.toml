@@ -1,7 +1,24 @@
-[build]
-  command = "npm run build:all"
-  # Removed: publish = "dist" - conflicts with @netlify/plugin-nextjs
-  # Plugin requires exclusive deployment control
+# Netlify Configuration for XDrive Logistics
+# This configuration enables Next.js deployment with build caching
 
+[build]
+  # Build command: 
+  # 1. build:landing - Compiles Vite landing page
+  # 2. integrate:landing - Integrates landing page into Next.js public folder
+  # 3. build:portal - Builds Next.js application
+  command = "npm run build:all"
+  
+  # No publish directory specified
+  # The @netlify/plugin-nextjs plugin manages deployment automatically
+  # and requires exclusive control over the deployment process
+
+# Next.js Plugin Configuration
+# The plugin is now installed as a devDependency in package.json
+# This enables build caching and prevents the "Build cache not found" warning
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+  
+  # Expected behavior:
+  # - First build: May show "Build cache not found" warning (normal)
+  # - Subsequent builds: Automatically restores .next/cache for faster builds
+  # - Cache includes: compiled pages, static assets, and build artifacts
