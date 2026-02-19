@@ -146,6 +146,19 @@ Open browser console on any page:
 3. Check variable names are exactly correct (case-sensitive)
 4. Trigger "Clear cache and deploy"
 
+### Problem: Wrong Supabase key format (sb_publishable_*)
+
+**Symptom**: You see a key starting with `sb_publishable_` instead of `eyJhbGc...`
+
+**Cause**: Using the wrong Supabase key type. The `sb_publishable_*` format is NOT the anon key.
+
+**Solution**:
+1. Go to [Supabase Dashboard → Project Settings → API](https://app.supabase.com/project/jqxlauexhkonixtjvljw/settings/api)
+2. Copy the **"anon public"** key (starts with `eyJhbGc...`)
+3. This is a JWT token, not the `sb_publishable_*` format
+4. Update both `VITE_SUPABASE_ANON_KEY` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Netlify
+5. Clear cache and redeploy
+
 ### Problem: PR preview deploy fails
 
 **Cause**: Environment variables only set for Production context.
