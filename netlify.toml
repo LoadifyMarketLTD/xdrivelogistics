@@ -6,13 +6,9 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
 
-# Next.js plugin for portal routes
+# Next.js plugin - auto-detects .next/ directory
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  
-[plugins.inputs]
-  # Publish Next.js from its build directory
-  publish = ".next"
 
 # Rewrite portal routes to Next.js function
 [[redirects]]
