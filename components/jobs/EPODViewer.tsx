@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabaseClient'
 
 interface EPODViewerProps {
   jobId: string
@@ -34,7 +34,6 @@ export default function EPODViewer({ jobId, className = '' }: EPODViewerProps) {
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClientComponentClient()
 
   useEffect(() => {
     loadData()

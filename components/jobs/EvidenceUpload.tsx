@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, ChangeEvent, DragEvent } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabaseClient'
 
 interface EvidenceUploadProps {
   jobId: string
@@ -28,7 +28,6 @@ export default function EvidenceUpload({
   const [notes, setNotes] = useState('')
   const [receiverName, setReceiverName] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const supabase = createClientComponentClient()
 
   // Handle file selection
   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {

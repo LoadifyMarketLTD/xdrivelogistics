@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabaseClient'
 import DriverJobCard from '@/components/jobs/DriverJobCard'
 import StatusTimeline from '@/components/jobs/StatusTimeline'
 import StatusActions from '@/components/jobs/StatusActions'
@@ -67,7 +67,6 @@ interface StatusEvent {
 export default function JobDetailPage() {
   const params = useParams()
   const jobId = params?.jobId as string
-  const supabase = createClientComponentClient()
   
   const [job, setJob] = useState<Job | null>(null)
   const [postingCompany, setPostingCompany] = useState<Company | null>(null)
