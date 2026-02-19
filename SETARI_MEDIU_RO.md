@@ -183,7 +183,7 @@ Odată ce variabilele de mediu sunt configurate corect:
 4. ✅ Fără erori misterioase
 5. ✅ Preview-urile PR-urilor vor funcționa corect
 
-**Ești gata să mergiți PR-ul tău!** 🎉
+**Ești gata să faci merge la PR-ul tău!** 🎉
 
 ---
 
