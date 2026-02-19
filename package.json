@@ -8,10 +8,10 @@
   },
   "scripts": {
     "dev": "vite",
-    "dev:portal": "next dev",
+    "dev:portal": "npx next dev",
     "build": "npm run build:landing && npm run build:portal",
     "build:landing": "tsc -b tsconfig.app.json && vite build",
-    "build:portal": "next build",
+    "build:portal": "npx next build",
     "start": "vite preview",
     "lint": "eslint .",
     "preview": "vite preview"

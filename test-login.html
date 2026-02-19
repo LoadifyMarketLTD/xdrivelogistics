@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XDrive Login Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        h1 {
+            color: #C8A64D;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #C8A64D;
+        }
+        .test-section h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .status {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            background: #C8A64D;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #B39543;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+        .code {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .test-result {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 XDrive Logistics - Login Test</h1>
+        <p class="subtitle">Test autentificare și persistență sesiune</p>
+
+        <!-- Test 1: Environment & Connection -->
+        <div class="test-section">
+            <h2>Test 1: Conexiune la Supabase</h2>
+            <button onclick="testConnection()">Verifică Conexiunea</button>
+            <div id="connection-result" class="test-result"></div>
+        </div>
+
+        <!-- Test 2: Invalid Login -->
+        <div class="test-section">
+            <h2>Test 2: Credențiale Invalide</h2>
+            <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
+                Testează dacă sistemul respinge corect credențialele invalide
+            </p>
+            <button onclick="testInvalidLogin()">Test Credențiale Invalide</button>
+            <div id="invalid-result" class="test-result"></div>
+        </div>
+
+        <!-- Test 3: Valid Login (Manual) -->
+        <div class="test-section">
+            <h2>Test 3: Login cu Credențiale Valide</h2>
+            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                Introdu credențiale reale pentru a testa login-ul
+            </p>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="email" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Parolă:</label>
+                <input type="password" id="password" placeholder="••••••••">
+            </div>
+            <button onclick="testValidLogin()">Testează Login</button>
+            <button onclick="checkCurrentSession()" style="background: #6c757d;">Verifică Sesiunea</button>
+            <button onclick="testLogout()" style="background: #dc3545;">Logout</button>
+            <div id="login-result" class="test-result"></div>
+        </div>
+
+        <!-- Test 4: Session Persistence -->
+        <div class="test-section">
+            <h2>Test 4: Persistență Sesiune</h2>
+            <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
+                După login, refresh pagina pentru a verifica dacă sesiunea persistă
+            </p>
+            <button onclick="testSessionPersistence()">Verifică Persistență</button>
+            <div id="persistence-result" class="test-result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase client
+        const SUPABASE_URL = 'https://jqxlauexhkonixtjvljw.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU5MjI2ODUsImV4cCI6MjA1MTQ5ODY4NX0.YJrN5WBcWZxONXiDk_sIVpK1O0yPAqGMV3C27eHsm5c';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function showResult(elementId, message, type = 'info') {
+            const el = document.getElementById(elementId);
+            el.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        async function testConnection() {
+            showResult('connection-result', '⏳ Testare conexiune...', 'info');
+            
+            try {
+                const { data, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    showResult('connection-result', 
+                        `❌ Eroare de conexiune: ${error.message}`, 
+                        'error');
+                    return;
+                }
+                
+                const sessionStatus = data.session ? '🟢 Logat' : '⚪ Nu este logat';
+                showResult('connection-result', 
+                    `✅ Conexiunea funcționează!<br>Status sesiune: ${sessionStatus}`, 
+                    'success');
+            } catch (err) {
+                showResult('connection-result', 
+                    `❌ Eroare: ${err.message}`, 
+                    'error');
+            }
+        }
+
+        async function testInvalidLogin() {
+            showResult('invalid-result', '⏳ Testare credențiale invalide...', 'info');
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: 'invalid@test.com',
+                    password: 'wrongpassword123'
+                });
+                
+                if (error) {
+                    showResult('invalid-result', 
+                        `✅ Corect! Sistemul a respins credențialele invalide<br>
+                        <span style="font-size: 12px;">Mesaj eroare: ${error.message}</span>`, 
+                        'success');
+                } else {
+                    showResult('invalid-result', 
+                        '❌ PROBLEMĂ: Credențialele invalide au fost acceptate!', 
+                        'error');
+                }
+            } catch (err) {
+                showResult('invalid-result', 
+                    `✅ Eroare prinsă corect: ${err.message}`, 
+                    'success');
+            }
+        }
+
+        async function testValidLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showResult('login-result', '⚠️ Te rog introdu email și parolă', 'warning');
+                return;
+            }
+            
+            showResult('login-result', '⏳ Se încearcă autentificarea...', 'info');
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) {
+                    showResult('login-result', 
+                        `❌ Eroare autentificare: ${error.message}`, 
+                        'error');
+                } else if (data.user) {
+                    showResult('login-result', 
+                        `✅ Login reușit!<br>
+                        <div class="code">
+                        User ID: ${data.user.id}<br>
+                        Email: ${data.user.email}<br>
+                        Session: ${data.session ? 'Activă' : 'Inactivă'}
+                        </div>
+                        <strong>✅ Utilizatorul este acum logat!</strong>`, 
+                        'success');
+                }
+            } catch (err) {
+                showResult('login-result', 
+                    `❌ Eroare: ${err.message}`, 
+                    'error');
+            }
+        }
+
+        async function checkCurrentSession() {
+            showResult('login-result', '⏳ Verificare sesiune curentă...', 'info');
+            
+            try {
+                const { data, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    showResult('login-result', `❌ Eroare: ${error.message}`, 'error');
+                    return;
+                }
+                
+                if (data.session) {
+                    showResult('login-result', 
+                        `✅ Sesiune activă găsită!<br>
+                        <div class="code">
+                        User: ${data.session.user.email}<br>
+                        Expires: ${new Date(data.session.expires_at * 1000).toLocaleString()}
+                        </div>`, 
+                        'success');
+                } else {
+                    showResult('login-result', 
+                        '⚪ Nu există sesiune activă. Te rog să te loghezi.', 
+                        'info');
+                }
+            } catch (err) {
+                showResult('login-result', `❌ Eroare: ${err.message}`, 'error');
+            }
+        }
+
+        async function testLogout() {
+            showResult('login-result', '⏳ Se deconectează...', 'info');
+            
+            try {
+                const { error } = await supabase.auth.signOut();
+                
+                if (error) {
+                    showResult('login-result', `❌ Eroare logout: ${error.message}`, 'error');
+                } else {
+                    showResult('login-result', 
+                        '✅ Deconectat cu succes! Sesiunea a fost ștearsă.', 
+                        'success');
+                }
+            } catch (err) {
+                showResult('login-result', `❌ Eroare: ${err.message}`, 'error');
+            }
+        }
+
+        async function testSessionPersistence() {
+            showResult('persistence-result', '⏳ Verificare persistență sesiune...', 'info');
+            
+            try {
+                // Check 1: Current session
+                const { data: check1 } = await supabase.auth.getSession();
+                
+                // Check 2: Simulate refresh with new client
+                const supabase2 = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                const { data: check2 } = await supabase2.auth.getSession();
+                
+                const session1 = check1.session ? 'Sesiune activă' : 'Fără sesiune';
+                const session2 = check2.session ? 'Sesiune activă' : 'Fără sesiune';
+                
+                const persistent = (check1.session === null && check2.session === null) || 
+                                  (check1.session !== null && check2.session !== null);
+                
+                if (persistent) {
+                    showResult('persistence-result', 
+                        `✅ Sesiunea este persistentă!<br>
+                        <div class="code">
+                        Verificare 1: ${session1}<br>
+                        Verificare 2: ${session2}<br>
+                        Status: Consistent ✓
+                        </div>
+                        <strong>💡 Încearcă să faci refresh la pagină - sesiunea ar trebui să persiste!</strong>`, 
+                        'success');
+                } else {
+                    showResult('persistence-result', 
+                        `⚠️ Inconsistență în sesiune<br>
+                        Verificare 1: ${session1}<br>
+                        Verificare 2: ${session2}`, 
+                        'warning');
+                }
+            } catch (err) {
+                showResult('persistence-result', `❌ Eroare: ${err.message}`, 'error');
+            }
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            testConnection();
+        });
+    </script>
+</body>
+</html>
