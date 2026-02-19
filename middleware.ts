@@ -1,19 +1,27 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const DEFAULT_SUPABASE_URL = 'https://jqxlauexhkonixtjvljw.supabase.co'
-const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO'
-
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
+  const response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   })
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  // Skip session refresh when env vars are absent (e.g. deploy previews not yet configured).
+  // This prevents a broken-key from causing redirect loops on every request.
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return response
+  }
+
+  let mutableResponse = response
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         get(name: string) {
@@ -25,12 +33,12 @@ export async function middleware(request: NextRequest) {
             value,
             ...options,
           })
-          response = NextResponse.next({
+          mutableResponse = NextResponse.next({
             request: {
               headers: request.headers,
             },
           })
-          response.cookies.set({
+          mutableResponse.cookies.set({
             name,
             value,
             ...options,
@@ -42,12 +50,12 @@ export async function middleware(request: NextRequest) {
             value: '',
             ...options,
           })
-          response = NextResponse.next({
+          mutableResponse = NextResponse.next({
             request: {
               headers: request.headers,
             },
           })
-          response.cookies.set({
+          mutableResponse.cookies.set({
             name,
             value: '',
             ...options,
@@ -60,7 +68,7 @@ export async function middleware(request: NextRequest) {
   // Refresh session if expired - required for Server Components
   await supabase.auth.getUser()
 
-  return response
+  return mutableResponse
 }
 
 export const config = {
