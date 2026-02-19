@@ -3,10 +3,14 @@
 import { brandColors } from '@/lib/brandColors'
 import { useAuth } from '@/lib/AuthContext'
 
-export default function DriverSettingsPage() {
-  const { profile } = useAuth()
+interface SettingItemProps {
+  icon: string
+  label: string
+  value: string
+}
 
-  const SettingItem = ({ icon, label, value }: any) => (
+function SettingItem({ icon, label, value }: SettingItemProps) {
+  return (
     <div style={{
       background: brandColors.mobile.cardBackground,
       border: `1px solid ${brandColors.mobile.cardBorder}`,
@@ -37,6 +41,10 @@ export default function DriverSettingsPage() {
       </div>
     </div>
   )
+}
+
+export default function DriverSettingsPage() {
+  const { profile } = useAuth()
 
   return (
     <div style={{

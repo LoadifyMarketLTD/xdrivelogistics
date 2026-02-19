@@ -6,18 +6,36 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // Ignore build artifacts, auto-generated files, and third-party UI components
+  globalIgnores(['dist', '.next', 'src/components/ui', 'next-env.d.ts']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
       reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
     ],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Allow `any` types in this mixed JS/TS codebase (warn instead of error)
+      '@typescript-eslint/no-explicit-any': 'warn',
+      // Allow unused vars prefixed with _ (common convention for intentional ignores)
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+    },
+  },
+  // Apply Vite fast-refresh rules only to the Vite landing-page source
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    extends: [reactRefresh.configs.vite],
   },
 ])

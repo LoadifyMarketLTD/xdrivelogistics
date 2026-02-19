@@ -3,10 +3,14 @@
 import { brandColors } from '@/lib/brandColors'
 import { useRouter } from 'next/navigation'
 
-export default function FleetMorePage() {
-  const router = useRouter()
+interface MenuItemProps {
+  icon: string
+  label: string
+  onClick: () => void
+}
 
-  const MenuItem = ({ icon, label, onClick }: any) => (
+function MenuItem({ icon, label, onClick }: MenuItemProps) {
+  return (
     <button
       onClick={onClick}
       style={{
@@ -48,6 +52,10 @@ export default function FleetMorePage() {
       </div>
     </button>
   )
+}
+
+export default function FleetMorePage() {
+  const router = useRouter()
 
   return (
     <div style={{

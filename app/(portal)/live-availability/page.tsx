@@ -18,7 +18,6 @@ export default function LiveAvailabilityPage() {
     if (!companyId) return
     
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
     
     const fetch = async () => {
       try {
@@ -35,7 +34,6 @@ export default function LiveAvailabilityPage() {
     
     return () => {
       mounted = false
-      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [companyId])
   

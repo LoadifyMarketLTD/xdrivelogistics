@@ -30,14 +30,11 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   const [newLoadsCount, setNewLoadsCount] = useState(0)
   const [acceptedBidsCount, setAcceptedBidsCount] = useState(0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
+  const [isMobile, setIsMobile] = useState<boolean | null>(null)
 
   // Detect mobile viewport - only on client side to avoid hydration mismatch
   // Using 1024px breakpoint (lg) for true mobile-first layout
   useEffect(() => {
-    setIsMounted(true)
-    
     const checkMobile = () => {
       if (typeof window !== 'undefined') {
         setIsMobile(window.innerWidth < 1024)
@@ -93,7 +90,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   const totalNotifications = newLoadsCount + acceptedBidsCount
 
   // Don't render mobile-specific UI until mounted to avoid hydration mismatch
-  if (!isMounted) {
+  if (isMobile === null) {
     return (
       <div style={{
         display: 'flex',
