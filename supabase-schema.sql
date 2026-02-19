@@ -174,7 +174,34 @@ CREATE INDEX IF NOT EXISTS idx_jobs_posted_by ON public.jobs(posted_by_company_i
 CREATE INDEX IF NOT EXISTS idx_jobs_assigned_to ON public.jobs(assigned_company_id);
 
 -- ============================================================
--- 6. INVOICES TABLE
+-- 6. JOB_BIDS TABLE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.job_bids (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  job_id UUID REFERENCES public.jobs(id) ON DELETE CASCADE,
+  company_id UUID REFERENCES public.companies(id) ON DELETE CASCADE,
+  driver_id UUID REFERENCES public.drivers(id) ON DELETE SET NULL,
+  amount NUMERIC(12,2) NOT NULL,
+  currency TEXT DEFAULT 'EUR',
+  message TEXT,
+  accepted BOOLEAN DEFAULT false
+);
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_job_bids_job_id ON public.job_bids(job_id);
+CREATE INDEX IF NOT EXISTS idx_job_bids_company_id ON public.job_bids(company_id);
+CREATE INDEX IF NOT EXISTS idx_job_bids_driver_id ON public.job_bids(driver_id);
+
+DROP TRIGGER IF EXISTS set_updated_at_job_bids ON public.job_bids;
+CREATE TRIGGER set_updated_at_job_bids
+  BEFORE UPDATE ON public.job_bids
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_updated_at_column();
+
+-- ============================================================
+-- 7. INVOICES TABLE
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.invoices (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -219,7 +246,7 @@ CREATE INDEX IF NOT EXISTS idx_invoices_job_id ON public.invoices(job_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_status ON public.invoices(status);
 
 -- ============================================================
--- 7. ROW LEVEL SECURITY (RLS) POLICIES
+-- 8. ROW LEVEL SECURITY (RLS) POLICIES
 -- ============================================================
 
 -- Enable RLS on all tables
@@ -227,6 +254,7 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.companies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.drivers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.jobs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.job_bids ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
 
 -- Profiles policies
@@ -317,8 +345,27 @@ CREATE POLICY "Users can manage company invoices"
     )
   );
 
+-- Job bids policies
+DROP POLICY IF EXISTS "Users can view company bids" ON public.job_bids;
+CREATE POLICY "Users can view company bids"
+  ON public.job_bids FOR SELECT
+  USING (
+    company_id IN (
+      SELECT company_id FROM public.profiles WHERE id = auth.uid()
+    )
+  );
+
+DROP POLICY IF EXISTS "Users can manage company bids" ON public.job_bids;
+CREATE POLICY "Users can manage company bids"
+  ON public.job_bids FOR ALL
+  USING (
+    company_id IN (
+      SELECT company_id FROM public.profiles WHERE id = auth.uid()
+    )
+  );
+
 -- ============================================================
--- 8. HELPER FUNCTIONS
+-- 9. HELPER FUNCTIONS
 -- ============================================================
 
 -- Function to get current user's company_id
