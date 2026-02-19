@@ -22,14 +22,6 @@ const nextConfig = {
       },
     ],
   },
-
-  // Ensure proper path resolution
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-    }
-    return config
-  },
 }
 
 export default nextConfig
