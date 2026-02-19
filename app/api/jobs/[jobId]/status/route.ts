@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/supabase/server'
 
 // Define valid status transitions
 const VALID_TRANSITIONS: Record<string, string[]> = {
@@ -32,7 +31,7 @@ export async function POST(
   { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = await createClient()
     const { jobId } = await params
 
     // Get current user
@@ -187,7 +186,7 @@ export async function GET(
   { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = await createClient()
     const { jobId } = await params
 
     // Get current user

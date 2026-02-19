@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/supabase/server'
 
 /**
  * GET /api/jobs/[jobId]/pod
@@ -25,7 +24,7 @@ export async function GET(
   { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = await createClient()
     const { jobId } = await params
 
     // Get authenticated user
