@@ -6,13 +6,45 @@ For the application to work correctly in Netlify, you **MUST** set environment v
 
 ### Required Environment Variables
 
+The application uses **both Vite (landing page) and Next.js (portal)**, requiring environment variables with both naming conventions:
+
 ```bash
+# For Vite (landing page build)
+VITE_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
+VITE_SITE_URL=https://xdrivelogistics.co.uk
+
+# For Next.js (portal build)  
 NEXT_PUBLIC_SUPABASE_URL=https://jqxlauexhkonixtjvljw.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeGxhdWV4aGtvbml4dGp2bGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MTM2MzYsImV4cCI6MjA1NTI4OTYzNn0.yxmGBfB7tzCgBXi_6T-uJQ_JNNYmBVO
 NEXT_PUBLIC_SITE_URL=https://xdrivelogistics.co.uk
 ```
 
-**Note**: These are `NEXT_PUBLIC_*` variables - they are NOT secrets and are safe to expose in the browser.
+**Important Notes**:
+- ⚠️ **Both sets are required** - the build process compiles both Vite and Next.js applications
+- These are public client keys - they are NOT secrets and are safe to expose in the browser
+- The values should be identical for both `VITE_*` and `NEXT_PUBLIC_*` versions
+
+### 🏗️ Why Both Variable Sets?
+
+The XDrive Logistics application uses a **dual-build architecture**:
+
+1. **Landing Page** (`src/`) - Built with Vite
+   - Public marketing site
+   - Uses `VITE_*` environment variables
+   - Compiled with: `npm run build:landing`
+
+2. **Portal** (`app/`) - Built with Next.js
+   - Authenticated user dashboard and features
+   - Uses `NEXT_PUBLIC_*` environment variables  
+   - Compiled with: `npm run build:portal`
+
+The full build command `npm run build:all` runs:
+```bash
+build:landing → integrate:landing → build:portal
+```
+
+Since both build tools compile during deployment, **both variable naming conventions must be present** in Netlify's environment.
 
 ---
 
@@ -26,10 +58,10 @@ NEXT_PUBLIC_SITE_URL=https://xdrivelogistics.co.uk
 
 ### Step 2: Add Each Variable
 
-For **EACH** of the three variables above:
+For **EACH** of the **six variables** above (3 for Vite + 3 for Next.js):
 
 1. Click **Add a variable** or **Add single variable**
-2. **Key**: Enter the variable name (e.g., `NEXT_PUBLIC_SUPABASE_URL`)
+2. **Key**: Enter the variable name (e.g., `VITE_SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_URL`)
 3. **Values**: Enter the value
 4. **Scopes**: ✅ **CHECK ALL THREE**:
    - ✅ **Production** (main branch deploys)
@@ -39,10 +71,18 @@ For **EACH** of the three variables above:
 5. **DO NOT** check "Keep this value secret" - these are public client keys
 6. Click **Add variable**
 
+**Tip**: The `VITE_*` and `NEXT_PUBLIC_*` versions should have identical values - only the prefix differs.
+
 ### Step 3: Verify All Variables Are Set
 
-After adding all three variables, verify:
+After adding all six variables, verify:
 
+**Vite variables (for landing page):**
+- ✅ `VITE_SUPABASE_URL` → All 3 contexts
+- ✅ `VITE_SUPABASE_ANON_KEY` → All 3 contexts  
+- ✅ `VITE_SITE_URL` → All 3 contexts
+
+**Next.js variables (for portal):**
 - ✅ `NEXT_PUBLIC_SUPABASE_URL` → All 3 contexts
 - ✅ `NEXT_PUBLIC_SUPABASE_ANON_KEY` → All 3 contexts  
 - ✅ `NEXT_PUBLIC_SITE_URL` → All 3 contexts
@@ -139,9 +179,16 @@ Open browser console on any page:
 
 | Variable | Value | Secret? | All Contexts? |
 |----------|-------|---------|---------------|
+| `VITE_SUPABASE_URL` | `https://jqxlauexhkonixtjvljw.supabase.co` | ❌ No | ✅ Yes |
+| `VITE_SUPABASE_ANON_KEY` | `eyJhbGc...` (JWT token) | ❌ No | ✅ Yes |
+| `VITE_SITE_URL` | `https://xdrivelogistics.co.uk` | ❌ No | ✅ Yes |
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://jqxlauexhkonixtjvljw.supabase.co` | ❌ No | ✅ Yes |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJhbGc...` (JWT token) | ❌ No | ✅ Yes |
 | `NEXT_PUBLIC_SITE_URL` | `https://xdrivelogistics.co.uk` | ❌ No | ✅ Yes |
+
+**Why both sets?** The build process (`npm run build:all`) compiles both:
+1. Vite application (landing page) - uses `VITE_*` variables
+2. Next.js application (portal) - uses `NEXT_PUBLIC_*` variables
 
 ### Deploy Contexts Explained
 
