@@ -21,3 +21,12 @@ export const supabase = createClient(
   envKey ?? 'NEXT_PUBLIC_SUPABASE_ANON_KEY-not-configured'
 )
 
+export const supabase = isSupabaseConfigured
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+    })
+  : null

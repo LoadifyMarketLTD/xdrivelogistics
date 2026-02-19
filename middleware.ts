@@ -62,10 +62,17 @@ export async function middleware(request: NextRequest) {
           })
         },
       },
-    }
-  )
+      set(name: string, value: string, options: any) {
+        // Only set on response (request cookies are immutable in Next middleware)
+        response.cookies.set({ name, value, ...options })
+      },
+      remove(name: string, options: any) {
+        response.cookies.set({ name, value: '', ...options })
+      },
+    },
+  })
 
-  // Refresh session if expired - required for Server Components
+  // Refresh session (server components rely on this)
   await supabase.auth.getUser()
 
   return mutableResponse
