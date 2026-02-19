@@ -115,23 +115,14 @@ export default function PostJobPage() {
       if (formData.pickup_datetime) jobData.pickup_datetime = formData.pickup_datetime
       if (formData.delivery_datetime) jobData.delivery_datetime = formData.delivery_datetime
       if (formData.vehicle_type) jobData.vehicle_type = formData.vehicle_type
+      if (formData.cargo_type) jobData.cargo_type = formData.cargo_type
       if (formData.pallets) jobData.pallets = parseInt(formData.pallets)
+      if (formData.boxes) jobData.boxes = parseInt(formData.boxes)
+      if (formData.bags) jobData.bags = parseInt(formData.bags)
+      if (formData.items) jobData.items = parseInt(formData.items)
       if (formData.weight_kg) jobData.weight_kg = parseFloat(formData.weight_kg)
       if (formData.budget) jobData.budget = parseFloat(formData.budget)
-      
-      // Build comprehensive load details with cargo info
-      const cargoInfo = []
-      if (formData.cargo_type) cargoInfo.push(`Cargo Type: ${formData.cargo_type}`)
-      if (formData.pallets) cargoInfo.push(`Pallets: ${formData.pallets}`)
-      if (formData.boxes) cargoInfo.push(`Boxes: ${formData.boxes}`)
-      if (formData.bags) cargoInfo.push(`Bags: ${formData.bags}`)
-      if (formData.items) cargoInfo.push(`Items: ${formData.items}`)
-      if (formData.weight_kg) cargoInfo.push(`Weight: ${formData.weight_kg} kg`)
-      
-      const cargoDetails = cargoInfo.length > 0 ? cargoInfo.join(' | ') : ''
-      const userDetails = formData.load_details ? formData.load_details : ''
-      
-      jobData.load_details = [cargoDetails, userDetails].filter(Boolean).join('\n\n')
+      if (formData.load_details) jobData.load_details = formData.load_details
 
       const { data, error } = await supabase
         .from('jobs')

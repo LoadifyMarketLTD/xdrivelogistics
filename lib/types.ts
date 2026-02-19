@@ -96,8 +96,12 @@ export interface Job {
   pickup_datetime: string | null
   delivery_datetime: string | null
   vehicle_type: string | null
+  cargo_type: string | null
   load_details: string | null
   pallets: number | null
+  boxes: number | null
+  bags: number | null
+  items: number | null
   weight_kg: number | null
   budget: number | null
   assigned_company_id: string | null
@@ -129,7 +133,6 @@ export interface Job {
   // References
   your_ref: string | null
   cust_ref: string | null
-  items: number | null
   
   // Assignment
   vehicle_ref: string | null
@@ -163,8 +166,12 @@ export interface JobFormData {
   pickup_datetime?: string
   delivery_datetime?: string
   vehicle_type?: string
+  cargo_type?: string
   load_details?: string
   pallets?: number
+  boxes?: number
+  bags?: number
+  items?: number
   weight_kg?: number
   budget?: number
 }
