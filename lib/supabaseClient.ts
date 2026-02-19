@@ -18,10 +18,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
     '- VITE_SUPABASE_URL (Vite) or NEXT_PUBLIC_SUPABASE_URL (Next.js)\n' +
     '- VITE_SUPABASE_ANON_KEY (Vite) or NEXT_PUBLIC_SUPABASE_ANON_KEY (Next.js)\n\n' +
     'Please set these in your Netlify environment variables.\n' +
-    'See NETLIFY_SETUP.md for instructions.'
+    'See NETLIFY_DEPLOYMENT_GUIDE.md for instructions.'
   )
 }
 
+// Use placeholder credentials during build to allow static page generation
+// At runtime on Netlify, actual environment variables will be available
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
   supabaseAnonKey || 'placeholder-key'

@@ -14,7 +14,12 @@ export default function LandingPage() {
 
     // Fetch and parse the Vite-built index.html to get the correct asset paths
     fetch('/index.html')
-      .then(res => res.text())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Failed to fetch index.html: ${res.status} ${res.statusText}`)
+        }
+        return res.text()
+      })
       .then(html => {
         // Extract CSS link
         const cssMatch = html.match(/href="([^"]+\.css)"/)
