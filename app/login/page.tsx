@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation'
 import { supabase, isSupabaseConfigured } from '@/lib/supabaseClient'
 import Link from 'next/link'
 
-const CONFIG_ERROR_MESSAGE = 'Configuration error: Invalid API credentials. Please contact support.'
-
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -18,15 +16,21 @@ export default function LoginPage() {
   // Check if user is already authenticated
   useEffect(() => {
     const checkAuth = async () => {
+      console.log('[Auth] Checking existing session...')
+      console.log('[Auth] isSupabaseConfigured:', isSupabaseConfigured)
+
       // Check if Supabase is properly configured
       if (!isSupabaseConfigured) {
-        setError(CONFIG_ERROR_MESSAGE)
-        setChecking(false)
-        return
+        console.warn('[Auth] Supabase env vars missing – using hardcoded defaults')
       }
 
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError) {
+        console.error('[Auth] getSession error:', sessionError)
+      }
+      console.log('[Auth] Existing session found:', !!session)
       if (session) {
+        console.log('[Auth] Already authenticated – redirecting to /dashboard')
         router.push('/dashboard')
       } else {
         setChecking(false)
@@ -37,15 +41,9 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    console.log('[Auth] Login button clicked')
     setError('')
     setLoading(true)
-
-    // Check if Supabase is properly configured
-    if (!isSupabaseConfigured) {
-      setError(CONFIG_ERROR_MESSAGE)
-      setLoading(false)
-      return
-    }
 
     if (!email) {
       setError('Please enter an email address')
@@ -60,24 +58,33 @@ export default function LoginPage() {
     }
 
     try {
+      console.log('[Auth] Sending auth request to Supabase...')
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
+      console.log('[Auth] Auth response received:', { user: data?.user?.id ?? null, error: signInError })
 
       if (signInError) {
-        // Check if the error is related to invalid API key
-        if (signInError.message && signInError.message.toLowerCase().includes('api key')) {
-          setError(CONFIG_ERROR_MESSAGE)
-        } else {
-          setError('Invalid email or password. Please try again.')
+        // Log 503 / service-unavailable details in full
+        if ((signInError as { status?: number }).status === 503) {
+          console.error('[Auth] 503 Service Unavailable – full error:', JSON.stringify(signInError))
         }
+        console.error('[Auth] Sign-in error:', signInError.message, signInError)
+        setError(signInError.message || 'Sign-in failed. Please try again.')
         setPassword('')
       } else if (data.user) {
+        console.log('[Auth] Sign-in successful – redirecting to /dashboard')
         router.push('/dashboard')
+      } else {
+        // No user and no error – unexpected state
+        console.warn('[Auth] No user and no error in response:', data)
+        setError('Sign-in failed. Please try again.')
       }
-    } catch (err) {
-      setError('An error occurred. Please try again.')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.'
+      console.error('[Auth] Unexpected error during sign-in:', err)
+      setError(message)
     } finally {
       setLoading(false)
     }
