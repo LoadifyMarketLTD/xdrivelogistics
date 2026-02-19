@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect, MouseEvent, TouchEvent } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabaseClient'
 
 interface SignatureCaptureProps {
   jobId: string
@@ -23,7 +23,6 @@ export default function SignatureCapture({
   const [error, setError] = useState<string | null>(null)
   const [receiverName, setReceiverName] = useState('')
   const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null)
-  const supabase = createClientComponentClient()
 
   useEffect(() => {
     const canvas = canvasRef.current
