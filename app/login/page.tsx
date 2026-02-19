@@ -2,8 +2,10 @@
 
 import { useState, FormEvent, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabaseClient'
+import { supabase, isSupabaseConfigured } from '@/lib/supabaseClient'
 import Link from 'next/link'
+
+const CONFIG_ERROR_MESSAGE = 'Configuration error: Invalid API credentials. Please contact support.'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -16,6 +18,13 @@ export default function LoginPage() {
   // Check if user is already authenticated
   useEffect(() => {
     const checkAuth = async () => {
+      // Check if Supabase is properly configured
+      if (!isSupabaseConfigured) {
+        setError(CONFIG_ERROR_MESSAGE)
+        setChecking(false)
+        return
+      }
+
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
         router.push('/dashboard')
@@ -30,6 +39,13 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
+
+    // Check if Supabase is properly configured
+    if (!isSupabaseConfigured) {
+      setError(CONFIG_ERROR_MESSAGE)
+      setLoading(false)
+      return
+    }
 
     if (!email) {
       setError('Please enter an email address')
@@ -50,7 +66,12 @@ export default function LoginPage() {
       })
 
       if (signInError) {
-        setError('Invalid email or password. Please try again.')
+        // Check if the error is related to invalid API key
+        if (signInError.message && signInError.message.toLowerCase().includes('api key')) {
+          setError(CONFIG_ERROR_MESSAGE)
+        } else {
+          setError('Invalid email or password. Please try again.')
+        }
         setPassword('')
       } else if (data.user) {
         router.push('/dashboard')

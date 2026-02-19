@@ -1,5 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
 
+// Placeholder values used when credentials are missing
+const PLACEHOLDER_URL = 'https://placeholder.supabase.co'
+const PLACEHOLDER_KEY = 'placeholder-key'
+
 // Support both Vite and Next.js environment variables
 const supabaseUrl = 
   typeof import.meta !== 'undefined' && import.meta.env
@@ -11,9 +15,16 @@ const supabaseAnonKey =
     ? import.meta.env.VITE_SUPABASE_ANON_KEY
     : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn(
-    '⚠️  Missing Supabase credentials!\n' +
+// Validate that credentials are present and not placeholder values
+const hasValidCredentials = 
+  supabaseUrl && 
+  supabaseAnonKey && 
+  supabaseUrl !== PLACEHOLDER_URL &&
+  supabaseAnonKey !== PLACEHOLDER_KEY
+
+if (!hasValidCredentials) {
+  console.error(
+    '❌ Invalid or missing Supabase credentials!\n' +
     'Required environment variables:\n' +
     '- VITE_SUPABASE_URL (Vite) or NEXT_PUBLIC_SUPABASE_URL (Next.js)\n' +
     '- VITE_SUPABASE_ANON_KEY (Vite) or NEXT_PUBLIC_SUPABASE_ANON_KEY (Next.js)\n\n' +
@@ -22,9 +33,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
   )
 }
 
-// Use placeholder credentials during build to allow static page generation
-// At runtime on Netlify, actual environment variables will be available
+// Create Supabase client with proper credentials
+// If credentials are invalid, we still create the client but mark it as invalid
 export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-key'
+  supabaseUrl || PLACEHOLDER_URL,
+  supabaseAnonKey || PLACEHOLDER_KEY
 )
+
+// Export a flag to check if credentials are valid
+export const isSupabaseConfigured = hasValidCredentials
