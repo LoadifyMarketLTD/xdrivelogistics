@@ -24,6 +24,15 @@ interface Load {
   created_at: string
   distance_miles?: number | null
   load_type?: string | null
+  pickup_lat?: number | null
+  pickup_lng?: number | null
+  delivery_lat?: number | null
+  delivery_lng?: number | null
+}
+
+interface DistanceInfo {
+  toPickup: { miles: string; duration: string } | null
+  jobDistance: { miles: string; duration: string } | null
 }
 
 type SortBy = 'date' | 'distance' | 'price'
@@ -56,6 +65,11 @@ export default function LoadsPage() {
   const [bidAmount, setBidAmount] = useState('')
   const [bidMessage, setBidMessage] = useState('')
   const [submittingBid, setSubmittingBid] = useState(false)
+
+  // Distance state per load id
+  const [distances, setDistances] = useState<Record<string, DistanceInfo>>({})
+  const [driverLat, setDriverLat] = useState<number | null>(null)
+  const [driverLng, setDriverLng] = useState<number | null>(null)
   
   // Use ref for mounted state to prevent updates after unmount
   const mountedRef = useRef(true)
@@ -96,6 +110,21 @@ export default function LoadsPage() {
     
     // Initial fetch
     fetchLoads()
+
+    // Fetch driver's saved location from driver_locations table
+    if (user?.id) {
+      supabase
+        .from('driver_locations')
+        .select('lat, lng')
+        .eq('driver_id', user.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) {
+            setDriverLat(data.lat)
+            setDriverLng(data.lng)
+          }
+        })
+    }
     
     // Set up polling for real-time updates (every 30s)
     const interval = setInterval(() => {
@@ -108,7 +137,7 @@ export default function LoadsPage() {
       mountedRef.current = false
       clearInterval(interval)
     }
-  }, [fetchLoads])
+  }, [fetchLoads, user?.id])
 
   const filteredAndSortedLoads = useMemo(() => {
     const filtered = loads.filter(load => {
@@ -193,6 +222,46 @@ export default function LoadsPage() {
     )
   }
 
+  const fetchDistance = async (load: Load) => {
+    if (distances[load.id]) return // already fetched
+    if (!load.pickup_lat || !load.pickup_lng || !load.delivery_lat || !load.delivery_lng) {
+      setDistances(prev => ({ ...prev, [load.id]: { toPickup: null, jobDistance: null } }))
+      return
+    }
+    try {
+      const [toPickupRes, jobDistRes] = await Promise.all([
+        driverLat && driverLng
+          ? fetch('/api/directions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                origin: { lat: driverLat, lng: driverLng },
+                destination: { lat: load.pickup_lat, lng: load.pickup_lng }
+              })
+            }).then(r => r.ok ? r.json() : null).catch(() => null)
+          : Promise.resolve(null),
+        fetch('/api/directions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            origin: { lat: load.pickup_lat, lng: load.pickup_lng },
+            destination: { lat: load.delivery_lat, lng: load.delivery_lng }
+          })
+        }).then(r => r.ok ? r.json() : null).catch(() => null)
+      ])
+      setDistances(prev => ({
+        ...prev,
+        [load.id]: {
+          toPickup: toPickupRes?.miles ? { miles: toPickupRes.miles, duration: toPickupRes.duration } : null,
+          jobDistance: jobDistRes?.miles ? { miles: jobDistRes.miles, duration: jobDistRes.duration } : null,
+        }
+      }))
+    } catch (err) {
+      console.error('[fetchDistance] Error fetching distance:', err)
+      setDistances(prev => ({ ...prev, [load.id]: { toPickup: null, jobDistance: null } }))
+    }
+  }
+
   const handlePlaceBid = async (load: Load) => {
     setSelectedLoad(load)
     setShowBidModal(true)
@@ -201,7 +270,7 @@ export default function LoadsPage() {
   }
 
   const submitBid = async () => {
-    if (!selectedLoad || !companyId || !user) return
+    if (!selectedLoad || !user) return
     
     if (!bidAmount || parseFloat(bidAmount) <= 0) {
       alert('Please enter a valid bid amount')
@@ -211,12 +280,12 @@ export default function LoadsPage() {
     try {
       setSubmittingBid(true)
       
-      // Check for existing bid
+      // Check for existing bid from this user on this load
       const { data: existingBids } = await supabase
         .from('job_bids')
         .select('id')
         .eq('job_id', selectedLoad.id)
-        .eq('bidder_company_id', companyId)
+        .eq('bidder_id', user.id)
       
       if (existingBids && existingBids.length > 0) {
         alert('You have already placed a bid on this load')
@@ -229,9 +298,8 @@ export default function LoadsPage() {
         .from('job_bids')
         .insert({
           job_id: selectedLoad.id,
-          bidder_company_id: companyId,
-          bidder_user_id: user.id,
-          quote_amount: parseFloat(bidAmount),
+          bidder_id: user.id,
+          amount_gbp: parseFloat(bidAmount),
           message: bidMessage || null,
           status: 'submitted'
         })
@@ -248,6 +316,12 @@ export default function LoadsPage() {
     } finally {
       setSubmittingBid(false)
     }
+  }
+
+  const formatDistanceText = (info: DistanceInfo | undefined, key: 'toPickup' | 'jobDistance'): string => {
+    if (info === undefined) return 'Loading…'
+    const segment = info[key]
+    return segment ? `${segment.miles} (${segment.duration})` : '—'
   }
 
   if (loading && loads.length === 0) {
@@ -457,7 +531,11 @@ export default function LoadsPage() {
                     {/* Load Row */}
                     <div
                       className={expandedLoadId === load.id ? 'load-item-expanded' : 'load-item'}
-                      onClick={() => setExpandedLoadId(expandedLoadId === load.id ? null : load.id)}
+                      onClick={() => {
+                        const nextId = expandedLoadId === load.id ? null : load.id
+                        setExpandedLoadId(nextId)
+                        if (nextId) fetchDistance(load)
+                      }}
                     >
                       <div className="load-item-header">
                         <div className="load-item-content">
@@ -505,6 +583,17 @@ export default function LoadsPage() {
                     {/* Expandable Details */}
                     {expandedLoadId === load.id && (
                       <div className="load-item-expanded-details">
+                        {/* Distance Info */}
+                        <div className="load-details-grid" style={{ marginBottom: '12px' }}>
+                          <div>
+                            <strong>Distance to Pick Up:</strong>{' '}
+                            {formatDistanceText(distances[load.id], 'toPickup')}
+                          </div>
+                          <div>
+                            <strong>Job Distance:</strong>{' '}
+                            {formatDistanceText(distances[load.id], 'jobDistance')}
+                          </div>
+                        </div>
                         <div className="load-details-grid">
                           {load.pallets && (
                             <div>

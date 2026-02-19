@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
 import { brandColors } from '@/lib/brandColors'
 import { useRouter } from 'next/navigation'
+import { updateDriverLocation } from '@/lib/driverLocation'
 
 export default function DriverHomePage() {
   const { profile } = useAuth()
@@ -49,6 +50,14 @@ export default function DriverHomePage() {
     }
 
     fetchStats()
+
+    // Sync driver GPS location on mount and every 60 seconds
+    updateDriverLocation()
+    const locationInterval = setInterval(updateDriverLocation, 60000)
+
+    return () => {
+      clearInterval(locationInterval)
+    }
   }, [profile])
 
   const StatCard = ({ icon, label, value, color, onClick }: any) => (

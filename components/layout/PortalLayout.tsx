@@ -70,7 +70,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         const { data: acceptedBids } = await supabase
           .from('job_bids')
           .select('id')
-          .eq('bidder_company_id', companyId)
+          .eq('bidder_id', user?.id)
           .eq('status', 'accepted')
         
         setAcceptedBidsCount(acceptedBids?.length || 0)

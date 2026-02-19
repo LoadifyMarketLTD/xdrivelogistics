@@ -7,7 +7,7 @@ import { brandColors } from '@/lib/brandColors'
 import { useRouter } from 'next/navigation'
 
 export default function FleetDashboardPage() {
-  const { companyId } = useAuth()
+  const { companyId, user } = useAuth()
   const router = useRouter()
   const [stats, setStats] = useState({
     activeJobs: 0,
@@ -28,12 +28,12 @@ export default function FleetDashboardPage() {
           .eq('company_id', companyId)
           .in('status', ['open', 'assigned', 'in_progress'])
 
-        // Get pending bids
+        // Get pending bids for this user
         const { data: bids } = await supabase
           .from('job_bids')
           .select('id')
-          .eq('bidder_company_id', companyId)
-          .eq('status', 'pending')
+          .eq('bidder_id', user?.id)
+          .eq('status', 'submitted')
 
         // Get new loads (last 24 hours)
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
@@ -56,7 +56,7 @@ export default function FleetDashboardPage() {
     }
 
     fetchStats()
-  }, [companyId])
+  }, [companyId, user?.id])
 
   const StatCard = ({ icon, label, value, color, onClick }: any) => (
     <button
