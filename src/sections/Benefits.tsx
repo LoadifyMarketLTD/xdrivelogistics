@@ -77,7 +77,7 @@ export function Benefits() {
                 <div className="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center mb-3 group-hover:bg-orange-500 group-hover:text-white transition-all">
                   {benefit.icon}
                 </div>
-                <h4 className="text-base font-semibold text-white mb-2">{benefit.title}</h4>
+                <h3 className="text-base font-semibold text-white mb-2">{benefit.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
               </div>
             ))}

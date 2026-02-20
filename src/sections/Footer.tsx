@@ -68,7 +68,7 @@ export function Footer() {
 
           {/* Links Columns */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Companie</h4>
+            <h3 className="text-white font-semibold mb-4">Companie</h3>
             <ul className="space-y-3">
               {footerLinks.company.map((link, index) => (
                 <li key={index}>
@@ -81,7 +81,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-semibold mb-4">Servicii</h4>
+            <h3 className="text-white font-semibold mb-4">Servicii</h3>
             <ul className="space-y-3">
               {footerLinks.services.map((link, index) => (
                 <li key={index}>
@@ -94,7 +94,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-semibold mb-4">Legal</h4>
+            <h3 className="text-white font-semibold mb-4">Legal</h3>
             <ul className="space-y-3">
               {footerLinks.legal.map((link, index) => (
                 <li key={index}>
