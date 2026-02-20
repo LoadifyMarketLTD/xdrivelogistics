@@ -1,30 +1,49 @@
-import { Truck, Building2, MapPin, Calendar, Shield, Clock } from 'lucide-react';
+import { Truck, Building2, Users, MapPin, Calendar, Shield, Clock } from 'lucide-react';
 import { FadeIn } from '@/components/FadeIn';
 
-const services = [
+const audiences = [
+  {
+    icon: <Users className="w-8 h-8" />,
+    title: 'For Brokers & Dispatchers',
+    subtitle: 'Post Loads. Get Verified Carriers. Move Freight Fast.',
+    features: [
+      'Verified carriers only',
+      'Instant bids',
+      'Real-time availability',
+      'Performance ratings',
+      'Secure payment options',
+    ],
+    cta: { label: 'Post a Load', href: '/register' },
+    color: '#274C77',
+    bg: '#274C7710',
+  },
   {
     icon: <Truck className="w-8 h-8" />,
     title: 'For Drivers',
-    description: 'Find verified loads across the UK. Guaranteed payment and flexible schedule.',
+    subtitle: 'Find Loads. Get Paid Fast. Build Your Reputation.',
     features: [
-      'Access to thousands of daily loads',
-      'Payment within 24–48 hours',
-      'GPS-optimised routes',
-      '24/7 support',
+      'Guaranteed payment system',
+      'Return load suggestions',
+      'Daily active loads',
+      'Transparent rating system',
+      'No hidden fees',
     ],
+    cta: { label: 'Find Loads', href: '/register' },
     color: '#2E7D32',
     bg: '#2E7D3210',
   },
   {
     icon: <Building2 className="w-8 h-8" />,
-    title: 'For Companies',
-    description: 'Hire verified drivers quickly. Reduce costs and optimise deliveries.',
+    title: 'For Transport Companies',
+    subtitle: 'Scale Your Fleet. Increase Revenue. Optimise Routes.',
     features: [
-      'Database of 2,500+ drivers',
-      'Full document verification',
-      'Real-time tracking',
-      'Automatic invoicing',
+      'Multi-driver dashboard',
+      'Fleet tracking',
+      'Job history & analytics',
+      'Invoice automation',
+      'Company performance score',
     ],
+    cta: { label: 'Manage Fleet', href: '/register' },
     color: '#1F3A5F',
     bg: '#1F3A5F10',
   },
@@ -74,39 +93,39 @@ export function Services() {
             </span>
           </h2>
           <p className="text-slate-500 max-w-2xl mx-auto text-lg">
-            We offer services tailored for both independent drivers and transport companies of any size.
+            We offer services tailored for brokers, independent drivers, and transport companies of any size.
           </p>
         </FadeIn>
 
-        {/* Main Services */}
-        <div className="grid md:grid-cols-2 gap-8 mb-20">
-          {services.map((service, index) => (
+        {/* Audience Sections */}
+        <div className="grid md:grid-cols-3 gap-8 mb-20">
+          {audiences.map((audience, index) => (
             <FadeIn key={index} delay={index * 150}>
               <div
-                className="group relative p-8 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200/60 hover:-translate-y-1 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-xl hover:shadow-slate-300/40"
+                className="group relative p-8 rounded-2xl bg-white border border-slate-200/60 hover:-translate-y-1 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-xl hover:shadow-slate-300/40 flex flex-col"
               >
                 {/* Gradient top accent */}
                 <div
                   className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ background: `linear-gradient(90deg, ${service.color}, ${service.color}80)` }}
+                  style={{ background: `linear-gradient(90deg, ${audience.color}, ${audience.color}80)` }}
                 />
 
                 <div
                   className="inline-flex items-center justify-center w-16 h-16 rounded-xl mb-6 group-hover:scale-110 transition-transform duration-300"
-                  style={{ backgroundColor: service.bg, color: service.color }}
+                  style={{ backgroundColor: audience.bg, color: audience.color }}
                 >
-                  {service.icon}
+                  {audience.icon}
                 </div>
 
-                <h3 className="text-2xl font-bold mb-3" style={{ color: '#1F3A5F' }}>{service.title}</h3>
-                <p className="text-slate-500 mb-6">{service.description}</p>
+                <h3 className="text-xl font-bold mb-2" style={{ color: '#1F3A5F' }}>{audience.title}</h3>
+                <p className="text-slate-500 mb-6 text-sm">{audience.subtitle}</p>
 
-                <ul className="space-y-3">
-                  {service.features.map((feature, fIndex) => (
+                <ul className="space-y-3 flex-1">
+                  {audience.features.map((feature, fIndex) => (
                     <li key={fIndex} className="flex items-center gap-3 text-sm">
                       <span
                         className="w-5 h-5 rounded-full flex items-center justify-center text-xs text-white font-bold flex-shrink-0"
-                        style={{ backgroundColor: service.color }}
+                        style={{ backgroundColor: audience.color }}
                       >
                         ✓
                       </span>
@@ -114,6 +133,14 @@ export function Services() {
                     </li>
                   ))}
                 </ul>
+
+                <a
+                  href={audience.cta.href}
+                  className="mt-8 inline-flex items-center justify-center px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all duration-300 hover:opacity-90"
+                  style={{ backgroundColor: audience.color }}
+                >
+                  {audience.cta.label}
+                </a>
               </div>
             </FadeIn>
           ))}

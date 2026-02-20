@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Navbar } from './sections/Navbar';
 import { Hero } from './sections/Hero';
+import { LiveProof } from './sections/LiveProof';
+import { WhyXDrive } from './sections/WhyXDrive';
 import { Stats } from './sections/Stats';
 import { Services } from './sections/Services';
 import { HowItWorks } from './sections/HowItWorks';
@@ -18,6 +20,8 @@ function App() {
       <Navbar onLoginClick={() => setIsLoginOpen(true)} />
       <main>
         <Hero onLoginClick={() => setIsLoginOpen(true)} />
+        <LiveProof />
+        <WhyXDrive />
         <Stats />
         <Services />
         <HowItWorks />
