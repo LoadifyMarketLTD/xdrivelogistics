@@ -74,10 +74,7 @@ function StepCard({ step, index, total, accentColor, lightBg }: StepCardProps) {
         />
       )}
       <div
-        className="relative z-10 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200/60 hover:-translate-y-1 transition-all duration-300 group h-full"
-        style={{ boxShadow: '0 2px 12px rgba(31,58,95,0.06)' }}
-        onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 12px 32px ${accentColor}20`)}
-        onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 2px 12px rgba(31,58,95,0.06)')}
+        className="relative z-10 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200/60 hover:-translate-y-1 transition-all duration-300 group h-full shadow-sm hover:shadow-xl hover:shadow-slate-300/40"
       >
         <div className="flex items-center justify-between mb-5">
           <div

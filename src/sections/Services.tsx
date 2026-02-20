@@ -83,10 +83,7 @@ export function Services() {
           {services.map((service, index) => (
             <FadeIn key={index} delay={index * 150}>
               <div
-                className="group relative p-8 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200/60 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
-                style={{ boxShadow: '0 4px 24px rgba(31,58,95,0.06)' }}
-                onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 16px 48px rgba(31,58,95,0.14)')}
-                onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 4px 24px rgba(31,58,95,0.06)')}
+                className="group relative p-8 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200/60 hover:-translate-y-1 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-xl hover:shadow-slate-300/40"
               >
                 {/* Gradient top accent */}
                 <div
@@ -127,10 +124,7 @@ export function Services() {
           {features.map((feature, index) => (
             <FadeIn key={index} delay={index * 100}>
               <div
-                className="p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200/60 hover:-translate-y-1 transition-all duration-300 group"
-                style={{ boxShadow: '0 2px 12px rgba(31,58,95,0.05)' }}
-                onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 8px 32px rgba(31,58,95,0.12)')}
-                onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 2px 12px rgba(31,58,95,0.05)')}
+                className="p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200/60 hover:-translate-y-1 transition-all duration-300 group shadow-sm hover:shadow-xl hover:shadow-slate-300/40"
               >
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300"

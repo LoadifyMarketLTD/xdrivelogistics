@@ -86,10 +86,7 @@ export function Benefits() {
             {benefits.map((benefit, index) => (
               <FadeIn key={index} delay={index * 80}>
                 <div
-                  className="group p-5 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200/60 hover:-translate-y-1 transition-all duration-300 h-full"
-                  style={{ boxShadow: '0 2px 10px rgba(31,58,95,0.05)' }}
-                  onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 8px 28px ${benefit.color}18`)}
-                  onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 2px 10px rgba(31,58,95,0.05)')}
+                  className="group p-5 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200/60 hover:-translate-y-1 transition-all duration-300 h-full shadow-sm hover:shadow-xl hover:shadow-slate-300/40"
                 >
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300"

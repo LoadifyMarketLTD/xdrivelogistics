@@ -90,10 +90,7 @@ export function Testimonials() {
           {testimonials.map((t, index) => (
             <FadeIn key={index} delay={index * 80}>
               <div
-                className="group flex flex-col p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200/60 hover:-translate-y-1 transition-all duration-300 h-full"
-                style={{ boxShadow: '0 2px 12px rgba(31,58,95,0.06)' }}
-                onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 12px 36px rgba(31,58,95,0.12)')}
-                onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 2px 12px rgba(31,58,95,0.06)')}
+                className="group flex flex-col p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200/60 hover:-translate-y-1 transition-all duration-300 h-full shadow-sm hover:shadow-xl hover:shadow-slate-300/40"
               >
                 {/* Rating */}
                 <div className="flex gap-0.5 mb-4">
