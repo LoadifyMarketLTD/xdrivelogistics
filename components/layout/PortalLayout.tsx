@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
@@ -100,14 +101,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             padding: '20px 16px',
             borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
           }}>
-            <div style={{
-              fontSize: '16px',
-              fontWeight: '700',
-              color: '#D4AF37',
-              letterSpacing: '0.5px',
-            }}>
-              XDrive Logistics LTD
-            </div>
+            <Image src="/logo.webp" alt="XDrive Logistics LTD" width={140} height={40} style={{ display: 'block', marginBottom: '4px' }} priority />
           </div>
         </div>
         <div style={{
@@ -177,7 +171,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             color: '#D4AF37',
             letterSpacing: '0.5px',
           }}>
-            XDrive Logistics
+            <Image src="/logo.webp" alt="XDrive Logistics" width={100} height={28} style={{ display: 'block' }} />
           </div>
           <div style={{ width: '48px' }} /> {/* Spacer for centering */}
         </div>
@@ -216,14 +210,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           padding: '20px 16px',
           borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
         }}>
-          <div style={{
-            fontSize: '16px',
-            fontWeight: '700',
-            color: '#D4AF37',
-            letterSpacing: '0.5px',
-          }}>
-            XDrive Logistics LTD
-          </div>
+          <Image src="/logo.webp" alt="XDrive Logistics LTD" width={140} height={40} style={{ display: 'block', marginBottom: '4px' }} priority />
           <div style={{
             fontSize: '11px',
             color: '#9ca3af',

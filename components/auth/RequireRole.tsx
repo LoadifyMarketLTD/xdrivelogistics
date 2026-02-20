@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { ROLE_LABEL, type Role } from '@/lib/roles'
@@ -24,11 +25,33 @@ export default function RequireRole({ allowedRoles, children }: RequireRoleProps
     }
   }, [loading, profileLoading, profile, allowedRoles, router])
 
-  if (loading || profileLoading) return null
+  if (loading || profileLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', color: '#6b7280' }}>
+        Loading…
+      </div>
+    )
+  }
 
   const role = profile?.role as Role | undefined
+
+  if (!profile) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', color: '#6b7280' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>Profile not found</div>
+          <Link href="/onboarding" style={{ color: '#C8A64D', textDecoration: 'none', fontWeight: '500' }}>Complete your profile →</Link>
+        </div>
+      </div>
+    )
+  }
+
   if (role && !allowedRoles.includes(role)) {
-    return null
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', color: '#6b7280' }}>
+        Redirecting…
+      </div>
+    )
   }
 
   return <>{children}</>

@@ -2,22 +2,12 @@
 
 import { useState, FormEvent, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { supabase, isSupabaseConfigured } from '@/lib/supabaseClient'
 import Link from 'next/link'
 import { needsOnboarding } from '@/lib/profile'
 import { DEFAULT_ROLE, type Role } from '@/lib/roles'
-
-const ROLE_DASHBOARD: Record<Role, string> = {
-  driver: '/dashboard/driver',
-  broker: '/dashboard/broker',
-  company: '/dashboard/company',
-}
-
-function roleRedirect(role: string | null | undefined): string {
-  if (role === 'broker') return ROLE_DASHBOARD.broker
-  if (role === 'company') return ROLE_DASHBOARD.company
-  return ROLE_DASHBOARD.driver
-}
+import { getDefaultDashboardPath } from '@/lib/routing/getDefaultDashboardPath'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -47,7 +37,7 @@ export default function LoginPage() {
         if (needsOnboarding(role ?? DEFAULT_ROLE, profileData)) {
           router.push('/onboarding')
         } else {
-          router.push(roleRedirect(role))
+          router.push(getDefaultDashboardPath(role))
         }
       } else {
         setChecking(false)
@@ -100,7 +90,7 @@ export default function LoginPage() {
         if (needsOnboarding(role ?? DEFAULT_ROLE, profileData)) {
           router.push('/onboarding')
         } else {
-          router.push(roleRedirect(role))
+          router.push(getDefaultDashboardPath(role))
         }
       } else {
         setError('Sign-in failed. Please try again.')
@@ -151,6 +141,9 @@ export default function LoginPage() {
           border: '1px solid #e5e7eb'
         }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <div style={{ marginBottom: '16px' }}>
+              <Image src="/logo.webp" alt="XDrive Logistics LTD" width={160} height={46} style={{ display: 'inline-block' }} priority />
+            </div>
             <h1 style={{
               fontSize: '28px',
               fontWeight: '700',

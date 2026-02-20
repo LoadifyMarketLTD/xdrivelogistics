@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
+import { getDefaultDashboardPath } from '@/lib/routing/getDefaultDashboardPath'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,14 +16,7 @@ export default function DashboardPage() {
     if (loading || profileLoading) return
 
     const role = profile?.role
-    if (role === 'broker') {
-      router.replace('/dashboard/broker')
-    } else if (role === 'company') {
-      router.replace('/dashboard/company')
-    } else {
-      // driver or legacy/unknown role
-      router.replace('/dashboard/driver')
-    }
+    router.replace(getDefaultDashboardPath(role))
   }, [loading, profileLoading, profile, router])
 
   return (
