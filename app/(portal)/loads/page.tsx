@@ -279,13 +279,19 @@ export default function LoadsPage() {
     
     try {
       setSubmittingBid(true)
-      
+
+      const {
+        data: { user: authUser }
+      } = await supabase.auth.getUser()
+
+      if (!authUser) throw new Error('Authentication required. Please sign in to place a bid.')
+
       // Check for existing bid from this user on this load
       const { data: existingBids } = await supabase
         .from('job_bids')
         .select('id')
         .eq('job_id', selectedLoad.id)
-        .eq('bidder_id', user.id)
+        .eq('bidder_id', authUser.id)
       
       if (existingBids && existingBids.length > 0) {
         alert('You have already placed a bid on this load')
@@ -299,6 +305,7 @@ export default function LoadsPage() {
         .from('job_bids')
         .insert({
           job_id: selectedLoad.id,
+          bidder_id: authUser.id,
           bid_price_gbp: bidGbp,
           message: bidMessage?.trim() || null
         })
