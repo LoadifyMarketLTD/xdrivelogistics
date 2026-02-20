@@ -58,7 +58,7 @@ export function Hero({ onLoginClick }: HeroProps) {
               <Button
                 onClick={onLoginClick}
                 size="lg"
-                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-6 text-lg group"
+                className="bg-orange-700 hover:bg-orange-800 text-white font-semibold px-8 py-6 text-lg group"
               >
                 Începe Acum
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
