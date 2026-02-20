@@ -71,7 +71,7 @@ export function Navbar({ onLoginClick }: NavbarProps) {
             </a>
             <Button
               onClick={onLoginClick}
-              className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6"
+              className="bg-orange-700 hover:bg-orange-800 text-white font-medium px-6"
             >
               Intră în Cont
             </Button>
@@ -112,7 +112,7 @@ export function Navbar({ onLoginClick }: NavbarProps) {
                   setIsMobileMenuOpen(false);
                   onLoginClick();
                 }}
-                className="bg-orange-500 hover:bg-orange-600 text-white w-full"
+                className="bg-orange-700 hover:bg-orange-800 text-white w-full"
               >
                 Intră în Cont
               </Button>

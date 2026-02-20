@@ -93,7 +93,7 @@ export function HowItWorks() {
                     <div className="w-12 h-12 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-all">
                       {step.icon}
                     </div>
-                    <span className="text-4xl font-bold text-white/10">{step.step}</span>
+                    <span aria-hidden="true" className="text-4xl font-bold text-white/10">{step.step}</span>
                   </div>
                   <h4 className="text-lg font-semibold text-white mb-2">{step.title}</h4>
                   <p className="text-sm text-muted-foreground">{step.description}</p>
@@ -121,7 +121,7 @@ export function HowItWorks() {
                     <div className="w-12 h-12 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-all">
                       {step.icon}
                     </div>
-                    <span className="text-4xl font-bold text-white/10">{step.step}</span>
+                    <span aria-hidden="true" className="text-4xl font-bold text-white/10">{step.step}</span>
                   </div>
                   <h4 className="text-lg font-semibold text-white mb-2">{step.title}</h4>
                   <p className="text-sm text-muted-foreground">{step.description}</p>
