@@ -3,25 +3,25 @@ import { Truck, Building2, MapPin, Calendar, Shield, Clock } from 'lucide-react'
 const services = [
   {
     icon: <Truck className="w-8 h-8" />,
-    title: 'Pentru Șoferi',
-    description: 'Găsești încărcături verificate în toată UK. Plată garantată și program flexibil.',
+    title: 'For Drivers',
+    description: 'Find verified loads across the UK. Guaranteed payment and flexible schedule.',
     features: [
-      'Acces la mii de încărcături zilnice',
-      'Plată în 24-48 ore',
-      'Rute optimizate GPS',
-      'Suport 24/7',
+      'Access to thousands of daily loads',
+      'Payment within 24–48 hours',
+      'GPS-optimised routes',
+      '24/7 support',
     ],
     color: 'from-orange-500 to-orange-600',
   },
   {
     icon: <Building2 className="w-8 h-8" />,
-    title: 'Pentru Companii',
-    description: 'Angajezi șoferi verificați rapid. Reduci costurile și optimizezi livrările.',
+    title: 'For Companies',
+    description: 'Hire verified drivers quickly. Reduce costs and optimise deliveries.',
     features: [
-      'Bază de date cu 2500+ șoferi',
-      'Verificare completă documente',
-      'Tracking în timp real',
-      'Facturare automată',
+      'Database of 2,500+ drivers',
+      'Full document verification',
+      'Real-time tracking',
+      'Automatic invoicing',
     ],
     color: 'from-blue-500 to-blue-600',
   },
@@ -30,23 +30,23 @@ const services = [
 const features = [
   {
     icon: <MapPin className="w-6 h-6" />,
-    title: 'Acoperire Națională',
-    description: 'Prezent în toate orașele importante din UK',
+    title: 'National Coverage',
+    description: 'Present in all major UK cities',
   },
   {
     icon: <Calendar className="w-6 h-6" />,
-    title: 'Programare Flexibilă',
-    description: 'Alege când și unde vrei să lucrezi',
+    title: 'Flexible Scheduling',
+    description: 'Choose when and where you want to work',
   },
   {
     icon: <Shield className="w-6 h-6" />,
-    title: 'Securitate Garantată',
-    description: 'Toți șoferii sunt verificați complet',
+    title: 'Guaranteed Security',
+    description: 'All drivers are fully verified',
   },
   {
     icon: <Clock className="w-6 h-6" />,
-    title: 'Livrare Rapidă',
-    description: 'Timp mediu de livrare sub 24h',
+    title: 'Fast Delivery',
+    description: 'Average delivery time under 24 hours',
   },
 ];
 
@@ -57,14 +57,14 @@ export function Services() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block px-4 py-1 rounded-full bg-orange-500/10 text-orange-400 text-sm font-medium mb-4">
-            Serviciile Noastre
+            Our Services
           </span>
           <h2 className="text-3xl lg:text-5xl font-bold text-white mb-4">
-            Soluții Complete de <span className="text-gradient">Transport</span>
+            Complete <span className="text-gradient">Transport Solutions</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Oferim servicii adaptate atât pentru șoferi independenți, cât și pentru companii 
-            de transport de orice dimensiune.
+            We offer services tailored for both independent drivers and transport companies 
+            of any size.
           </p>
         </div>
 

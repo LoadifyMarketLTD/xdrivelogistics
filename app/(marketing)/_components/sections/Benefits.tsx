@@ -4,33 +4,33 @@ export default function Benefits() {
   const benefits = [
     {
       icon: '✅',
-      title: 'Verificare Completă',
-      description: 'Toți șoferii trec prin un proces riguros de verificare a documentelor și istoricului.',
+      title: 'Full Verification',
+      description: 'All drivers go through a rigorous verification process for documents and history.',
     },
     {
       icon: '⚡',
-      title: 'Matching Instant',
-      description: 'Algoritm inteligent care conectează șoferii cu încărcăturile potrivite în câteva secunde.',
+      title: 'Instant Matching',
+      description: 'Smart algorithm connecting drivers with the right loads in seconds.',
     },
     {
       icon: '💬',
-      title: 'Suport 24/7',
-      description: 'Echipa noastră este disponibilă non-stop pentru orice problemă sau întrebare.',
+      title: '24/7 Support',
+      description: 'Our team is available around the clock for any issue or question.',
     },
     {
       icon: '📈',
-      title: 'Crește Veniturile',
-      description: 'Șoferii câștigă mai mult prin acces la mai multe încărcături și rute optimizate.',
+      title: 'Grow Your Revenue',
+      description: 'Drivers earn more through access to more loads and optimised routes.',
     },
     {
       icon: '🔒',
-      title: 'Plăți Securizate',
-      description: 'Sistem de plată sigur cu garanție pentru ambele părți.',
+      title: 'Secure Payments',
+      description: 'Secure payment system with guarantee for both parties.',
     },
     {
       icon: '⭐',
-      title: 'Sistem de Rating',
-      description: 'Transparență totală prin recenzii și rating-uri autentice de la utilizatori reali.',
+      title: 'Rating System',
+      description: 'Full transparency through authentic reviews and ratings from real users.',
     },
   ]
 
@@ -43,7 +43,7 @@ export default function Benefits() {
           color: 'var(--text)',
           marginBottom: '0.75rem',
         }}>
-          De Ce XDrive?
+          Why XDrive?
         </h2>
         <p style={{
           fontSize: '1.125rem',
@@ -51,7 +51,7 @@ export default function Benefits() {
           maxWidth: '600px',
           margin: '0 auto',
         }}>
-          Beneficii care fac Diferența
+          Benefits That Make a Difference
         </p>
       </div>
 
@@ -82,7 +82,7 @@ export default function Benefits() {
             fontSize: '0.875rem',
             color: 'var(--muted)',
           }}>
-            Livrări la Timp
+            On-Time Deliveries
           </div>
         </div>
         <div style={{
@@ -105,7 +105,7 @@ export default function Benefits() {
             fontSize: '0.875rem',
             color: 'var(--muted)',
           }}>
-            Rating Mediu
+            Average Rating
           </div>
         </div>
       </div>

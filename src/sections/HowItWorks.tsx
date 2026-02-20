@@ -4,26 +4,26 @@ const driverSteps = [
   {
     icon: <UserPlus className="w-6 h-6" />,
     step: '01',
-    title: 'Creează Cont',
-    description: 'Înregistrează-te gratuit și completează profilul cu documentele necesare.',
+    title: 'Create Account',
+    description: 'Register for free and complete your profile with the required documents.',
   },
   {
     icon: <Search className="w-6 h-6" />,
     step: '02',
-    title: 'Găsește Încărcături',
-    description: 'Caută încărcături disponibile pe ruta ta și aplică instant.',
+    title: 'Find Loads',
+    description: 'Search for available loads on your route and apply instantly.',
   },
   {
     icon: <CheckCircle className="w-6 h-6" />,
     step: '03',
-    title: 'Confirmă și Livrează',
-    description: 'Primești confirmare, preiei marfa și livrezi la destinație.',
+    title: 'Confirm and Deliver',
+    description: 'Receive confirmation, pick up the goods and deliver to destination.',
   },
   {
     icon: <CreditCard className="w-6 h-6" />,
     step: '04',
-    title: 'Primești Plata',
-    description: 'Banii îți intră în cont în 24-48 ore după livrare.',
+    title: 'Receive Payment',
+    description: 'Funds arrive in your account within 24–48 hours after delivery.',
   },
 ];
 
@@ -31,26 +31,26 @@ const companySteps = [
   {
     icon: <UserPlus className="w-6 h-6" />,
     step: '01',
-    title: 'Înregistrează Compania',
-    description: 'Creează cont business și adaugă detaliile companiei tale.',
+    title: 'Register Your Company',
+    description: 'Create a business account and add your company details.',
   },
   {
     icon: <ClipboardList className="w-6 h-6" />,
     step: '02',
-    title: 'Postează Încărcătura',
-    description: 'Adaugă detaliile transportului și bugetul disponibil.',
+    title: 'Post a Load',
+    description: 'Add transport details and your available budget.',
   },
   {
     icon: <Truck className="w-6 h-6" />,
     step: '03',
-    title: 'Alege Șoferul',
-    description: 'Primești oferte și selectezi șoferul potrivit.',
+    title: 'Choose a Driver',
+    description: 'Receive bids and select the right driver.',
   },
   {
     icon: <CheckCircle className="w-6 h-6" />,
     step: '04',
-    title: 'Urmărește Livrarea',
-    description: 'Tracking în timp real și confirmare la destinație.',
+    title: 'Track Delivery',
+    description: 'Real-time tracking and destination confirmation.',
   },
 ];
 
@@ -65,20 +65,20 @@ export function HowItWorks() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block px-4 py-1 rounded-full bg-orange-500/10 text-orange-400 text-sm font-medium mb-4">
-            Cum Funcționează
+            How It Works
           </span>
           <h2 className="text-3xl lg:text-5xl font-bold text-white mb-4">
-            Simplu și <span className="text-gradient">Eficient</span>
+            Simple and <span className="text-gradient">Efficient</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Platforma noastră face legătura între șoferi și transportatori în doar câțiva pași simpli.
+            Our platform connects drivers and carriers in just a few simple steps.
           </p>
         </div>
 
         {/* Driver Steps */}
         <div className="mb-20">
           <h3 className="text-xl font-semibold text-white mb-8 text-center">
-            Pentru <span className="text-orange-500">Șoferi</span>
+            For <span className="text-orange-500">Drivers</span>
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {driverSteps.map((step, index) => (
@@ -106,7 +106,7 @@ export function HowItWorks() {
         {/* Company Steps */}
         <div>
           <h3 className="text-xl font-semibold text-white mb-8 text-center">
-            Pentru <span className="text-blue-500">Companii</span>
+            For <span className="text-blue-500">Companies</span>
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {companySteps.map((step, index) => (

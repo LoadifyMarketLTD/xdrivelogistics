@@ -1,9 +1,9 @@
 export default function ForDrivers() {
   const features = [
-    'Acces la mii de încărcături zilnice',
-    'Plată în 24-48 ore',
-    'Rute optimizate GPS',
-    'Suport 24/7',
+    'Access to thousands of daily loads',
+    'Payment within 24–48 hours',
+    'GPS-optimised routes',
+    '24/7 support',
   ]
 
   return (
@@ -27,7 +27,7 @@ export default function ForDrivers() {
         color: 'var(--text)',
         marginBottom: '0.75rem',
       }}>
-        Pentru Șoferi
+        For Drivers
       </h3>
       <p style={{
         fontSize: '1rem',
@@ -35,7 +35,7 @@ export default function ForDrivers() {
         marginBottom: '1.5rem',
         lineHeight: '1.6',
       }}>
-        Găsești încărcături verificate în toată UK. Plată garantată și program flexibil.
+        Find verified loads across the UK. Guaranteed payment and flexible schedule.
       </p>
       <ul style={{
         listStyle: 'none',

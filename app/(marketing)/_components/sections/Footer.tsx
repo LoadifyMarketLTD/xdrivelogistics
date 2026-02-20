@@ -25,7 +25,7 @@ export default function Footer() {
             fontWeight: '700',
             marginBottom: '1rem',
           }}>
-            Gata să Transformi Transportul?
+            Ready to Transform Your Transport?
           </h2>
           <p style={{
             fontSize: '1.125rem',
@@ -34,7 +34,7 @@ export default function Footer() {
             margin: '0 auto 2rem',
             lineHeight: '1.6',
           }}>
-            Alătură-te celor 2,500+ de șoferi și companii care folosesc XDrive Logistics pentru a-și optimiza afacerile de transport.
+            Join 2,500+ drivers and companies using XDrive Logistics to optimise their transport operations.
           </p>
           <div style={{
             display: 'flex',
@@ -59,7 +59,7 @@ export default function Footer() {
                 border: 'none',
               }}
             >
-              Creează Cont Gratuit
+              Create Free Account
             </a>
             <a
               href="tel:07423272138"
@@ -77,7 +77,7 @@ export default function Footer() {
                 border: '2px solid #fff',
               }}
             >
-              Sună Acum
+              Call Now
             </a>
           </div>
           <div style={{
@@ -91,7 +91,7 @@ export default function Footer() {
             opacity: 0.75,
             marginTop: '1rem',
           }}>
-            ✓ Înregistrare gratuită • ✓ Fără comisioane ascunse • ✓ Anulare oricând
+            ✓ Free registration • ✓ No hidden fees • ✓ Cancel anytime
           </div>
         </div>
       </div>
@@ -152,7 +152,7 @@ export default function Footer() {
                 lineHeight: '1.6',
                 marginBottom: '1rem',
               }}>
-                Platforma #1 de logistică în UK care conectează șoferi verificați cu transportatori de încredere.
+                The #1 logistics platform in the UK connecting verified drivers with trusted carriers.
               </p>
               <div style={{
                 fontSize: '0.875rem',
@@ -172,14 +172,14 @@ export default function Footer() {
                 color: 'var(--text)',
                 marginBottom: '1rem',
               }}>
-                Companie
+                Company
               </h4>
               <ul style={{
                 listStyle: 'none',
                 padding: 0,
                 margin: 0,
               }}>
-                {['Despre Noi', 'Echipa', 'Cariere', 'Blog'].map((item) => (
+                {['About Us', 'Team', 'Careers', 'Blog'].map((item) => (
                   <li key={item} style={{ marginBottom: '0.5rem' }}>
                     <a href="#" style={{
                       color: 'var(--muted)',
@@ -193,7 +193,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Servicii */}
+            {/* Services */}
             <div>
               <h4 style={{
                 fontWeight: '600',
@@ -201,14 +201,14 @@ export default function Footer() {
                 color: 'var(--text)',
                 marginBottom: '1rem',
               }}>
-                Servicii
+                Services
               </h4>
               <ul style={{
                 listStyle: 'none',
                 padding: 0,
                 margin: 0,
               }}>
-                {['Pentru Șoferi', 'Pentru Companii', 'Tarife', 'FAQ'].map((item) => (
+                {['For Drivers', 'For Companies', 'Pricing', 'FAQ'].map((item) => (
                   <li key={item} style={{ marginBottom: '0.5rem' }}>
                     <a href="#" style={{
                       color: 'var(--muted)',
@@ -237,7 +237,7 @@ export default function Footer() {
                 padding: 0,
                 margin: 0,
               }}>
-                {['Termeni și Condiții', 'Politica de Confidențialitate', 'Politica Cookie', 'GDPR'].map((item) => (
+                {['Terms & Conditions', 'Privacy Policy', 'Cookie Policy', 'GDPR'].map((item) => (
                   <li key={item} style={{ marginBottom: '0.5rem' }}>
                     <a href="#" style={{
                       color: 'var(--muted)',
@@ -263,13 +263,13 @@ export default function Footer() {
               color: 'var(--muted)',
               marginBottom: '0.5rem',
             }}>
-              © {currentYear} XDrive Logistics Ltd. Toate drepturile rezervate.
+              © 2021 – {currentYear} XDrive Logistics Ltd. All rights reserved.
             </p>
             <p style={{
               fontSize: '0.8125rem',
               color: 'var(--muted-2)',
             }}>
-              XDrive Logistics Ltd. | Înregistrată în Anglia și Țara Galilor | Company Number: 13171804 | VAT: GB375949535 | Adresă: 101 Cornelian Street Blackburn BB1 9QL
+              XDrive Logistics Ltd. | Registered in England and Wales | Company Number: 13171804 | VAT: GB375949535 | Address: 101 Cornelian Street Blackburn BB1 9QL
             </p>
           </div>
         </div>

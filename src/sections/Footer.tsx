@@ -2,21 +2,21 @@ import { Truck, Phone, Mail, MapPin, Facebook, Twitter, Linkedin, Instagram } fr
 
 const footerLinks = {
   company: [
-    { label: 'Despre Noi', href: '#' },
-    { label: 'Echipa', href: '#' },
-    { label: 'Cariere', href: '#' },
+    { label: 'About Us', href: '#' },
+    { label: 'Team', href: '#' },
+    { label: 'Careers', href: '#' },
     { label: 'Blog', href: '#' },
   ],
   services: [
-    { label: 'Pentru Șoferi', href: '#services' },
-    { label: 'Pentru Companii', href: '#services' },
-    { label: 'Tarife', href: '#' },
+    { label: 'For Drivers', href: '#services' },
+    { label: 'For Companies', href: '#services' },
+    { label: 'Pricing', href: '#' },
     { label: 'FAQ', href: '#' },
   ],
   legal: [
-    { label: 'Termeni și Condiții', href: '#' },
-    { label: 'Politica de Confidențialitate', href: '#' },
-    { label: 'Politica Cookie', href: '#' },
+    { label: 'Terms & Conditions', href: '#' },
+    { label: 'Privacy Policy', href: '#' },
+    { label: 'Cookie Policy', href: '#' },
     { label: 'GDPR', href: '#' },
   ],
 };
@@ -45,8 +45,8 @@ export function Footer() {
               </div>
             </a>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              Platforma #1 de logistică în UK care conectează șoferi verificați 
-              cu transportatori de încredere.
+              The #1 logistics platform in the UK connecting verified drivers 
+              with trusted carriers.
             </p>
             
             {/* Contact Info */}
@@ -55,9 +55,9 @@ export function Footer() {
                 <Phone className="w-4 h-4 text-orange-500" />
                 <span>07423 272138</span>
               </a>
-              <a href="mailto:contact@xdrivelogistics.co.uk" className="flex items-center gap-3 text-muted-foreground hover:text-white transition-colors">
+              <a href="mailto:xdrivelogisticsltd@gmail.com" className="flex items-center gap-3 text-muted-foreground hover:text-white transition-colors">
                 <Mail className="w-4 h-4 text-orange-500" />
-                <span>contact@xdrivelogistics.co.uk</span>
+                <span>xdrivelogisticsltd@gmail.com</span>
               </a>
               <div className="flex items-center gap-3 text-muted-foreground">
                 <MapPin className="w-4 h-4 text-orange-500" />
@@ -68,7 +68,7 @@ export function Footer() {
 
           {/* Links Columns */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Companie</h3>
+            <h3 className="text-white font-semibold mb-4">Company</h3>
             <ul className="space-y-3">
               {footerLinks.company.map((link, index) => (
                 <li key={index}>
@@ -81,7 +81,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-white font-semibold mb-4">Servicii</h3>
+            <h3 className="text-white font-semibold mb-4">Services</h3>
             <ul className="space-y-3">
               {footerLinks.services.map((link, index) => (
                 <li key={index}>
@@ -110,7 +110,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} XDrive Logistics Ltd. Toate drepturile rezervate.
+            © 2021 – {new Date().getFullYear()} XDrive Logistics Ltd. All rights reserved.
           </p>
           
           {/* Social Links */}
@@ -131,8 +131,8 @@ export function Footer() {
         {/* Company Info */}
         <div className="mt-8 pt-8 border-t border-border text-center">
           <p className="text-xs text-muted-foreground">
-            XDrive Logistics Ltd. | Înregistrată în Anglia și Țara Galilor | Company Number: 13185532 |
-            VAT: GB372319642 | Adresă: Unit 1, Furthergate Industrial Estate, Blackburn BB1 3BD
+            XDrive Logistics Ltd. | Registered in England and Wales | Company Number: 13185532 |
+            VAT: GB372319642 | Address: Unit 1, Furthergate Industrial Estate, Blackburn BB1 3BD
           </p>
         </div>
       </div>

@@ -28,11 +28,11 @@ export function CTA({ onLoginClick }: CTAProps) {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative text-center">
         <h2 className="text-3xl lg:text-5xl font-bold text-white mb-6">
-          Gata să Transformi Transportul?
+          Ready to Transform Your Transport?
         </h2>
         <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-          Alătură-te celor 2,500+ de șoferi și companii care folosesc XDrive Logistics 
-          pentru a-și optimiza afacerile de transport.
+          Join 2,500+ drivers and companies using XDrive Logistics 
+          to optimise their transport operations.
         </p>
 
         {/* CTA Buttons */}
@@ -42,7 +42,7 @@ export function CTA({ onLoginClick }: CTAProps) {
             size="lg"
             className="bg-white text-orange-600 hover:bg-white/90 font-semibold px-8 py-6 text-lg group"
           >
-            Creează Cont Gratuit
+            Create Free Account
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
           <Button
@@ -52,7 +52,7 @@ export function CTA({ onLoginClick }: CTAProps) {
             onClick={() => window.open('tel:07423272138')}
           >
             <Phone className="w-5 h-5 mr-2" />
-            Sună Acum
+            Call Now
           </Button>
         </div>
 
@@ -63,15 +63,15 @@ export function CTA({ onLoginClick }: CTAProps) {
             <span>07423 272138</span>
           </a>
           <span className="hidden sm:inline">|</span>
-          <a href="mailto:contact@xdrivelogistics.co.uk" className="flex items-center gap-2 hover:text-white transition-colors">
+          <a href="mailto:xdrivelogisticsltd@gmail.com" className="flex items-center gap-2 hover:text-white transition-colors">
             <Mail className="w-4 h-4" />
-            <span>contact@xdrivelogistics.co.uk</span>
+            <span>xdrivelogisticsltd@gmail.com</span>
           </a>
         </div>
 
         {/* Trust Text */}
         <p className="mt-8 text-sm text-white/60">
-          ✓ Înregistrare gratuită • ✓ Fără comisioane ascunse • ✓ Anulare oricând
+          ✓ Free registration • ✓ No hidden fees • ✓ Cancel anytime
         </p>
       </div>
     </section>

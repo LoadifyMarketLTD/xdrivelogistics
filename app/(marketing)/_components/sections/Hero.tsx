@@ -17,7 +17,7 @@ export default function Hero() {
           letterSpacing: '-0.02em',
           lineHeight: '1.1',
         }}>
-          Platforma #1 de Logistică în UK
+          #1 Logistics Platform in the UK
         </h1>
         <p style={{
           fontSize: 'clamp(1.125rem, 2vw, 1.5rem)',
@@ -26,7 +26,7 @@ export default function Hero() {
           margin: '0 auto 2rem',
           lineHeight: '1.6',
         }}>
-          Conectăm Șoferi Verificați cu Transportatori de Încredere
+          Connecting Verified Drivers with Trusted Carriers
         </p>
         <p style={{
           fontSize: '1.125rem',
@@ -35,7 +35,7 @@ export default function Hero() {
           margin: '0 auto 2rem',
           lineHeight: '1.6',
         }}>
-          Platforma XDrive Logistics simplifică transportul în UK. Găsești încărcături verificate instant sau angajezi șoferi profesioniști pentru afacerea ta.
+          XDrive Logistics simplifies transport across the UK. Find verified loads instantly or hire professional drivers for your business.
         </p>
 
         {/* CTA Buttons */}
@@ -47,10 +47,10 @@ export default function Hero() {
           marginBottom: '4rem',
         }}>
           <PrimaryButton href="/register" variant="primary" size="lg">
-            Începe Acum
+            Get Started
           </PrimaryButton>
           <PrimaryButton href="#how-it-works" variant="secondary" size="lg">
-            Află Mai Multe
+            Learn More
           </PrimaryButton>
         </div>
 
@@ -64,22 +64,22 @@ export default function Hero() {
           <StatCard 
             icon="🚛" 
             value="2,500+" 
-            label="Șoferi Verificați" 
+            label="Verified Drivers" 
           />
           <StatCard 
             icon="✅" 
             value="50,000+" 
-            label="Livrări Complete" 
+            label="Completed Deliveries" 
           />
           <StatCard 
             icon="🛣️" 
             value="1,500+" 
-            label="Rute Zilnice" 
+            label="Daily Routes" 
           />
           <StatCard 
             icon="⭐" 
             value="4.8/5" 
-            label="Rating Mediu" 
+            label="Average Rating" 
           />
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function Hero() {
         gap: '1rem',
         marginTop: '3rem',
       }}>
-        {['Șoferi Verificați', 'Disponibil 24/7', 'Acoperire UK'].map((badge) => (
+        {['Verified Drivers', 'Available 24/7', 'UK Coverage'].map((badge) => (
           <div
             key={badge}
             style={{

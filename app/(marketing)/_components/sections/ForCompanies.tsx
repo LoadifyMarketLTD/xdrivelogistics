@@ -1,9 +1,9 @@
 export default function ForCompanies() {
   const features = [
-    'Bază de date cu 2500+ șoferi',
-    'Verificare completă documente',
-    'Tracking în timp real',
-    'Facturare automată',
+    'Database of 2,500+ drivers',
+    'Full document verification',
+    'Real-time tracking',
+    'Automatic invoicing',
   ]
 
   return (
@@ -27,7 +27,7 @@ export default function ForCompanies() {
         color: 'var(--text)',
         marginBottom: '0.75rem',
       }}>
-        Pentru Companii
+        For Companies
       </h3>
       <p style={{
         fontSize: '1rem',
@@ -35,7 +35,7 @@ export default function ForCompanies() {
         marginBottom: '1.5rem',
         lineHeight: '1.6',
       }}>
-        Angajezi șoferi verificați rapid. Reduci costurile și optimizezi livrările.
+        Hire verified drivers quickly. Reduce costs and optimise deliveries.
       </p>
       <ul style={{
         listStyle: 'none',

@@ -8,27 +8,27 @@ export default function Testimonials() {
 
   const testimonials = [
     {
-      quote: 'De când folosesc XDrive Logistics, veniturile mele au crescut cu 40%. Platforma este foarte intuitivă și găsesc încărcături zilnic pe ruta mea preferată.',
+      quote: 'Since using XDrive Logistics, my income has grown by 40%. The platform is very intuitive and I find loads daily on my preferred route.',
       name: 'Marian Popescu',
-      role: 'Șofer Independent',
+      role: 'Independent Driver',
       initials: 'MP',
     },
     {
-      quote: 'Am redus timpul de căutare a șoferilor de la zile la ore. Toți șoferii sunt verificați și profesioniști. Recomand cu încredere!',
+      quote: 'We reduced driver search time from days to hours. All drivers are verified and professional. Highly recommended!',
       name: 'Sarah Johnson',
-      role: 'Manager Transport, FastDelivery UK',
+      role: 'Transport Manager, FastDelivery UK',
       initials: 'SJ',
     },
     {
-      quote: 'Am 5 camioane în flotă și XDrive ne-a ajutat să optimizăm rutele și să reducem costurile cu 25%. Suportul tehnic este excelent.',
+      quote: 'I have 5 trucks in my fleet and XDrive has helped us optimise routes and reduce costs by 25%. Technical support is excellent.',
       name: 'Ion Dumitrescu',
-      role: 'Proprietar Flotă',
+      role: 'Fleet Owner',
       initials: 'ID',
     },
     {
-      quote: 'Platforma ne-a transformat modul în care gestionăm transportul. Tracking în timp real și facturare automată ne salvează ore întregi.',
+      quote: 'The platform has transformed the way we manage transport. Real-time tracking and automatic invoicing save us hours.',
       name: 'Emma Williams',
-      role: 'Director Operațiuni, LogiCorp',
+      role: 'Operations Director, LogiCorp',
       initials: 'EW',
     },
   ]
@@ -52,7 +52,7 @@ export default function Testimonials() {
           color: 'var(--text)',
           marginBottom: '0.75rem',
         }}>
-          Testimoniale
+          Testimonials
         </h2>
         <p style={{
           fontSize: '1.125rem',
@@ -60,7 +60,7 @@ export default function Testimonials() {
           maxWidth: '600px',
           margin: '0 auto',
         }}>
-          Ce Spun Clienții Noștri
+          What Our Clients Say
         </p>
       </div>
 
