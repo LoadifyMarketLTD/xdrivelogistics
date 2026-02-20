@@ -19,10 +19,10 @@ export function Navbar({ onLoginClick }: NavbarProps) {
   }, []);
 
   const navLinks = [
-    { href: '#services', label: 'Servicii' },
-    { href: '#how-it-works', label: 'Cum Funcționează' },
-    { href: '#benefits', label: 'Beneficii' },
-    { href: '#testimonials', label: 'Testimoniale' },
+    { href: '#services', label: 'Services' },
+    { href: '#how-it-works', label: 'How It Works' },
+    { href: '#benefits', label: 'Benefits' },
+    { href: '#testimonials', label: 'Testimonials' },
   ];
 
   return (
@@ -73,7 +73,7 @@ export function Navbar({ onLoginClick }: NavbarProps) {
               onClick={onLoginClick}
               className="bg-orange-700 hover:bg-orange-800 text-white font-medium px-6"
             >
-              Intră în Cont
+              Sign In
             </Button>
           </div>
 
@@ -114,7 +114,7 @@ export function Navbar({ onLoginClick }: NavbarProps) {
                 }}
                 className="bg-orange-700 hover:bg-orange-800 text-white w-full"
               >
-                Intră în Cont
+                Sign In
               </Button>
             </div>
           </div>

@@ -36,21 +36,21 @@ export function Hero({ onLoginClick }: HeroProps) {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 mb-6">
               <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
               <span className="text-sm text-orange-400 font-medium">
-                Platforma #1 de Logistică în UK
+                #1 Logistics Platform in the UK
               </span>
             </div>
 
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-              Conectăm{' '}
-              <span className="text-gradient">Șoferi Verificați</span>{' '}
-              cu Transportatori de Încredere
+              Connecting{' '}
+              <span className="text-gradient">Verified Drivers</span>{' '}
+              with Trusted Carriers
             </h1>
 
             {/* Subheadline */}
             <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0">
-              Platforma XDrive Logistics simplifică transportul în UK. Găsești încărcături 
-              verificate instant sau angajezi șoferi profesioniști pentru afacerea ta.
+              XDrive Logistics simplifies transport across the UK. Find verified loads 
+              instantly or hire professional drivers for your business.
             </p>
 
             {/* CTA Buttons */}
@@ -60,7 +60,7 @@ export function Hero({ onLoginClick }: HeroProps) {
                 size="lg"
                 className="bg-orange-700 hover:bg-orange-800 text-white font-semibold px-8 py-6 text-lg group"
               >
-                Începe Acum
+                Get Started
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button
@@ -69,7 +69,7 @@ export function Hero({ onLoginClick }: HeroProps) {
                 className="border-white/20 text-white hover:bg-white/10 px-8 py-6 text-lg"
                 onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
               >
-                Află Mai Multe
+                Learn More
               </Button>
             </div>
 
@@ -77,15 +77,15 @@ export function Hero({ onLoginClick }: HeroProps) {
             <div className="flex flex-wrap gap-6 justify-center lg:justify-start">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Shield className="w-5 h-5 text-green-500" />
-                <span>Șoferi Verificați</span>
+                <span>Verified Drivers</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="w-5 h-5 text-blue-500" />
-                <span>Disponibil 24/7</span>
+                <span>Available 24/7</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin className="w-5 h-5 text-orange-500" />
-                <span>Acoperire UK</span>
+                <span>UK Coverage</span>
               </div>
             </div>
           </div>
@@ -97,7 +97,7 @@ export function Hero({ onLoginClick }: HeroProps) {
               <div className="glass rounded-2xl p-6 glow-orange">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <p className="text-sm text-muted-foreground">Încărcături Active</p>
+                    <p className="text-sm text-muted-foreground">Active Loads</p>
                     <p className="text-3xl font-bold text-white">1,247</p>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
@@ -117,8 +117,8 @@ export function Hero({ onLoginClick }: HeroProps) {
                   </div>
                   <div>
                     <p className="text-white font-semibold">John Driver</p>
-                    <p className="text-sm text-muted-foreground">⭐ 4.9 (127 recenzii)</p>
-                    <p className="text-xs text-green-400">✓ Disponibil acum</p>
+                    <p className="text-sm text-muted-foreground">⭐ 4.9 (127 reviews)</p>
+                    <p className="text-xs text-green-400">✓ Available now</p>
                   </div>
                 </div>
               </div>
@@ -127,7 +127,7 @@ export function Hero({ onLoginClick }: HeroProps) {
               <div className="glass rounded-2xl p-6 mt-4 -ml-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Livrări Complete</p>
+                    <p className="text-sm text-muted-foreground">Completed Deliveries</p>
                     <p className="text-2xl font-bold text-white">50,000+</p>
                   </div>
                   <div className="flex -space-x-2">

@@ -3,31 +3,31 @@ import { Star, Quote } from 'lucide-react';
 const testimonials = [
   {
     name: 'Marian Popescu',
-    role: 'Șofer Independent',
+    role: 'Independent Driver',
     image: 'MP',
     rating: 5,
-    text: 'De când folosesc XDrive Logistics, veniturile mele au crescut cu 40%. Platforma este foarte intuitivă și găsesc încărcături zilnic pe ruta mea preferată.',
+    text: 'Since using XDrive Logistics, my income has grown by 40%. The platform is very intuitive and I find loads daily on my preferred route.',
   },
   {
     name: 'Sarah Johnson',
-    role: 'Manager Transport, FastDelivery UK',
+    role: 'Transport Manager, FastDelivery UK',
     image: 'SJ',
     rating: 5,
-    text: 'Am redus timpul de căutare a șoferilor de la zile la ore. Toți șoferii sunt verificați și profesioniști. Recomand cu încredere!',
+    text: 'We reduced driver search time from days to hours. All drivers are verified and professional. Highly recommended!',
   },
   {
     name: 'Ion Dumitrescu',
-    role: 'Proprietar Flotă',
+    role: 'Fleet Owner',
     image: 'ID',
     rating: 5,
-    text: 'Am 5 camioane în flotă și XDrive ne-a ajutat să optimizăm rutele și să reducem costurile cu 25%. Suportul tehnic este excelent.',
+    text: 'I have 5 trucks in my fleet and XDrive has helped us optimise routes and reduce costs by 25%. Technical support is excellent.',
   },
   {
     name: 'Emma Williams',
-    role: 'Director Operațiuni, LogiCorp',
+    role: 'Operations Director, LogiCorp',
     image: 'EW',
     rating: 5,
-    text: 'Platforma ne-a transformat modul în care gestionăm transportul. Tracking în timp real și facturare automată ne salvează ore întregi.',
+    text: 'The platform has transformed the way we manage transport. Real-time tracking and automatic invoicing save us hours.',
   },
 ];
 
@@ -41,13 +41,13 @@ export function Testimonials() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block px-4 py-1 rounded-full bg-orange-500/10 text-orange-400 text-sm font-medium mb-4">
-            Testimoniale
+            Testimonials
           </span>
           <h2 className="text-3xl lg:text-5xl font-bold text-white mb-4">
-            Ce Spun <span className="text-gradient">Clienții Noștri</span>
+            What Our <span className="text-gradient">Clients Say</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Peste 2,500 de șoferi și companii de transport folosesc XDrive Logistics zilnic.
+            Over 2,500 drivers and transport companies use XDrive Logistics daily.
           </p>
         </div>
 

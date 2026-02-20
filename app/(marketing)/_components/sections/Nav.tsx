@@ -61,16 +61,16 @@ export default function Nav() {
           alignItems: 'center',
         }} className="desktop-nav">
           <a href="#services" style={{ color: 'var(--text)', fontWeight: '500', fontSize: '0.9375rem' }}>
-            Servicii
+            Services
           </a>
           <a href="#how-it-works" style={{ color: 'var(--text)', fontWeight: '500', fontSize: '0.9375rem' }}>
-            Cum Funcționează
+            How It Works
           </a>
           <a href="#benefits" style={{ color: 'var(--text)', fontWeight: '500', fontSize: '0.9375rem' }}>
-            Beneficii
+            Benefits
           </a>
           <a href="#testimonials" style={{ color: 'var(--text)', fontWeight: '500', fontSize: '0.9375rem' }}>
-            Testimoniale
+            Testimonials
           </a>
         </div>
 
@@ -102,7 +102,7 @@ export default function Nav() {
               background: 'var(--surface)',
             }}
           >
-            Intră în Cont
+            Sign In
           </a>
           <a
             href="/register"
@@ -116,7 +116,7 @@ export default function Nav() {
               background: 'var(--brand)',
             }}
           >
-            Începe Acum
+            Get Started
           </a>
         </div>
       </div>

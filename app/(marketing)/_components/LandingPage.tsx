@@ -29,7 +29,7 @@ export default function LandingPage() {
             color: 'var(--text)',
             marginBottom: '0.75rem',
           }}>
-            Serviciile Noastre
+            Our Services
           </h2>
           <p style={{
             fontSize: '1.125rem',
@@ -37,7 +37,7 @@ export default function LandingPage() {
             maxWidth: '600px',
             margin: '0 auto',
           }}>
-            Soluții Complete de Transport
+            Complete Transport Solutions
           </p>
           <p style={{
             fontSize: '1rem',
@@ -45,7 +45,7 @@ export default function LandingPage() {
             maxWidth: '700px',
             margin: '0.75rem auto 0',
           }}>
-            Oferim servicii adaptate atât pentru șoferi independenți, cât și pentru companii de transport de orice dimensiune.
+            We offer services tailored for both independent drivers and transport companies of any size.
           </p>
         </div>
         

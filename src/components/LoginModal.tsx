@@ -57,7 +57,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           window.location.href = '/login';
           return;
         }
-        setLoginError(error.message || 'Email sau parolă greșită. Vă rugăm să încercați din nou.');
+        setLoginError(error.message || 'Invalid email or password. Please try again.');
       } else if (data.user) {
         // Successfully logged in - close modal and show success
         onClose();
@@ -66,7 +66,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
         window.location.href = '/dashboard';
       }
     } catch (err) {
-      setLoginError('A apărut o eroare. Vă rugăm să încercați din nou.');
+      setLoginError('An error occurred. Please try again.');
     } finally {
       setLoginLoading(false);
     }
@@ -86,13 +86,13 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
     // Validation
     if (registerPassword !== registerConfirmPassword) {
-      setRegisterError('Parolele nu se potrivesc.');
+      setRegisterError('Passwords do not match.');
       setRegisterLoading(false);
       return;
     }
 
     if (registerPassword.length < 6) {
-      setRegisterError('Parola trebuie să aibă cel puțin 6 caractere.');
+      setRegisterError('Password must be at least 6 characters.');
       setRegisterLoading(false);
       return;
     }
@@ -108,16 +108,16 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           window.location.href = '/register';
           return;
         }
-        setRegisterError(error.message || 'A apărut o eroare la înregistrare.');
+        setRegisterError(error.message || 'An error occurred during registration.');
       } else if (data.user) {
-        setRegisterSuccess('Contul a fost creat cu succes! Verificați emailul pentru confirmare.');
+        setRegisterSuccess('Account created successfully! Please check your email for confirmation.');
         // Clear form
         setRegisterEmail('');
         setRegisterPassword('');
         setRegisterConfirmPassword('');
       }
     } catch (err) {
-      setRegisterError('A apărut o eroare. Vă rugăm să încercați din nou.');
+      setRegisterError('An error occurred. Please try again.');
     } finally {
       setRegisterLoading(false);
     }
@@ -131,29 +131,29 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
             <Truck className="w-8 h-8 text-white" />
           </div>
           <DialogTitle className="text-2xl font-bold text-white">
-            {activeTab === 'login' ? 'Bine ai revenit!' : 'Creează Cont'}
+            {activeTab === 'login' ? 'Welcome back!' : 'Create Account'}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground text-sm">
             {activeTab === 'login'
-              ? 'Intră în contul tău XDrive Logistics'
-              : 'Înregistrează-te gratuit pe platformă'}
+              ? 'Sign in to your XDrive Logistics account'
+              : 'Register for free on the platform'}
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="mt-4">
           <TabsList className="grid w-full grid-cols-2 bg-secondary">
             <TabsTrigger value="login" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
-              Autentificare
+              Sign In
             </TabsTrigger>
             <TabsTrigger value="register" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
-              Înregistrare
+              Register
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="login" className="space-y-4 mt-4">
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-white">Adresă Email</Label>
+                <Label htmlFor="email" className="text-white">Email Address</Label>
                 <Input
                   id="email"
                   type="email"
@@ -166,7 +166,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-white">Parolă</Label>
+                <Label htmlFor="password" className="text-white">Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -190,10 +190,10 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
               <div className="flex items-center justify-between text-sm">
                 <label htmlFor="remember-me" className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" id="remember-me" className="rounded border-border bg-secondary" />
-                  <span className="text-muted-foreground">Ține-mă minte</span>
+                  <span className="text-muted-foreground">Remember me</span>
                 </label>
                 <a href="#" className="text-orange-500 hover:text-orange-400">
-                  Ai uitat parola?
+                  Forgot password?
                 </a>
               </div>
               {loginError && (
@@ -206,7 +206,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-5"
                 disabled={loginLoading}
               >
-                {loginLoading ? 'Se încarcă...' : 'Intră în Cont'}
+                {loginLoading ? 'Loading...' : 'Sign In'}
               </Button>
             </form>
           </TabsContent>
@@ -214,7 +214,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           <TabsContent value="register" className="space-y-4 mt-4">
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="reg-email" className="text-white">Adresă Email</Label>
+                <Label htmlFor="reg-email" className="text-white">Email Address</Label>
                 <Input
                   id="reg-email"
                   type="email"
@@ -227,7 +227,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="reg-password" className="text-white">Parolă</Label>
+                <Label htmlFor="reg-password" className="text-white">Password</Label>
                 <div className="relative">
                   <Input
                     id="reg-password"
@@ -249,7 +249,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="reg-confirm" className="text-white">Confirmă Parola</Label>
+                <Label htmlFor="reg-confirm" className="text-white">Confirm Password</Label>
                 <Input
                   id="reg-confirm"
                   type="password"
@@ -264,10 +264,10 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
               <div className="flex items-start gap-2 text-sm">
                 <input type="checkbox" id="terms-accept" className="rounded border-border bg-secondary mt-0.5" required />
                 <label htmlFor="terms-accept" className="text-muted-foreground">
-                  Sunt de acord cu{' '}
-                  <a href="#" className="text-orange-500 hover:text-orange-400">Termenii și Condițiile</a>
-                  {' '}și{' '}
-                  <a href="#" className="text-orange-500 hover:text-orange-400">Politica de Confidențialitate</a>
+                  I agree to the{' '}
+                  <a href="#" className="text-orange-500 hover:text-orange-400">Terms & Conditions</a>
+                  {' '}and{' '}
+                  <a href="#" className="text-orange-500 hover:text-orange-400">Privacy Policy</a>
                 </label>
               </div>
               {registerError && (
@@ -285,7 +285,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-5"
                 disabled={registerLoading}
               >
-                {registerLoading ? 'Se creează contul...' : 'Creează Cont'}
+                {registerLoading ? 'Creating account...' : 'Create Account'}
               </Button>
             </form>
           </TabsContent>
@@ -293,13 +293,13 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
         {/* Help Section */}
         <div className="mt-6 pt-6 border-t border-border text-center">
-          <p className="text-sm text-muted-foreground mb-2">Ai nevoie de ajutor?</p>
+          <p className="text-sm text-muted-foreground mb-2">Need help?</p>
           <a
             href="tel:07423272138"
             className="inline-flex items-center gap-2 text-orange-500 hover:text-orange-400 font-medium"
           >
             <Phone className="w-4 h-4" />
-            Sună la 07423 272138
+            Call 07423 272138
           </a>
         </div>
       </DialogContent>

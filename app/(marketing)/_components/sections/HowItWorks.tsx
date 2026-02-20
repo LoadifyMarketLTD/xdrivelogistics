@@ -4,46 +4,46 @@ export default function HowItWorks() {
   const driverSteps = [
     {
       number: '01',
-      title: 'Creează Cont',
-      description: 'Înregistrează-te gratuit și completează profilul cu documentele necesare.',
+      title: 'Create Account',
+      description: 'Register for free and complete your profile with the required documents.',
     },
     {
       number: '02',
-      title: 'Găsește Încărcături',
-      description: 'Caută încărcături disponibile pe ruta ta și aplică instant.',
+      title: 'Find Loads',
+      description: 'Search for available loads on your route and apply instantly.',
     },
     {
       number: '03',
-      title: 'Confirmă și Livrează',
-      description: 'Primești confirmare, preiei marfa și livrezi la destinație.',
+      title: 'Confirm and Deliver',
+      description: 'Receive confirmation, pick up the goods and deliver to destination.',
     },
     {
       number: '04',
-      title: 'Primești Plata',
-      description: 'Banii îți intră în cont în 24-48 ore după livrare.',
+      title: 'Receive Payment',
+      description: 'Funds arrive in your account within 24–48 hours after delivery.',
     },
   ]
 
   const companySteps = [
     {
       number: '01',
-      title: 'Înregistrează Compania',
-      description: 'Creează cont business și adaugă detaliile companiei tale.',
+      title: 'Register Your Company',
+      description: 'Create a business account and add your company details.',
     },
     {
       number: '02',
-      title: 'Postează Încărcătura',
-      description: 'Adaugă detaliile transportului și bugetul disponibil.',
+      title: 'Post a Load',
+      description: 'Add transport details and your available budget.',
     },
     {
       number: '03',
-      title: 'Alege Șoferul',
-      description: 'Primești oferte și selectezi șoferul potrivit.',
+      title: 'Choose a Driver',
+      description: 'Receive bids and select the right driver.',
     },
     {
       number: '04',
-      title: 'Urmărește Livrarea',
-      description: 'Tracking în timp real și confirmare la destinație.',
+      title: 'Track Delivery',
+      description: 'Real-time tracking and destination confirmation.',
     },
   ]
 
@@ -92,7 +92,7 @@ export default function HowItWorks() {
           color: 'var(--text)',
           marginBottom: '0.75rem',
         }}>
-          Cum Funcționează
+          How It Works
         </h2>
         <p style={{
           fontSize: '1.125rem',
@@ -100,7 +100,7 @@ export default function HowItWorks() {
           maxWidth: '600px',
           margin: '0 auto',
         }}>
-          Simplu și Eficient
+          Simple and Efficient
         </p>
       </div>
 
@@ -118,7 +118,7 @@ export default function HowItWorks() {
             marginBottom: '1.5rem',
             textAlign: 'center',
           }}>
-            Pentru Șoferi
+            For Drivers
           </h3>
           <div style={{
             display: 'grid',
@@ -140,7 +140,7 @@ export default function HowItWorks() {
             marginBottom: '1.5rem',
             textAlign: 'center',
           }}>
-            Pentru Companii
+            For Companies
           </h3>
           <div style={{
             display: 'grid',
