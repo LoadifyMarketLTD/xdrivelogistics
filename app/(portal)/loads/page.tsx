@@ -35,7 +35,19 @@ interface DistanceInfo {
   jobDistance: { miles: string; duration: string } | null
 }
 
-type SortBy = 'date' | 'distance' | 'price'
+// ── Profit estimate helpers ──────────────────────────────────────────────────
+/** UK average operating cost per mile (fuel + wear) in £ */
+const COST_PER_MILE = 0.45
+
+function calcProfit(budget: number | null, distanceMiles: number | null): { fuel: number; profit: number; margin: number } | null {
+  if (!budget || !distanceMiles || distanceMiles <= 0) return null
+  const fuel = Math.round(distanceMiles * COST_PER_MILE * 100) / 100
+  const profit = Math.round((budget - fuel) * 100) / 100
+  const margin = budget > 0 ? Math.round((profit / budget) * 100) : 0
+  return { fuel, profit, margin }
+}
+
+type SortBy = 'date' | 'distance' | 'price' | 'profit'
 type LoadTab = 'all-live' | 'on-demand' | 'regular' | 'daily-hire'
 
 export default function LoadsPage() {
@@ -196,6 +208,10 @@ export default function LoadsPage() {
         return (b.distance_miles || 0) - (a.distance_miles || 0)
       } else if (sortBy === 'price') {
         return (b.budget || 0) - (a.budget || 0)
+      } else if (sortBy === 'profit') {
+        const pA = calcProfit(a.budget, a.distance_miles)?.profit ?? -Infinity
+        const pB = calcProfit(b.budget, b.distance_miles)?.profit ?? -Infinity
+        return pB - pA
       }
       return 0
     })
@@ -482,6 +498,7 @@ export default function LoadsPage() {
                 <option value="date">Date (Newest)</option>
                 <option value="distance">Distance</option>
                 <option value="price">Price (Highest)</option>
+                <option value="profit">Est. Profit (Highest)</option>
               </select>
             </div>
 
@@ -558,6 +575,30 @@ export default function LoadsPage() {
                             )}
                             {load.budget && <span>💰 £{load.budget.toFixed(2)}</span>}
                             {load.distance_miles && <span>📍 {load.distance_miles} miles</span>}
+                            {/* ── Profit estimate ────────────────── */}
+                            {(() => {
+                              const est = calcProfit(load.budget, load.distance_miles ?? null)
+                              if (!est) return null
+                              const isProfit = est.profit >= 0
+                              return (
+                                <span style={{
+                                  display: 'inline-flex',
+                                  gap: '6px',
+                                  alignItems: 'center',
+                                  background: isProfit ? '#f0fdf4' : '#fef2f2',
+                                  border: `1px solid ${isProfit ? '#86efac' : '#fca5a5'}`,
+                                  borderRadius: '4px',
+                                  padding: '2px 8px',
+                                  fontSize: '12px',
+                                  fontWeight: '600',
+                                  color: isProfit ? '#16a34a' : '#dc2626',
+                                  whiteSpace: 'nowrap',
+                                }}>
+                                  {isProfit ? '📈' : '📉'} Est. profit: £{est.profit.toFixed(0)} ({est.margin}%)
+                                  <span style={{ fontWeight: '400', color: '#9ca3af' }}>fuel ~£{est.fuel.toFixed(0)}</span>
+                                </span>
+                              )
+                            })()}
                           </div>
                         </div>
                         <div style={{ display: 'flex', gap: '8px' }}>
