@@ -315,13 +315,21 @@ export default function LoadsPage() {
         return
       }
       
-      // Submit bid
+      const numericBid = Number(bidAmount)
+      if (isNaN(numericBid) || numericBid <= 0) {
+        alert('Please enter a valid bid amount greater than £0')
+        setSubmittingBid(false)
+        return
+      }
+
+      // Submit bid — write both amount_gbp and bid_price_gbp to satisfy DB constraint
       const { error: bidError } = await supabase
         .from('job_bids')
         .insert({
           job_id: selectedLoad.id,
           bidder_id: authUser.id,
-          amount_gbp: Number(bidAmount),
+          amount_gbp: numericBid,
+          bid_price_gbp: numericBid,
           message: bidMessage?.trim() || null
         })
       
@@ -706,6 +714,8 @@ export default function LoadsPage() {
                 value={bidAmount}
                 onChange={(e) => setBidAmount(e.target.value)}
                 step="0.01"
+                min="0.01"
+                placeholder="e.g. 250.00"
                 className="form-input"
               />
             </div>
