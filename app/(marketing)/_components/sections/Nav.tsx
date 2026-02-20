@@ -1,5 +1,8 @@
 'use client'
 
+import Image from 'next/image'
+import Link from 'next/link'
+
 export default function Nav() {
   return (
     <nav style={{
@@ -23,36 +26,21 @@ export default function Nav() {
         justifyContent: 'space-between',
       }}>
         {/* Logo */}
-        <div style={{
+        <Link href="/" style={{
           display: 'flex',
           alignItems: 'center',
           gap: '0.75rem',
+          textDecoration: 'none',
         }}>
-          <div style={{
-            width: '2.5rem',
-            height: '2.5rem',
-            background: 'var(--brand)',
-            borderRadius: 'var(--r-md)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#fff',
-            fontWeight: '700',
-            fontSize: '1.25rem',
-          }}>
-            X
-          </div>
-          <div>
-            <div style={{
-              fontWeight: '700',
-              fontSize: '1.125rem',
-              color: 'var(--text)',
-              lineHeight: '1.2',
-            }}>
-              XDrive Logistics
-            </div>
-          </div>
-        </div>
+          <Image
+            src="/logo.png"
+            alt="XDrive Logistics LTD"
+            width={120}
+            height={40}
+            style={{ objectFit: 'contain' }}
+            priority
+          />
+        </Link>
 
         {/* Desktop Navigation */}
         <div style={{

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { User } from '@supabase/supabase-js'
@@ -60,15 +61,19 @@ export default function Navbar() {
         height: '64px'
       }}>
         <Link href="/" style={{
-          fontSize: '24px',
-          fontWeight: '700',
-          color: '#1f2937',
           textDecoration: 'none',
           display: 'flex',
           alignItems: 'center',
-          gap: '8px'
+          gap: '8px',
         }}>
-          <span style={{ color: '#C8A64D' }}>XDrive Logistics LTD</span>
+          <Image
+            src="/logo.png"
+            alt="XDrive Logistics LTD"
+            width={130}
+            height={44}
+            style={{ objectFit: 'contain' }}
+            priority
+          />
         </Link>
 
         <div style={{
