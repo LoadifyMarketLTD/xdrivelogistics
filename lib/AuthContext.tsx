@@ -8,10 +8,25 @@ interface Profile {
   id: string
   email: string
   full_name: string | null
+  display_name: string | null
   phone: string | null
   company_id: string | null
   role: string
+  country: string | null
   is_active: boolean
+  // Driver onboarding fields
+  driver_base_postcode: string | null
+  driver_vehicle_type: string | null
+  driver_availability: string | null
+  // Broker onboarding fields
+  broker_company_name: string | null
+  broker_company_postcode: string | null
+  broker_payment_terms: string | null
+  // Company onboarding fields
+  company_name: string | null
+  company_postcode: string | null
+  company_fleet_size: number | null
+  company_primary_services: string | null
 }
 
 interface AuthContextType {

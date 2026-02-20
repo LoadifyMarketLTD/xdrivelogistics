@@ -1,207 +1,102 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
-import '@/styles/portal.css'
+import { needsOnboarding } from '@/lib/profile'
+import { DEFAULT_ROLE, ROLE_LABEL, type Role } from '@/lib/roles'
+import OnboardingForm from '@/components/onboarding/OnboardingForm'
 
 export const dynamic = 'force-dynamic'
 
+const ROLE_DASHBOARD: Record<Role, string> = {
+  driver: '/dashboard/driver',
+  broker: '/dashboard/broker',
+  company: '/dashboard/company',
+}
+
 export default function OnboardingPage() {
   const router = useRouter()
-  const { user, companyId, loading: authLoading, refreshProfile } = useAuth()
-  
-  const [companyName, setCompanyName] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { user, profile, loading, profileLoading, refreshProfile } = useAuth()
+  const [resolving, setResolving] = useState(true)
+
+  const role = (profile?.role ?? DEFAULT_ROLE) as Role
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login')
+    if (loading || profileLoading) return
+
+    if (!user) {
+      router.replace('/login')
       return
     }
 
-    // If user already has a company, redirect to dashboard
-    if (!authLoading && companyId) {
-      router.push('/dashboard')
+    // If onboarding is already complete, skip to dashboard
+    if (profile && !needsOnboarding(role, profile)) {
+      router.replace(ROLE_DASHBOARD[role] ?? '/dashboard')
       return
     }
 
-    // Redirect to the new company-specific onboarding page
-    if (!authLoading && user && !companyId) {
-      router.push('/onboarding/company')
-      return
-    }
-  }, [authLoading, user, companyId, router])
+    setResolving(false)
+  }, [loading, profileLoading, user, profile, role, router])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSave = async (fields: Record<string, string | number>) => {
+    if (!user) throw new Error('Not authenticated')
 
-    if (!companyName.trim()) {
-      setError('Company name is required')
-      return
-    }
+    const { error } = await supabase
+      .from('profiles')
+      .upsert(
+        { id: user.id, ...fields },
+        { onConflict: 'id' }
+      )
 
-    try {
-      setSubmitting(true)
-      setError(null)
+    if (error) throw new Error(error.message)
 
-      // Call the create_company RPC function
-      const { data: newCompanyId, error: rpcError } = await supabase
-        .rpc('create_company', { company_name: companyName.trim() })
-
-      if (rpcError) throw rpcError
-
-      console.log('Company created successfully:', newCompanyId)
-
-      // Refresh profile to get the new company_id
-      await refreshProfile()
-
-      alert('Company created successfully!')
-      router.push('/dashboard')
-    } catch (err: any) {
-      console.error('Error creating company:', err)
-      setError(err.message || 'Failed to create company')
-    } finally {
-      setSubmitting(false)
-    }
+    await refreshProfile()
+    router.push(ROLE_DASHBOARD[role] ?? '/dashboard')
   }
 
-  if (authLoading) {
+  if (loading || profileLoading || resolving) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0F1F2E', color: '#fff' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '18px' }}>Loading...</div>
-        </div>
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#f9fafb',
+        color: '#6b7280',
+      }}>
+        Loading…
       </div>
     )
   }
 
   return (
-    <div className="dashboard-content">
-      <header className="platform-header">
-        <div className="container">
-          <div className="platform-nav">
-            <div className="platform-brand">
-              <span className="platform-brand-accent">XDrive Logistics LTD</span> Onboarding
-            </div>
-          </div>
+    <div style={{
+      minHeight: '100vh',
+      background: '#f9fafb',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '24px',
+    }}>
+      {/* Top brand strip */}
+      <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+        <div style={{ fontSize: '20px', fontWeight: '700', color: '#C8A64D', letterSpacing: '0.4px' }}>
+          XDrive Logistics Ltd
         </div>
-      </header>
-
-      <main className="container">
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: 'calc(100vh - 200px)',
-          padding: '40px 20px'
-        }}>
-          <div style={{
-            backgroundColor: '#132433',
-            borderRadius: '12px',
-            padding: '48px',
-            border: '1px solid rgba(255,255,255,0.08)',
-            maxWidth: '500px',
-            width: '100%'
-          }}>
-            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🚚</div>
-              <h1 style={{ fontSize: '28px', marginBottom: '12px', color: '#fff' }}>
-                Welcome to XDrive Logistics LTD Marketplace
-              </h1>
-              <p style={{ fontSize: '15px', color: '#94a3b8', lineHeight: '1.6' }}>
-                To post jobs and bid on transport opportunities, you need to create your company profile.
-              </p>
-            </div>
-
-            {error && (
-              <div style={{
-                padding: '12px 16px',
-                backgroundColor: 'rgba(255, 107, 107, 0.1)',
-                border: '1px solid rgba(255, 107, 107, 0.3)',
-                borderRadius: '8px',
-                marginBottom: '24px',
-                color: '#ff6b6b',
-                fontSize: '14px'
-              }}>
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit}>
-              <div style={{ marginBottom: '24px' }}>
-                <label style={{
-                  display: 'block',
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#fff'
-                }}>
-                  Company Name *
-                </label>
-                <input
-                  type="text"
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                  required
-                  autoFocus
-                  style={{
-                    width: '100%',
-                    padding: '14px',
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '6px',
-                    color: '#fff',
-                    fontSize: '16px'
-                  }}
-                  placeholder="Enter your company name"
-                />
-                <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '6px' }}>
-                  This will be visible to other companies in the marketplace
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className="action-btn primary"
-                style={{
-                  width: '100%',
-                  padding: '14px',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  opacity: submitting ? 0.6 : 1
-                }}
-              >
-                {submitting ? 'Creating Company...' : 'Create Company & Continue'}
-              </button>
-            </form>
-
-            <div style={{
-              marginTop: '24px',
-              padding: '16px',
-              backgroundColor: 'rgba(200,166,77,0.1)',
-              border: '1px solid rgba(200,166,77,0.2)',
-              borderRadius: '8px',
-              fontSize: '13px',
-              color: '#94a3b8',
-              lineHeight: '1.6'
-            }}>
-              <strong style={{ color: 'var(--gold-premium)', display: 'block', marginBottom: '8px' }}>
-                ℹ️ What happens next:
-              </strong>
-              <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                <li>Your company profile will be created</li>
-                <li>You'll be assigned as the admin</li>
-                <li>You can start posting jobs to the marketplace</li>
-                <li>You can browse and bid on other jobs</li>
-              </ul>
-            </div>
-          </div>
+        <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '4px' }}>
+          Account type: <strong style={{ color: '#1f2937' }}>{ROLE_LABEL[role]}</strong>
         </div>
-      </main>
+      </div>
+
+      <OnboardingForm role={role} onSave={handleSave} />
+
+      <p style={{ marginTop: '20px', fontSize: '13px', color: '#9ca3af' }}>
+        You can update these details later in your profile settings.
+      </p>
     </div>
   )
 }
+
