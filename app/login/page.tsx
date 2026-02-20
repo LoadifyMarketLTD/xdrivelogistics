@@ -4,6 +4,20 @@ import { useState, FormEvent, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase, isSupabaseConfigured } from '@/lib/supabaseClient'
 import Link from 'next/link'
+import { needsOnboarding } from '@/lib/profile'
+import { DEFAULT_ROLE, type Role } from '@/lib/roles'
+
+const ROLE_DASHBOARD: Record<Role, string> = {
+  driver: '/dashboard/driver',
+  broker: '/dashboard/broker',
+  company: '/dashboard/company',
+}
+
+function roleRedirect(role: string | null | undefined): string {
+  if (role === 'broker') return ROLE_DASHBOARD.broker
+  if (role === 'company') return ROLE_DASHBOARD.company
+  return ROLE_DASHBOARD.driver
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -25,17 +39,15 @@ export default function LoginPage() {
       if (session) {
         const { data: profileData } = await supabase
           .from('profiles')
-          .select('role')
+          .select('*')
           .eq('id', session.user.id)
           .maybeSingle()
 
-        const role = profileData?.role
-        if (role === 'broker') {
-          router.push('/dashboard/broker')
-        } else if (role === 'company') {
-          router.push('/dashboard/company')
+        const role = profileData?.role as Role | undefined
+        if (needsOnboarding(role ?? DEFAULT_ROLE, profileData)) {
+          router.push('/onboarding')
         } else {
-          router.push('/dashboard/driver')
+          router.push(roleRedirect(role))
         }
       } else {
         setChecking(false)
@@ -77,21 +89,18 @@ export default function LoginPage() {
         setError(signInError.message || 'Sign-in failed. Please try again.')
         setPassword('')
       } else if (data.user) {
-        // Fetch role then redirect to the appropriate dashboard
+        // Fetch full profile to check if onboarding is needed
         const { data: profileData } = await supabase
           .from('profiles')
-          .select('role')
+          .select('*')
           .eq('id', data.user.id)
           .maybeSingle()
 
-        const role = profileData?.role
-        if (role === 'broker') {
-          router.push('/dashboard/broker')
-        } else if (role === 'company') {
-          router.push('/dashboard/company')
+        const role = profileData?.role as Role | undefined
+        if (needsOnboarding(role ?? DEFAULT_ROLE, profileData)) {
+          router.push('/onboarding')
         } else {
-          // driver (default) or any legacy role
-          router.push('/dashboard/driver')
+          router.push(roleRedirect(role))
         }
       } else {
         setError('Sign-in failed. Please try again.')

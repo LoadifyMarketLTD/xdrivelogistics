@@ -76,13 +76,8 @@ export default function RegisterPage() {
           .from('profiles')
           .upsert({ id: data.user.id, email, role: selectedRole }, { onConflict: 'id' })
 
-        // Redirect to the correct role dashboard
-        const dashboardRoutes: Record<Role, string> = {
-          driver: '/dashboard/driver',
-          broker: '/dashboard/broker',
-          company: '/dashboard/company',
-        }
-        router.push(dashboardRoutes[selectedRole])
+        // New users always need onboarding — go there first
+        router.push('/onboarding')
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred. Please try again.')

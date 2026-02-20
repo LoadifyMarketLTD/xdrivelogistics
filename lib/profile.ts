@@ -78,7 +78,7 @@ export async function getRole(userId: string): Promise<Role> {
  * Returns true when the role-specific required onboarding fields are missing
  * from the profile, meaning the onboarding form must be shown.
  */
-export function needsOnboarding(role: Role, profile: Partial<Profile> | null): boolean {
+export function needsOnboarding(role: Role = DEFAULT_ROLE, profile: Partial<Profile> | null): boolean {
   if (!profile) return true
   switch (role) {
     case 'driver':
