@@ -358,12 +358,13 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           top: 0,
           zIndex: 40,
         }}>
-          {/* Left side - Action buttons */}
+          {/* Left side - Logo + Action buttons */}
           <div style={{
             display: 'flex',
             gap: '12px',
             alignItems: 'center',
           }}>
+            <Image src="/logo.webp" alt="XDrive" width={90} height={26} style={{ display: 'block', marginRight: '4px' }} priority />
             <button
               onClick={() => router.push('/jobs/new')}
               style={{
