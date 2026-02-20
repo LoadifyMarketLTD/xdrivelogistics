@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Section from '../ui/Section'
 import StatCard from '../ui/StatCard'
 import PrimaryButton from '../ui/PrimaryButton'
@@ -9,6 +10,22 @@ export default function Hero() {
         textAlign: 'center',
         marginBottom: '3rem',
       }}>
+        {/* Company Logo */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginBottom: '1.5rem',
+        }}>
+          <Image
+            src="/logo.png"
+            alt="XDrive Logistics LTD"
+            width={180}
+            height={60}
+            style={{ objectFit: 'contain' }}
+            priority
+          />
+        </div>
+
         <h1 style={{
           fontSize: 'clamp(2rem, 5vw, 3.5rem)',
           fontWeight: '800',
