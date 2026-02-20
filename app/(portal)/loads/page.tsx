@@ -322,6 +322,7 @@ export default function LoadsPage() {
         .insert({
           job_id: selectedLoad.id,
           bidder_id: authUser.id,
+          quote_amount: bidGbp,
           amount_gbp: bidGbp,
           message: bidMessage?.trim() || null
         })

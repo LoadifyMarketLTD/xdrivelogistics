@@ -12,7 +12,7 @@
     "build:landing": "tsc -b tsconfig.app.json && vite build",
     "build:portal": "next build",
     "integrate:landing": "bash scripts/integrate-landing.sh",
-    "build:all": "npm run build:landing && npm run integrate:landing && npm run build:portal",
+    "build:all": "npm run build:portal",
     "start": "vite preview",
     "lint": "eslint .",
     "preview": "vite preview"
