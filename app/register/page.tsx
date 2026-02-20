@@ -4,11 +4,13 @@ import { useState, FormEvent, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import Link from 'next/link'
+import { ROLES, ROLE_LABEL, DEFAULT_ROLE, type Role } from '@/lib/roles'
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [selectedRole, setSelectedRole] = useState<Role>(DEFAULT_ROLE)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [checking, setChecking] = useState(true)
@@ -61,6 +63,7 @@ export default function RegisterPage() {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
+        options: { data: { role: selectedRole } },
       })
 
       if (signUpError) {
@@ -68,8 +71,18 @@ export default function RegisterPage() {
         setPassword('')
         setConfirmPassword('')
       } else if (data.user) {
-        // Redirect to dashboard after successful registration
-        router.push('/dashboard')
+        // Persist role in profiles table (upsert is safe with or without DB trigger)
+        await supabase
+          .from('profiles')
+          .upsert({ id: data.user.id, email, role: selectedRole }, { onConflict: 'id' })
+
+        // Redirect to the correct role dashboard
+        const dashboardRoutes: Record<Role, string> = {
+          driver: '/dashboard/driver',
+          broker: '/dashboard/broker',
+          company: '/dashboard/company',
+        }
+        router.push(dashboardRoutes[selectedRole])
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred. Please try again.')
@@ -134,6 +147,65 @@ export default function RegisterPage() {
           </div>
 
           <form onSubmit={handleSubmit}>
+            {/* Role Selection */}
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{
+                display: 'block',
+                color: '#374151',
+                fontSize: '14px',
+                fontWeight: '500',
+                marginBottom: '10px',
+              }}>
+                I am a…
+              </label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {ROLES.map((role) => (
+                  <div
+                    key={role}
+                    onClick={() => setSelectedRole(role)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '12px 14px',
+                      border: `2px solid ${selectedRole === role ? '#C8A64D' : '#d1d5db'}`,
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      background: selectedRole === role ? '#fffbf0' : '#ffffff',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    <div style={{
+                      width: '18px',
+                      height: '18px',
+                      borderRadius: '50%',
+                      border: `2px solid ${selectedRole === role ? '#C8A64D' : '#9ca3af'}`,
+                      marginRight: '12px',
+                      flexShrink: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                      {selectedRole === role && (
+                        <div style={{
+                          width: '9px',
+                          height: '9px',
+                          borderRadius: '50%',
+                          background: '#C8A64D',
+                        }} />
+                      )}
+                    </div>
+                    <span style={{
+                      fontSize: '14px',
+                      fontWeight: selectedRole === role ? '600' : '400',
+                      color: selectedRole === role ? '#1f2937' : '#4b5563',
+                    }}>
+                      {ROLE_LABEL[role]}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div style={{ marginBottom: '20px' }}>
               <label htmlFor="email" style={{
                 display: 'block',

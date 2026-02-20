@@ -23,7 +23,20 @@ export default function LoginPage() {
 
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
-        router.push('/dashboard')
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .maybeSingle()
+
+        const role = profileData?.role
+        if (role === 'broker') {
+          router.push('/dashboard/broker')
+        } else if (role === 'company') {
+          router.push('/dashboard/company')
+        } else {
+          router.push('/dashboard/driver')
+        }
       } else {
         setChecking(false)
       }
@@ -64,7 +77,22 @@ export default function LoginPage() {
         setError(signInError.message || 'Sign-in failed. Please try again.')
         setPassword('')
       } else if (data.user) {
-        router.push('/dashboard')
+        // Fetch role then redirect to the appropriate dashboard
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .maybeSingle()
+
+        const role = profileData?.role
+        if (role === 'broker') {
+          router.push('/dashboard/broker')
+        } else if (role === 'company') {
+          router.push('/dashboard/company')
+        } else {
+          // driver (default) or any legacy role
+          router.push('/dashboard/driver')
+        }
       } else {
         setError('Sign-in failed. Please try again.')
       }

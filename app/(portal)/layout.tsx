@@ -6,23 +6,30 @@ import { useAuth } from '@/lib/AuthContext'
 import PortalLayout from '@/components/layout/PortalLayout'
 import MobileRedirect from '@/components/mobile/MobileRedirect'
 
+/** Roles that do NOT require a company to access the portal */
+const ROLES_NO_COMPANY = ['driver', 'broker']
+
 export default function PortalLayoutWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const { user, companyId, loading } = useAuth()
+  const { user, companyId, loading, profile, profileLoading } = useAuth()
   
   useEffect(() => {
-    if (!loading && !user) {
+    if (loading || profileLoading) return
+
+    if (!user) {
       router.push('/login')
       return
     }
     
-    if (!loading && user && !companyId) {
+    // Only require company setup for company-role users
+    const role = profile?.role ?? ''
+    if (!companyId && !ROLES_NO_COMPANY.includes(role)) {
       router.push('/onboarding/company')
       return
     }
-  }, [loading, user, companyId])
+  }, [loading, profileLoading, user, companyId, profile])
   
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div style={{ 
         display: 'flex', 
@@ -39,7 +46,12 @@ export default function PortalLayoutWrapper({ children }: { children: React.Reac
     )
   }
   
-  if (!user || !companyId) {
+  if (!user) {
+    return null
+  }
+
+  const role = profile?.role ?? ''
+  if (!companyId && !ROLES_NO_COMPANY.includes(role)) {
     return null
   }
   

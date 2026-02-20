@@ -4,33 +4,21 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
 import { useEffect, useState } from 'react'
-
-interface MenuItem {
-  label: string
-  path: string
-}
-
-const menuItems: MenuItem[] = [
-  { label: 'Dashboard', path: '/dashboard' },
-  { label: 'Directory', path: '/directory' },
-  { label: 'Live Availability', path: '/live-availability' },
-  { label: 'Loads', path: '/loads' },
-  { label: 'Quotes', path: '/quotes' },
-  { label: 'Diary', path: '/diary' },
-  { label: 'Return Journeys', path: '/return-journeys' },
-  { label: 'Freight Vision', path: '/freight-vision' },
-  { label: 'Drivers & Vehicles', path: '/drivers-vehicles' },
-  { label: 'Company Settings', path: '/company/settings' },
-]
+import { NAV_ITEMS } from '@/config/nav'
+import { ROLE_LABEL, type Role } from '@/lib/roles'
 
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { user, companyId } = useAuth()
+  const { user, companyId, profile } = useAuth()
   const [newLoadsCount, setNewLoadsCount] = useState(0)
   const [acceptedBidsCount, setAcceptedBidsCount] = useState(0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState<boolean | null>(null)
+
+  const userRole = (profile?.role ?? 'driver') as Role
+  const roleLabel = ROLE_LABEL[userRole] ?? userRole
+  const visibleNavItems = NAV_ITEMS.filter((item) => item.allowedRoles.includes(userRole))
 
   // Detect mobile viewport - only on client side to avoid hydration mismatch
   // Using 1024px breakpoint (lg) for true mobile-first layout
@@ -242,7 +230,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             marginTop: '4px',
             letterSpacing: '0.3px',
           }}>
-            Transport Exchange
+            {roleLabel}
           </div>
         </div>
 
@@ -252,7 +240,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           overflowY: 'auto',
           padding: '12px 0',
         }}>
-          {menuItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const isActive = pathname === item.path || pathname.startsWith(item.path + '/')
             
             return (
