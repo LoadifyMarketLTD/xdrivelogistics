@@ -3,21 +3,35 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
+import { useAuth } from '@/lib/AuthContext'
 import { JobWithTracking, TrackingEvent, ProofOfDelivery, JobDocument, JobNote } from '@/lib/types'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
 
+interface JobBid {
+  id: string
+  created_at: string
+  bidder_id: string
+  amount_gbp: number
+  message: string | null
+  status: 'submitted' | 'withdrawn' | 'rejected' | 'accepted'
+}
+
 export default function LoadDetailPage() {
   const params = useParams()
   const router = useRouter()
   const jobId = params.id as string
+  const { companyId } = useAuth()
   
   const [job, setJob] = useState<JobWithTracking | null>(null)
   const [trackingEvents, setTrackingEvents] = useState<TrackingEvent[]>([])
   const [pod, setPod] = useState<ProofOfDelivery | null>(null)
   const [documents, setDocuments] = useState<JobDocument[]>([])
   const [notes, setNotes] = useState<JobNote[]>([])
+  const [bids, setBids] = useState<JobBid[]>([])
+  const [bidsLoading, setBidsLoading] = useState(false)
+  const [bidActionLoading, setBidActionLoading] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -25,6 +39,62 @@ export default function LoadDetailPage() {
     if (!jobId) return
     fetchJobDetails()
   }, [jobId])
+
+  useEffect(() => {
+    // Fetch bids once job is loaded and user is the poster
+    if (job?.id && companyId && job.posted_by_company_id === companyId) {
+      fetchBids()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [job?.id, job?.posted_by_company_id, companyId])
+
+  const fetchBids = async () => {
+    try {
+      setBidsLoading(true)
+      const response = await fetch(`/api/jobs/${jobId}/bids`)
+      if (!response.ok) {
+        const data = await response.json()
+        console.error('Error fetching bids:', data.error)
+        return
+      }
+      const data = await response.json()
+      setBids(data.bids || [])
+    } catch (err) {
+      console.error('Error fetching bids:', err)
+    } finally {
+      setBidsLoading(false)
+    }
+  }
+
+  const handleBidAction = async (bidId: string, action: 'accept' | 'reject') => {
+    const confirmMsg = action === 'accept'
+      ? 'Accept this bid? The job will be marked as assigned and all other bids will be rejected.'
+      : 'Reject this bid?'
+    if (!confirm(confirmMsg)) return
+
+    try {
+      setBidActionLoading(bidId)
+      const response = await fetch(`/api/jobs/${jobId}/bids`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bidId, action }),
+      })
+      const data = await response.json()
+      if (!response.ok) {
+        alert(data.error || `Failed to ${action} bid`)
+        return
+      }
+      alert(data.message)
+      // Refresh both job and bids
+      await fetchJobDetails()
+      await fetchBids()
+    } catch (err: unknown) {
+      console.error(`Error ${action}ing bid:`, err)
+      alert(`Failed to ${action} bid`)
+    } finally {
+      setBidActionLoading(null)
+    }
+  }
 
   const fetchJobDetails = async () => {
     try {
@@ -523,6 +593,121 @@ export default function LoadDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Bids Received — only visible to the job poster */}
+      {companyId && job.posted_by_company_id === companyId && (
+        <div style={{
+          backgroundColor: '#ffffff',
+          border: '1px solid #e5e7eb',
+          borderRadius: '8px',
+          padding: '24px',
+          marginBottom: '20px'
+        }}>
+          <h2 style={{
+            fontSize: '18px',
+            fontWeight: '600',
+            color: '#1f2937',
+            marginBottom: '16px'
+          }}>
+            Bids Received ({bids.length})
+          </h2>
+
+          {bidsLoading ? (
+            <div style={{ color: '#6b7280', fontSize: '14px' }}>Loading bids...</div>
+          ) : bids.length === 0 ? (
+            <div style={{ color: '#6b7280', fontSize: '14px' }}>No bids received yet.</div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {bids.map((bid) => {
+                const statusColors: Record<string, string> = {
+                  submitted: '#f59e0b',
+                  accepted: '#10b981',
+                  rejected: '#ef4444',
+                  withdrawn: '#6b7280',
+                }
+                return (
+                  <div
+                    key={bid.id}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '14px 16px',
+                      backgroundColor: '#f9fafb',
+                      borderRadius: '6px',
+                      border: '1px solid #e5e7eb',
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '16px', fontWeight: '700', color: '#1f2937' }}>
+                          £{bid.amount_gbp.toFixed(2)}
+                        </span>
+                        <span style={{
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          color: '#ffffff',
+                          backgroundColor: statusColors[bid.status] || '#6b7280',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                        }}>
+                          {bid.status.charAt(0).toUpperCase() + bid.status.slice(1)}
+                        </span>
+                      </div>
+                      {bid.message && (
+                        <div style={{ fontSize: '13px', color: '#4b5563', fontStyle: 'italic' }}>
+                          &quot;{bid.message}&quot;
+                        </div>
+                      )}
+                      <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>
+                        {new Date(bid.created_at).toLocaleString('en-GB')}
+                      </div>
+                    </div>
+                    {bid.status === 'submitted' && job.status === 'open' && (
+                      <div style={{ display: 'flex', gap: '8px', marginLeft: '16px' }}>
+                        <button
+                          onClick={() => handleBidAction(bid.id, 'accept')}
+                          disabled={bidActionLoading === bid.id}
+                          style={{
+                            padding: '8px 16px',
+                            backgroundColor: '#10b981',
+                            color: '#ffffff',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: bidActionLoading === bid.id ? 'not-allowed' : 'pointer',
+                            fontSize: '13px',
+                            fontWeight: '600',
+                            opacity: bidActionLoading === bid.id ? 0.6 : 1,
+                          }}
+                        >
+                          {bidActionLoading === bid.id ? '...' : 'Accept'}
+                        </button>
+                        <button
+                          onClick={() => handleBidAction(bid.id, 'reject')}
+                          disabled={bidActionLoading === bid.id}
+                          style={{
+                            padding: '8px 16px',
+                            backgroundColor: '#ef4444',
+                            color: '#ffffff',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: bidActionLoading === bid.id ? 'not-allowed' : 'pointer',
+                            fontSize: '13px',
+                            fontWeight: '600',
+                            opacity: bidActionLoading === bid.id ? 0.6 : 1,
+                          }}
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Tracking Timeline */}
       {trackingEvents.length > 0 && (
