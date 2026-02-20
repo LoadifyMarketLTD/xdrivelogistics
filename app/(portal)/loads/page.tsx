@@ -321,7 +321,7 @@ export default function LoadsPage() {
         .insert({
           job_id: selectedLoad.id,
           bidder_id: authUser.id,
-          bid_price_gbp: Number(bidAmount),
+          amount_gbp: Number(bidAmount),
           message: bidMessage?.trim() || null
         })
       
