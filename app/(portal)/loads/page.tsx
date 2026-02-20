@@ -294,14 +294,13 @@ export default function LoadsPage() {
       }
       
       // Submit bid
+      const bidGbp = Number(bidAmount)
       const { error: bidError } = await supabase
         .from('job_bids')
         .insert({
           job_id: selectedLoad.id,
-          bidder_id: user.id,
-          amount_gbp: parseFloat(bidAmount),
-          message: bidMessage || null,
-          status: 'submitted'
+          bid_price_gbp: bidGbp,
+          message: bidMessage?.trim() || null
         })
       
       if (bidError) throw bidError
