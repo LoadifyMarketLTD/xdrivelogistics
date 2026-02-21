@@ -1,16 +1,6 @@
-import { useState, type FormEvent } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Truck, Eye, EyeOff, Phone } from 'lucide-react';
-import { type AuthError } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured } from '@/lib/supabaseClient';
-
-function isApiKeyError(error: AuthError): boolean {
-  return error.message != null && error.message.toLowerCase().includes('api key')
-}
+import { Truck, Phone } from 'lucide-react';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -18,109 +8,14 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ isOpen, onClose }: LoginModalProps) {
-  const [showPassword, setShowPassword] = useState(false);
-  const [activeTab, setActiveTab] = useState('login');
-  
-  // Login form state
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [loginError, setLoginError] = useState('');
-  
-  // Register form state
-  const [registerEmail, setRegisterEmail] = useState('');
-  const [registerPassword, setRegisterPassword] = useState('');
-  const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
-  const [registerLoading, setRegisterLoading] = useState(false);
-  const [registerError, setRegisterError] = useState('');
-  const [registerSuccess, setRegisterSuccess] = useState('');
-
-  // Handle login submission
-  const handleLogin = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoginError('');
-    setLoginLoading(true);
-
-    if (!isSupabaseConfigured) {
-      window.location.href = '/login';
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password: loginPassword,
-      });
-
-      if (error) {
-        if (isApiKeyError(error)) {
-          window.location.href = '/login';
-          return;
-        }
-        setLoginError(error.message || 'Invalid email or password. Please try again.');
-      } else if (data.user) {
-        // Successfully logged in - close modal and show success
-        onClose();
-        // Note: In production, use proper routing (React Router or Next.js router)
-        // For now, redirect to dashboard
-        window.location.href = '/dashboard';
-      }
-    } catch (err) {
-      setLoginError('An error occurred. Please try again.');
-    } finally {
-      setLoginLoading(false);
-    }
+  const handleSignIn = () => {
+    onClose();
+    window.location.href = '/login';
   };
 
-  // Handle registration submission
-  const handleRegister = async (e: FormEvent) => {
-    e.preventDefault();
-    setRegisterError('');
-    setRegisterSuccess('');
-    setRegisterLoading(true);
-
-    if (!isSupabaseConfigured) {
-      window.location.href = '/register';
-      return;
-    }
-
-    // Validation
-    if (registerPassword !== registerConfirmPassword) {
-      setRegisterError('Passwords do not match.');
-      setRegisterLoading(false);
-      return;
-    }
-
-    if (registerPassword.length < 6) {
-      setRegisterError('Password must be at least 6 characters.');
-      setRegisterLoading(false);
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email: registerEmail,
-        password: registerPassword,
-      });
-
-      if (error) {
-        if (isApiKeyError(error)) {
-          window.location.href = '/register';
-          return;
-        }
-        setRegisterError(error.message || 'An error occurred during registration.');
-      } else if (data.user) {
-        setRegisterSuccess('Account created successfully! Please check your email for confirmation.');
-        // Clear form
-        setRegisterEmail('');
-        setRegisterPassword('');
-        setRegisterConfirmPassword('');
-      }
-    } catch (err) {
-      setRegisterError('An error occurred. Please try again.');
-    } finally {
-      setRegisterLoading(false);
-    }
+  const handleRegister = () => {
+    onClose();
+    window.location.href = '/register';
   };
 
   return (
@@ -131,165 +26,28 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
             <Truck className="w-8 h-8 text-white" />
           </div>
           <DialogTitle className="text-2xl font-bold text-white">
-            {activeTab === 'login' ? 'Welcome back!' : 'Create Account'}
+            XDrive Logistics
           </DialogTitle>
           <DialogDescription className="text-muted-foreground text-sm">
-            {activeTab === 'login'
-              ? 'Sign in to your XDrive Logistics account'
-              : 'Register for free on the platform'}
+            Sign in or create an account to access the platform
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="mt-4">
-          <TabsList className="grid w-full grid-cols-2 bg-secondary">
-            <TabsTrigger value="login" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
-              Sign In
-            </TabsTrigger>
-            <TabsTrigger value="register" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
-              Register
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="login" className="space-y-4 mt-4">
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-white">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="nume@exemplu.com"
-                  className="bg-secondary border-border text-white placeholder:text-muted-foreground"
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  required
-                  disabled={loginLoading}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-white">Password</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    className="bg-secondary border-border text-white placeholder:text-muted-foreground pr-10"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    required
-                    disabled={loginLoading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <label htmlFor="remember-me" className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="remember-me" className="rounded border-border bg-secondary" />
-                  <span className="text-muted-foreground">Remember me</span>
-                </label>
-                <a href="#" className="text-orange-500 hover:text-orange-400">
-                  Forgot password?
-                </a>
-              </div>
-              {loginError && (
-                <div className="p-3 rounded-md bg-red-500/10 border border-red-500/50 text-red-500 text-sm">
-                  {loginError}
-                </div>
-              )}
-              <Button 
-                type="submit" 
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-5"
-                disabled={loginLoading}
-              >
-                {loginLoading ? 'Loading...' : 'Sign In'}
-              </Button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="register" className="space-y-4 mt-4">
-            <form onSubmit={handleRegister} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="reg-email" className="text-white">Email Address</Label>
-                <Input
-                  id="reg-email"
-                  type="email"
-                  placeholder="nume@exemplu.com"
-                  className="bg-secondary border-border text-white placeholder:text-muted-foreground"
-                  value={registerEmail}
-                  onChange={(e) => setRegisterEmail(e.target.value)}
-                  required
-                  disabled={registerLoading}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="reg-password" className="text-white">Password</Label>
-                <div className="relative">
-                  <Input
-                    id="reg-password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    className="bg-secondary border-border text-white placeholder:text-muted-foreground pr-10"
-                    value={registerPassword}
-                    onChange={(e) => setRegisterPassword(e.target.value)}
-                    required
-                    disabled={registerLoading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="reg-confirm" className="text-white">Confirm Password</Label>
-                <Input
-                  id="reg-confirm"
-                  type="password"
-                  placeholder="••••••••"
-                  className="bg-secondary border-border text-white placeholder:text-muted-foreground"
-                  value={registerConfirmPassword}
-                  onChange={(e) => setRegisterConfirmPassword(e.target.value)}
-                  required
-                  disabled={registerLoading}
-                />
-              </div>
-              <div className="flex items-start gap-2 text-sm">
-                <input type="checkbox" id="terms-accept" className="rounded border-border bg-secondary mt-0.5" required />
-                <label htmlFor="terms-accept" className="text-muted-foreground">
-                  I agree to the{' '}
-                  <a href="#" className="text-orange-500 hover:text-orange-400">Terms & Conditions</a>
-                  {' '}and{' '}
-                  <a href="#" className="text-orange-500 hover:text-orange-400">Privacy Policy</a>
-                </label>
-              </div>
-              {registerError && (
-                <div className="p-3 rounded-md bg-red-500/10 border border-red-500/50 text-red-500 text-sm">
-                  {registerError}
-                </div>
-              )}
-              {registerSuccess && (
-                <div className="p-3 rounded-md bg-green-500/10 border border-green-500/50 text-green-500 text-sm">
-                  {registerSuccess}
-                </div>
-              )}
-              <Button 
-                type="submit" 
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-5"
-                disabled={registerLoading}
-              >
-                {registerLoading ? 'Creating account...' : 'Create Account'}
-              </Button>
-            </form>
-          </TabsContent>
-        </Tabs>
+        <div className="mt-4 space-y-3">
+          <Button
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-5"
+            onClick={handleSignIn}
+          >
+            Sign In
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full font-semibold py-5 border-border text-white hover:bg-secondary"
+            onClick={handleRegister}
+          >
+            Create Account
+          </Button>
+        </div>
 
         {/* Help Section */}
         <div className="mt-6 pt-6 border-t border-border text-center">
