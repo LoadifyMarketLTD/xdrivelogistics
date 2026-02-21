@@ -15,7 +15,7 @@ export type RoleStatusRow = { role: UserRole; status: UserStatus }
 export function routeForRoleStatus(row: RoleStatusRow): string {
   if (row.status === 'blocked') return '/blocked'
   // Owner is never subject to pending approval
-  if (row.role === 'owner') return '/admin/approvals'
+  if (row.role === 'owner') return '/dashboard/owner'
   if (row.status === 'pending') return '/pending'
   switch (row.role) {
     case 'broker':        return '/dashboard/broker'
