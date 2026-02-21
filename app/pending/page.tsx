@@ -3,60 +3,57 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import Link from 'next/link'
 import { supabase } from '@/lib/supabaseClient'
+import { getMyRoleStatus, routeForRoleStatus } from '@/lib/rbac'
 
 export default function PendingPage() {
   const router = useRouter()
   const [role, setRole] = useState<string | null>(null)
-  const [status, setStatus] = useState<string | null>(null)
-  const [companyId, setCompanyId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [checking, setChecking] = useState(false)
 
   useEffect(() => {
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.replace('/login')
-        return
-      }
+      if (!session) { router.replace('/login'); return }
 
-      // Fetch profile status
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role, status')
-        .eq('user_id', session.user.id)
-        .maybeSingle()
-
-      const profileStatus = profile?.status ?? null
-      const profileRole = profile?.role ?? null
-
-      setRole(profileRole)
-      setStatus(profileStatus)
-
-      // If user is now active, redirect to dashboard
-      if (profileStatus === 'active') {
-        const { getDefaultDashboardPath } = await import('@/lib/routing/getDefaultDashboardPath')
-        router.replace(getDefaultDashboardPath(profileRole))
-        return
-      }
-
-      // For company_admin, find their company id for the profile link
-      if (profileRole === 'company_admin') {
-        const { data: company } = await supabase
-          .from('companies')
-          .select('id')
-          .eq('created_by', session.user.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
+      try {
+        const row = await getMyRoleStatus()
+        if (!row) { router.replace('/onboarding'); return }
+        // If already active, route to correct dashboard
+        if (row.status === 'active') { router.replace(routeForRoleStatus(row)); return }
+        setRole(row.role)
+      } catch {
+        // RPC not available (local/dev) — fallback to DB query
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role, status')
+          .eq('user_id', session.user.id)
           .maybeSingle()
-        setCompanyId(company?.id ?? null)
+        if (profile?.status === 'active') {
+          router.replace('/')
+          return
+        }
+        setRole(profile?.role ?? null)
       }
-
       setLoading(false)
     }
     init()
   }, [router])
+
+  const handleRefresh = async () => {
+    setChecking(true)
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) { router.replace('/login'); return }
+
+    try {
+      const row = await getMyRoleStatus()
+      if (!row) { router.replace('/onboarding'); return }
+      router.replace(routeForRoleStatus(row))
+    } catch {
+      setChecking(false)
+    }
+  }
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -71,8 +68,6 @@ export default function PendingPage() {
     )
   }
 
-  const isBlocked = status === 'blocked'
-
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
       <div style={{ width: '100%', maxWidth: '480px' }}>
@@ -81,51 +76,40 @@ export default function PendingPage() {
             <Image src="/logo.webp" alt="XDrive Logistics LTD" width={140} height={40} style={{ display: 'inline-block' }} priority />
           </div>
 
-          {isBlocked ? (
-            <>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🚫</div>
-              <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#dc2626', margin: '0 0 12px' }}>Account Rejected</h1>
-              <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.6', marginBottom: '24px' }}>
-                Your account application was not approved. If you believe this is a mistake, please contact support.
-              </p>
-              <a href="tel:07423272138" style={{ display: 'inline-block', padding: '12px 24px', backgroundColor: '#C8A64D', color: '#fff', borderRadius: '8px', textDecoration: 'none', fontWeight: '600', fontSize: '14px' }}>
-                📞 Contact Support: 07423272138
-              </a>
-            </>
-          ) : (
-            <>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>⏳</div>
-              <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#1f2937', margin: '0 0 12px' }}>Pending Approval</h1>
-              <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.6', marginBottom: '24px' }}>
-                {role === 'broker'
-                  ? 'Your broker account is under review. The platform owner will activate your account shortly.'
-                  : 'Your company account is under review. Complete your company profile below while you wait.'}
-              </p>
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>⏳</div>
+          <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#1f2937', margin: '0 0 12px' }}>Pending Approval</h1>
+          <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.6', marginBottom: '24px' }}>
+            {role === 'broker'
+              ? 'Your broker account is under review. The platform owner will activate your account shortly.'
+              : 'Your company account is under review. Complete your company profile while you wait.'}
+          </p>
 
-              <div style={{ backgroundColor: '#fffbf0', border: '1px solid #f3d990', borderRadius: '8px', padding: '14px 16px', marginBottom: '24px', fontSize: '13px', color: '#92741a', lineHeight: '1.6' }}>
-                ℹ️ You will be able to access the full platform once the owner approves your account.
-              </div>
+          <div style={{ backgroundColor: '#fffbf0', border: '1px solid #f3d990', borderRadius: '8px', padding: '14px 16px', marginBottom: '24px', fontSize: '13px', color: '#92741a', lineHeight: '1.6' }}>
+            ℹ️ You will be able to access the platform once the owner approves your account.
+          </div>
 
-              {/* Company admin: link to complete profile */}
-              {role === 'company_admin' && (
-                <Link href="/dashboard/company/profile" style={{
-                  display: 'inline-block', padding: '12px 24px',
-                  backgroundColor: '#C8A64D', color: '#fff', borderRadius: '8px',
-                  textDecoration: 'none', fontWeight: '600', fontSize: '14px',
-                  marginBottom: '16px',
-                }}>
-                  📝 Complete Company Profile →
-                </Link>
-              )}
-
-              <p style={{ fontSize: '13px', color: '#9ca3af', marginTop: '8px' }}>
-                Need help?{' '}
-                <a href="tel:07423272138" style={{ color: '#C8A64D', fontWeight: '600', textDecoration: 'none' }}>
-                  Call 07423272138
-                </a>
-              </p>
-            </>
+          {role === 'company_admin' && (
+            <a href="/dashboard/company/profile" style={{
+              display: 'inline-block', padding: '12px 24px',
+              backgroundColor: '#C8A64D', color: '#fff', borderRadius: '8px',
+              textDecoration: 'none', fontWeight: '600', fontSize: '14px', marginBottom: '16px',
+            }}>
+              📝 Complete Company Profile →
+            </a>
           )}
+
+          <button
+            onClick={handleRefresh}
+            disabled={checking}
+            style={{ display: 'block', width: '100%', padding: '11px', backgroundColor: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: '8px', color: '#374151', fontSize: '14px', fontWeight: '600', cursor: checking ? 'not-allowed' : 'pointer', marginBottom: '12px', opacity: checking ? 0.6 : 1 }}
+          >
+            {checking ? 'Checking…' : '🔄 Check Status'}
+          </button>
+
+          <p style={{ fontSize: '13px', color: '#9ca3af' }}>
+            Need help?{' '}
+            <a href="tel:07423272138" style={{ color: '#C8A64D', fontWeight: '600', textDecoration: 'none' }}>Call 07423272138</a>
+          </p>
 
           <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #e5e7eb' }}>
             <button onClick={handleSignOut} style={{ background: 'none', border: 'none', color: '#9ca3af', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}>

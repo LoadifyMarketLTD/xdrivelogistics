@@ -3,9 +3,9 @@
  * Single source of truth for role-based routing.
  */
 export function getDefaultDashboardPath(role?: string | null): string {
-  if (role === 'owner') return '/admin/approvals'
-  if (role === 'broker') return '/dashboard/broker'
-  if (role === 'company_admin' || role === 'company') return '/dashboard/company'
-  if (role === 'driver') return '/dashboard/driver'
+  if (role === 'owner') return '/owner'
+  if (role === 'broker') return '/broker'
+  if (role === 'company_admin' || role === 'company') return '/company'
+  if (role === 'driver') return '/driver'
   return '/onboarding'
 }

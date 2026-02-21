@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 /** Routes that require authentication + active status */
-const PROTECTED_PREFIXES = ['/dashboard', '/admin']
+const PROTECTED_PREFIXES = ['/dashboard', '/admin', '/owner', '/broker', '/company', '/driver']
 
 /** Pending company_admin users may access this route while awaiting approval */
 const PENDING_COMPANY_ALLOWED = '/dashboard/company/profile'
@@ -65,7 +65,15 @@ export async function middleware(request: NextRequest) {
   // /admin routes: owner only
   if (pathname.startsWith('/admin')) {
     if (role !== 'owner' || !isActive) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+      return NextResponse.redirect(new URL('/post-login', request.url))
+    }
+    return response
+  }
+
+  // /owner route: owner only
+  if (pathname.startsWith('/owner')) {
+    if (role !== 'owner' || !isActive) {
+      return NextResponse.redirect(new URL('/post-login', request.url))
     }
     return response
   }
@@ -77,9 +85,16 @@ export async function middleware(request: NextRequest) {
       if (role === 'company_admin' && pathname.startsWith(PENDING_COMPANY_ALLOWED)) {
         return response
       }
-      return NextResponse.redirect(new URL('/pending', request.url))
+      const dest = profile?.status === 'blocked' ? '/blocked' : '/pending'
+      return NextResponse.redirect(new URL(dest, request.url))
     }
     return response
+  }
+
+  // /broker, /company, /driver: active users only
+  if (!isActive && isNotActive) {
+    const dest = profile?.status === 'blocked' ? '/blocked' : '/pending'
+    return NextResponse.redirect(new URL(dest, request.url))
   }
 
   return response

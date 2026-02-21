@@ -549,6 +549,21 @@ begin
 end;
 $$;
 
+-- ─── RPC: get_my_role_status ─────────────────────────────────
+-- Called by clients immediately after login to determine routing.
+-- Returns the caller's role + status without exposing other rows.
+
+create or replace function public.get_my_role_status()
+returns table(role public.user_role, status public.user_status)
+language sql
+stable security definer
+as $$
+  select p.role, p.status
+  from public.profiles p
+  where p.user_id = auth.uid()
+  limit 1;
+$$;
+
 -- ─── Owner Bootstrap Note ─────────────────────────────────────
 -- After running this SQL, create the owner account via Supabase Auth,
 -- then run:
