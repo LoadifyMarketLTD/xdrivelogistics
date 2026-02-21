@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 /** Routes that require authentication + active status */
-const PROTECTED_PREFIXES = ['/dashboard', '/admin', '/owner', '/broker', '/company', '/driver']
+const PROTECTED_PREFIXES = ['/dashboard', '/admin', '/owner']
 
 /** Pending company_admin users may access this route while awaiting approval */
 const PENDING_COMPANY_ALLOWED = '/dashboard/company/profile'
@@ -89,12 +89,6 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL(dest, request.url))
     }
     return response
-  }
-
-  // /broker, /company, /driver: active users only
-  if (!isActive && isNotActive) {
-    const dest = profile?.status === 'blocked' ? '/blocked' : '/pending'
-    return NextResponse.redirect(new URL(dest, request.url))
   }
 
   return response

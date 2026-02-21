@@ -31,7 +31,8 @@ export default function PendingPage() {
           .eq('user_id', session.user.id)
           .maybeSingle()
         if (profile?.status === 'active') {
-          router.replace('/')
+          const { getDefaultDashboardPath } = await import('@/lib/routing/getDefaultDashboardPath')
+          router.replace(getDefaultDashboardPath(profile.role))
           return
         }
         setRole(profile?.role ?? null)

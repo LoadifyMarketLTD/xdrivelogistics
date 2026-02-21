@@ -10,17 +10,17 @@ export type RoleStatusRow = { role: UserRole; status: UserStatus }
 
 /**
  * Returns the next route for a given role+status combination.
- * Single source of truth — used by post-login, RequireRbac, pending page.
+ * Uses existing portal routes — single source of truth.
  */
 export function routeForRoleStatus(row: RoleStatusRow): string {
   if (row.status === 'pending') return '/pending'
   if (row.status === 'blocked') return '/blocked'
   switch (row.role) {
-    case 'owner':       return '/owner'
-    case 'broker':      return '/broker'
-    case 'company_admin': return '/company'
-    case 'driver':      return '/driver'
-    default:            return '/pending'
+    case 'owner':         return '/admin/approvals'
+    case 'broker':        return '/dashboard/broker'
+    case 'company_admin': return '/dashboard/company'
+    case 'driver':        return '/dashboard/driver'
+    default:              return '/pending'
   }
 }
 
