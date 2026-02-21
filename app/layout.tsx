@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://xdrivelogistics.co.uk'),
   title: 'XDrive Logistics LTD - Enterprise Exchange',
   description: 'B2B logistics exchange platform connecting drivers, carriers and brokers across the UK.',
+  icons: {
+    icon: '/logo.png',
+  },
   openGraph: {
     title: 'XDrive Logistics LTD - Enterprise Exchange',
     description: 'B2B logistics exchange platform connecting drivers, carriers and brokers across the UK.',
