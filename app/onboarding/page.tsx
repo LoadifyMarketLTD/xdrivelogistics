@@ -17,6 +17,7 @@ export default function OnboardingPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [checking, setChecking] = useState(true)
+  const [submitted, setSubmitted] = useState(false)
 
   const gold = '#C8A64D'
 
@@ -54,7 +55,8 @@ export default function OnboardingPage() {
         })
         if (rpcErr) throw rpcErr
       }
-      router.replace('/pending')
+      // TODO: Enable SMTP provider to send welcome emails later
+      setSubmitted(true)
     } catch (e: any) {
       setError(e?.message ?? 'Failed to create account. Please try again.')
     } finally {
@@ -81,6 +83,33 @@ export default function OnboardingPage() {
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
       <div style={{ width: '100%', maxWidth: '480px' }}>
         <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '48px 40px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', border: '1px solid #e5e7eb' }}>
+
+          {submitted ? (
+            /* ── Success / welcome screen ──────────────────────────── */
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ marginBottom: '16px' }}>
+                <Image src="/logo.webp" alt="XDrive Logistics LTD" width={140} height={40} style={{ display: 'inline-block' }} priority />
+              </div>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎉</div>
+              <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#1f2937', margin: '0 0 12px' }}>
+                Welcome to XDrive Logistics portal
+              </h1>
+              <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.6', marginBottom: '24px' }}>
+                Your account has been submitted for review. The platform owner will activate it shortly.
+              </p>
+              <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #86efac', borderRadius: '8px', padding: '14px 16px', marginBottom: '24px', fontSize: '14px', color: '#166534', fontWeight: '500' }}>
+                ✅ Welcome to XDrive Logistics portal — your dashboard is ready once approved.
+              </div>
+              <button
+                type="button"
+                onClick={() => router.replace('/pending')}
+                style={{ width: '100%', padding: '13px', backgroundColor: gold, border: 'none', borderRadius: '8px', color: '#ffffff', fontSize: '15px', fontWeight: '600', cursor: 'pointer' }}
+              >
+                View account status →
+              </button>
+            </div>
+          ) : (
+          <>
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
             <div style={{ marginBottom: '12px' }}>
               <Image src="/logo.webp" alt="XDrive Logistics LTD" width={140} height={40} style={{ display: 'inline-block' }} priority />
@@ -152,6 +181,8 @@ export default function OnboardingPage() {
           <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '13px', color: '#6b7280' }}>
             <Link href="/login" style={{ color: gold, textDecoration: 'none' }}>← Sign in to existing account</Link>
           </div>
+          </>
+          )}
         </div>
       </div>
     </div>

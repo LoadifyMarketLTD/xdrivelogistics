@@ -21,6 +21,21 @@ export default function CompanyDashboardPage() {
   const [stats, setStats] = useState({ postedLoads: 0, drivers: 0, vehicles: 0, acceptedLoads: 0 })
   const [activity, setActivity] = useState<ActivityItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [showWelcome, setShowWelcome] = useState(false)
+
+  // Show welcome banner on first dashboard visit (FREE Option A — localStorage)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (!localStorage.getItem('xdrive_welcome_seen')) {
+        setShowWelcome(true)
+      }
+    }
+  }, [])
+
+  const handleDismissWelcome = () => {
+    localStorage.setItem('xdrive_welcome_seen', '1')
+    setShowWelcome(false)
+  }
 
   useEffect(() => {
     if (!user || !companyId) return
@@ -88,6 +103,20 @@ export default function CompanyDashboardPage() {
   return (
     <RequireRole allowedRoles={['company']}>
       <ResponsiveContainer maxWidth="xl">
+
+        {/* ── WELCOME BANNER (first visit) ─────────────────────── */}
+        {showWelcome && (
+          <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '10px', padding: '14px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+            <span style={{ fontSize: '15px', color: '#166534', fontWeight: '500' }}>
+              🎉 Welcome to XDrive Logistics portal — your dashboard is ready.
+            </span>
+            <button
+              onClick={handleDismissWelcome}
+              style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '18px', cursor: 'pointer', lineHeight: 1, flexShrink: 0 }}
+              aria-label="Dismiss"
+            >×</button>
+          </div>
+        )}
 
         {/* ── TOP STRIP ────────────────────────────────────────── */}
         <div style={{ background: navy, borderRadius: '10px', padding: '18px 24px', marginBottom: '24px', display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'center', justifyContent: 'space-between' }}>
