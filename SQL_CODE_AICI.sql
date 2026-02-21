@@ -1,36 +1,16 @@
 -- ============================================================
--- ⚠️  ATENȚIE! IMPORTANT! CITEȘTE ASTA! ⚠️
+-- XDRIVE LOGISTICS -- SQL FIX SCRIPT
+-- COPIAZA TOTUL SI RULEAZA IN: Supabase > SQL Editor > Run
+-- COPY EVERYTHING AND RUN IN:  Supabase > SQL Editor > Run
 -- ============================================================
--- 
--- ❌ NU COPIA DOAR: "SQL_CODE_AICI.sql"
--- ✅ COPIAZĂ ÎNTREG CONȚINUTUL DIN ACEST FIȘIER!
 --
--- ❌ NU COPIA COD CU "..." (trei puncte)!
--- ✅ COPIAZĂ CODUL COMPLET!
---
--- ERORI COMUNE:
--- - "syntax error at or near SQL_CODE_AICI" = ai copiat NUMELE
--- - "syntax error at or near .." = ai copiat cod cu ... (placeholders)
---
--- SOLUȚIE: Copiază TOT din ACEST fișier, fără ... (placeholders)!
---
--- ============================================================
--- SQL CODE COMPLET - COPIAZĂ ȘI RULEAZĂ ÎN SUPABASE
--- COMPLETE SQL CODE - COPY AND RUN IN SUPABASE
--- ============================================================
--- 
--- CONȚINUT / CONTENTS:
---   PART 1: Fix job_bids status constraint (eroare "Failed to submit bid")
+-- CONTINUT / CONTENTS:
+--   PART 1: Fix job_bids status constraint
+--            (rezolva eroarea "Failed to submit bid")
 --   PART 2: Create invoices table
--- 
--- INSTRUCȚIUNI / INSTRUCTIONS:
--- 1. Deschide Supabase SQL Editor / Open Supabase SQL Editor
--- 2. Selectează TOT (Ctrl+A) / Select ALL (Ctrl+A)
--- 3. Copiază TOT (Ctrl+C) / Copy ALL (Ctrl+C)
--- 4. Lipește în SQL Editor (Ctrl+V) / Paste in SQL Editor (Ctrl+V)
--- 5. Apasă "Run" / Click "Run"
--- 
--- ============================================================
+--
+-- Safe to run multiple times (all statements are idempotent).
+--
 
 
 -- ============================================================

@@ -1,11 +1,24 @@
-# 🎯 SQL CODE AICI — COPIAZĂ ȘI RULEAZĂ ÎN SUPABASE
+<!-- ============================================================
+     ATENTIE / WARNING: ACESTA ESTE UN FISIER MARKDOWN -- NU SQL!
+     THIS IS A MARKDOWN FILE -- NOT SQL!
+     NU COPIA ACEST FISIER IN SUPABASE SQL EDITOR.
+     DO NOT COPY THIS FILE INTO SUPABASE SQL EDITOR.
+     Vei primi erori de sintaxa! / You will get syntax errors!
+     Copiaza DOAR blocul SQL de mai jos / Copy ONLY the SQL block below.
+     ============================================================ -->
 
-## 👇 COPIAZĂ TOT CODUL DE MAI JOS / COPY ALL THE CODE BELOW 👇
+# SQL CODE AICI -- COPIAZA SI RULEAZA IN SUPABASE
 
-> **Cum să folosești:**
-> 1. Apasă butonul **Copy** (colțul din dreapta sus al blocului de cod) / Click the **Copy** button (top-right of the code block)
-> 2. Deschide **Supabase → SQL Editor**
-> 3. Lipește (Ctrl+V) și apasă **Run**
+## COPIAZA TOT CODUL SQL DE MAI JOS / COPY ALL THE SQL CODE BELOW
+
+> **Cum sa folosesti / How to use:**
+> 1. Apasa butonul **Copy** (coltul din dreapta sus al blocului de cod) / Click the **Copy** button (top-right of code block)
+> 2. Deschide **Supabase > SQL Editor**
+> 3. Lipeste (Ctrl+V) si apasa **Run**
+>
+> **ATENTIE / WARNING:** Daca citesti acest fisier in format RAW, NU copia tot fisierul.
+> Copiaza DOAR codul din blocul de mai jos (intre ```sql si ```).
+> Copierea intregului fisier Markdown in Supabase cauzeaza erori de sintaxa!
 
 ```sql
 -- ============================================================
