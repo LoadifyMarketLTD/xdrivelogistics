@@ -136,14 +136,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     initializeAuth()
 
-    // Subscribe to auth state changes
+    // Subscribe to auth state changes.
+    // Skip INITIAL_SESSION because initializeAuth() already handles the first
+    // session load; acting on it here would trigger a second concurrent profile
+    // fetch immediately on every mount.
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return
-      
+      if (event === 'INITIAL_SESSION') return  // handled by initializeAuth above
+
       setUser(session?.user ?? null)
-      
+
       if (session?.user) {
         // Fetch profile without blocking
         fetchProfile(session.user.id)
