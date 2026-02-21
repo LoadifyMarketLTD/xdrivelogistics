@@ -1808,3 +1808,120 @@ select.form-input {
   background: var(--portal-error-bg);
   border-color: var(--cx-red);
 }
+
+/* ============================================
+   ENHANCED RESPONSIVE — TABLET + MOBILE
+   ============================================ */
+
+/* Tablet: 640px–1023px */
+@media (max-width: 1023px) {
+  .portal-shell {
+    flex-direction: column;
+  }
+  .portal-left-rail {
+    display: none;
+  }
+  .portal-main {
+    margin-left: 0;
+  }
+  /* 2-col grids collapse to 1 on tablet portrait */
+  .portal-grid-2 { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  /* 3 and 4-col → 2-col on tablet */
+  .portal-grid-3,
+  .portal-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile: ≤639px */
+@media (max-width: 639px) {
+  .portal-grid-3,
+  .portal-grid-4,
+  .two-column-grid,
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .portal-top-actions {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .portal-actions-group {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .portal-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .portal-filter-input,
+  .portal-filter-select {
+    width: 100%;
+  }
+
+  .portal-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .portal-table td,
+  .portal-table th {
+    white-space: nowrap;
+    padding: 8px 10px;
+  }
+
+  h1, .portal-page-title {
+    font-size: 18px;
+  }
+
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn-group button,
+  .btn-group a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .loads-container {
+    flex-direction: column;
+  }
+
+  .loads-sidebar {
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+}
+
+/* Very small phones: ≤375px */
+@media (max-width: 375px) {
+  .portal-content {
+    padding: 10px;
+  }
+  .portal-card,
+  .portal-panel {
+    padding: 12px;
+  }
+  .cx-card {
+    padding: 12px;
+  }
+}

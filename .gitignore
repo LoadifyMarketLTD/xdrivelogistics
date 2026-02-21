@@ -33,6 +33,7 @@ npm-debug.log*
 /tmp/
 *.tmp
 
-# Screenshots (generated, not committed by default)
-# Uncomment the line below if you want to include screenshots in git
-# docs/screenshots/*.png
+# Screenshot binary blobs — never commit PNGs from audit/proof directories
+audit/
+docs/screenshots/**/*.png
+docs/proof/**/*.png
