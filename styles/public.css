@@ -743,3 +743,38 @@
       .heroStats{grid-template-columns: 1fr}
       .logoBox{width:52px;height:52px}
     }
+
+/* ============================================
+   ENHANCED RESPONSIVE — LANDING PAGE
+   ============================================ */
+
+/* Extra small phones ≤ 380px */
+@media (max-width: 380px) {
+  header { height: 64px; }
+  h1 { font-size: clamp(20px, 8vw, 30px) !important; }
+  h2 { font-size: clamp(18px, 6vw, 24px) !important; }
+  .container { padding-left: 14px; padding-right: 14px; }
+  .btn { padding: 12px 18px; font-size: 14px; }
+}
+
+/* Touch-friendly tap targets */
+@media (hover: none) {
+  a, button, [role="button"], input[type="submit"] {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* Prevent text overflow on small screens */
+p, li, td, th, h1, h2, h3, h4 {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Safe-area padding for iPhones with notch */
+@supports (padding: env(safe-area-inset-bottom)) {
+  footer {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+}
