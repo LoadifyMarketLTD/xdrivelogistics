@@ -163,8 +163,8 @@ create table if not exists public.job_bids (
   currency text default 'GBP',
   message text,
 
-  status text not null default 'pending'
-    check (status in ('pending','accepted','rejected','withdrawn')),
+  status text not null default 'submitted'
+    check (status in ('submitted','accepted','rejected','withdrawn')),
 
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -283,8 +283,8 @@ begin
     select 1 from information_schema.columns
     where table_schema='public' and table_name='job_bids' and column_name='status'
   ) then
-    alter table public.job_bids add column status text not null default 'pending'
-      check (status in ('pending','accepted','rejected','withdrawn'));
+    alter table public.job_bids add column status text not null default 'submitted'
+      check (status in ('submitted','accepted','rejected','withdrawn'));
   end if;
 end $$;
 

@@ -330,7 +330,8 @@ export default function LoadsPage() {
           bidder_id: authUser.id,
           amount_gbp: numericBid,
           bid_price_gbp: numericBid,
-          message: bidMessage?.trim() || null
+          message: bidMessage?.trim() || null,
+          status: 'submitted'
         })
       
       if (bidError) throw bidError
