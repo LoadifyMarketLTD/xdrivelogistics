@@ -28,7 +28,7 @@ export default function OwnerPage() {
         // RPC unavailable — trust middleware already validated
       }
 
-      router.replace('/admin/approvals')
+      router.replace('/dashboard/owner')
     }
     redirect()
   }, [router])

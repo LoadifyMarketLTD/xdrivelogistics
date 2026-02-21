@@ -75,7 +75,7 @@ export async function middleware(request: NextRequest) {
   // everyone else goes to onboarding.
   if (!row) {
     if (user.email && user.email.toLowerCase() === OWNER_EMAIL) {
-      return NextResponse.redirect(new URL('/admin/approvals', request.url))
+      return NextResponse.redirect(new URL('/dashboard/owner', request.url))
     }
     return NextResponse.redirect(new URL('/onboarding', request.url))
   }
