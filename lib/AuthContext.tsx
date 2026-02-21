@@ -12,6 +12,7 @@ interface Profile {
   phone: string | null
   company_id: string | null
   role: string
+  status: string | null
   country: string | null
   is_active: boolean
   // Driver onboarding fields
