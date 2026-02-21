@@ -132,7 +132,7 @@ export default function EvidenceUpload({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            type: fileData.type,
+            evidence_type: fileData.type,
             phase,
             file_url: fileUrl,
             file_name: fileData.file.name,
