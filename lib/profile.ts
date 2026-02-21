@@ -4,7 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 // ─── Profile shape (mirrors AuthContext + onboarding fields) ──────────────────
 export interface Profile {
-  id: string
+  user_id: string
   email: string
   full_name: string | null
   display_name: string | null
@@ -40,11 +40,17 @@ export async function getCurrentUser(client: SupabaseClient = supabase) {
 
 /** Fetches the full profile row for a given user id. */
 export async function getProfile(userId: string): Promise<Profile | null> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('profiles')
     .select('*')
-    .eq('id', userId)
+    .eq('user_id', userId)
     .maybeSingle()
+
+  if (error) {
+    console.error('getProfile error:', error)
+    return null
+  }
+
   return data ?? null
 }
 

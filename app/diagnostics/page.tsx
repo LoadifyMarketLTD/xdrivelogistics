@@ -66,7 +66,7 @@ export default function DiagnosticsPage() {
                 const { data: profileData, error: pErr } = await supabase
                   .from('profiles')
                   .select('*')
-                  .eq('id', data.session.user.id)
+                  .eq('user_id', data.session.user.id)
                   .maybeSingle()
 
                 if (pErr) {

@@ -27,7 +27,7 @@ export default function DriverHomePage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!profile?.id) return
+    if (!profile?.user_id) return
 
     const fetchStats = async () => {
       try {
@@ -35,7 +35,7 @@ export default function DriverHomePage() {
         const { data: activeJobs } = await supabase
           .from('jobs')
           .select('id,pickup_location,delivery_location,pickup_datetime,status,vehicle_type')
-          .eq('driver_id', profile.id)
+          .eq('driver_id', profile.user_id)
           .in('status', ['assigned', 'in_progress'])
           .order('pickup_datetime', { ascending: true })
           .limit(1)
@@ -46,7 +46,7 @@ export default function DriverHomePage() {
         const { data: completedJobs } = await supabase
           .from('jobs')
           .select('id')
-          .eq('driver_id', profile.id)
+          .eq('driver_id', profile.user_id)
           .eq('status', 'completed')
           .gte('updated_at', today.toISOString())
 

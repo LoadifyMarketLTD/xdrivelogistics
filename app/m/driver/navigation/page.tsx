@@ -36,13 +36,13 @@ export default function DriverNavigationPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!profile?.id) return
+    if (!profile?.user_id) return
     const fetch = async () => {
       try {
         const { data } = await supabase
           .from('jobs')
           .select('id,pickup_location,delivery_location,pickup_datetime,delivery_datetime,status,pickup_lat,pickup_lng,delivery_lat,delivery_lng,vehicle_type,load_details')
-          .eq('driver_id', profile.id)
+          .eq('driver_id', profile.user_id)
           .in('status', ['assigned', 'in_progress'])
           .order('pickup_datetime', { ascending: true })
           .limit(1)
@@ -55,7 +55,7 @@ export default function DriverNavigationPage() {
       }
     }
     fetch()
-  }, [profile?.id])
+  }, [profile?.user_id])
 
   if (loading) {
     return (
