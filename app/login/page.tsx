@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { supabase, isSupabaseConfigured } from '@/lib/supabaseClient'
 import Link from 'next/link'
 import { needsOnboarding } from '@/lib/profile'
-import { DEFAULT_ROLE, type Role } from '@/lib/roles'
+import { DEFAULT_ROLE, ROLES, ROLE_LABEL, ROLE_DESCRIPTION, ROLE_ICON, type Role } from '@/lib/roles'
 import { getDefaultDashboardPath } from '@/lib/routing/getDefaultDashboardPath'
 
 export default function LoginPage() {
@@ -298,8 +298,33 @@ export default function LoginPage() {
           </div>
         </div>
 
+        {/* Account type reference */}
         <div style={{
           marginTop: '24px',
+          backgroundColor: '#ffffff',
+          borderRadius: '12px',
+          padding: '20px 24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          border: '1px solid #e5e7eb',
+        }}>
+          <p style={{ margin: '0 0 12px 0', fontSize: '13px', fontWeight: '600', color: '#374151', textAlign: 'center' }}>
+            Account Types
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {ROLES.map((role) => (
+              <div key={role} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <span style={{ fontSize: '18px', flexShrink: 0 }}>{ROLE_ICON[role]}</span>
+                <div>
+                  <span style={{ fontSize: '13px', fontWeight: '600', color: '#1f2937' }}>{ROLE_LABEL[role]}</span>
+                  <div style={{ fontSize: '12px', color: '#6b7280', lineHeight: '1.4' }}>{ROLE_DESCRIPTION[role]}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{
+          marginTop: '16px',
           textAlign: 'center',
           color: '#6b7280',
           fontSize: '13px'
