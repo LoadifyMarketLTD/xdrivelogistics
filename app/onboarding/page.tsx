@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
@@ -19,9 +19,11 @@ const ROLE_DASHBOARD: Record<Role, string> = {
 export default function OnboardingPage() {
   const router = useRouter()
   const { user, profile, loading, profileLoading, refreshProfile } = useAuth()
-  const [resolving, setResolving] = useState(true)
 
   const role = (profile?.role ?? DEFAULT_ROLE) as Role
+
+  // Derive resolving from existing state — avoids calling setState inside an effect
+  const resolving = loading || profileLoading || !user || (!!profile && !needsOnboarding(role, profile))
 
   useEffect(() => {
     if (loading || profileLoading) return
@@ -36,8 +38,6 @@ export default function OnboardingPage() {
       router.replace(ROLE_DASHBOARD[role] ?? '/dashboard')
       return
     }
-
-    setResolving(false)
   }, [loading, profileLoading, user, profile, role, router])
 
   const handleSave = async (fields: Record<string, string | number>) => {
@@ -56,7 +56,7 @@ export default function OnboardingPage() {
     router.push(ROLE_DASHBOARD[role] ?? '/dashboard')
   }
 
-  if (loading || profileLoading || resolving) {
+  if (resolving) {
     return (
       <div style={{
         minHeight: '100vh',
