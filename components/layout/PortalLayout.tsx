@@ -227,7 +227,64 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           overflowY: 'auto',
           padding: '12px 0',
         }}>
-          {visibleNavItems.map((item) => {
+          {/* Main section */}
+          {visibleNavItems.filter((i) => i.section !== 'account').map((item) => {
+            const isActive = pathname === item.path || pathname.startsWith(item.path + '/')
+            
+            return (
+              <div
+                key={item.path}
+                onClick={() => {
+                  router.push(item.path)
+                  if (isMobile) setIsMobileMenuOpen(false)
+                }}
+                style={{
+                  padding: '10px 16px',
+                  cursor: 'pointer',
+                  color: isActive ? '#ffffff' : '#d1d5db',
+                  background: isActive ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
+                  borderLeft: isActive ? '3px solid #D4AF37' : '3px solid transparent',
+                  fontSize: '13px',
+                  fontWeight: isActive ? '600' : '500',
+                  transition: 'all 0.15s',
+                  marginBottom: '1px',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = 'rgba(212, 175, 55, 0.08)'
+                    e.currentTarget.style.color = '#ffffff'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = 'transparent'
+                    e.currentTarget.style.color = '#d1d5db'
+                  }
+                }}
+              >
+                {item.label}
+              </div>
+            )
+          })}
+
+          {/* Account section divider */}
+          {visibleNavItems.some((i) => i.section === 'account') && (
+            <div style={{
+              padding: '12px 16px 4px',
+              fontSize: '10px',
+              fontWeight: '700',
+              color: '#6b7280',
+              textTransform: 'uppercase',
+              letterSpacing: '0.8px',
+              marginTop: '8px',
+              borderTop: '1px solid rgba(255,255,255,0.06)',
+            }}>
+              Account
+            </div>
+          )}
+
+          {/* Account section items */}
+          {visibleNavItems.filter((i) => i.section === 'account').map((item) => {
             const isActive = pathname === item.path || pathname.startsWith(item.path + '/')
             
             return (
@@ -301,12 +358,13 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           top: 0,
           zIndex: 40,
         }}>
-          {/* Left side - Action buttons */}
+          {/* Left side - Logo + Action buttons */}
           <div style={{
             display: 'flex',
             gap: '12px',
             alignItems: 'center',
           }}>
+            <Image src="/logo.webp" alt="XDrive" width={90} height={26} style={{ display: 'block', marginRight: '4px' }} priority />
             <button
               onClick={() => router.push('/jobs/new')}
               style={{
