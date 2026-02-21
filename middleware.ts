@@ -10,6 +10,14 @@ const PENDING_COMPANY_ALLOWED = '/dashboard/company/profile'
 /** Roles that are allowed to access /dashboard routes */
 const DASHBOARD_ROLES = ['owner', 'broker', 'company_admin', 'driver']
 
+/**
+ * The platform owner email. When this account has no profile row yet
+ * (new deployment / profile deleted) the middleware bootstraps them
+ * directly to the admin panel instead of sending them to onboarding
+ * where they could only register as broker/company.
+ */
+const OWNER_EMAIL = (process.env.OWNER_EMAIL ?? 'xdrivelogisticsltd@gmail.com').toLowerCase()
+
 type RoleStatus = { role: string; status: string }
 
 export async function middleware(request: NextRequest) {
@@ -62,8 +70,13 @@ export async function middleware(request: NextRequest) {
   const { data: rpcData } = await supabase.rpc('get_my_role_status')
   const row = Array.isArray(rpcData) ? (rpcData[0] as RoleStatus | undefined) : null
 
-  // No profile row → user needs onboarding
+  // No profile row → owner email gets sent straight to admin (the DB trigger
+  // in 003_bootstrap_owner_by_email.sql will create the row on next RPC call);
+  // everyone else goes to onboarding.
   if (!row) {
+    if (user.email && user.email.toLowerCase() === OWNER_EMAIL) {
+      return NextResponse.redirect(new URL('/admin/approvals', request.url))
+    }
     return NextResponse.redirect(new URL('/onboarding', request.url))
   }
 
