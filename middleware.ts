@@ -57,7 +57,13 @@ export async function middleware(request: NextRequest) {
     .eq('user_id', user.id)
     .maybeSingle()
 
-  const role: string = profile?.role ?? ''
+  // Fall back to JWT metadata when the DB query returns null (e.g. transient
+  // RLS/network issue) so a verified owner is never bounced back to /post-login.
+  const role: string =
+    profile?.role ??
+    (user.user_metadata?.role as string | undefined) ??
+    (user.app_metadata?.role as string | undefined) ??
+    ''
   // Support both new `status` column and legacy `is_active` boolean
   const isActive = profile?.status === 'active' || (!profile?.status && profile?.is_active !== false)
   const isNotActive = profile?.status === 'pending' || profile?.status === 'blocked'
