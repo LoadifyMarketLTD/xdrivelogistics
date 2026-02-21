@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://xdrivelogistics.co.uk/sitemap.xml

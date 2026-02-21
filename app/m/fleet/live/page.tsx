@@ -1,18 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/lib/AuthContext'
+import { supabase } from '@/lib/supabaseClient'
 import { brandColors } from '@/lib/brandColors'
-
-interface Vehicle {
-  id: string
-  registration: string
-  vehicle_type: string | null
-  make: string | null
-  model: string | null
-  is_available: boolean
-}
+import { Vehicle } from '@/lib/types'
 
 export default function FleetLivePage() {
   const { companyId } = useAuth()
@@ -20,80 +12,121 @@ export default function FleetLivePage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!companyId) { setLoading(false); return }
-    const load = async () => {
+    if (!companyId) return
+    const fetchVehicles = async () => {
       try {
         const { data } = await supabase
           .from('vehicles')
-          .select('id, registration, vehicle_type, make, model, is_available')
+          .select('*')
           .eq('company_id', companyId)
-          .order('registration')
+          .order('driver_name', { ascending: true })
         setVehicles(data || [])
-      } catch (e) {
-        console.error('Fleet live error:', e)
+      } catch (err) {
+        console.error('Error fetching vehicles:', err)
       } finally {
         setLoading(false)
       }
     }
-    load()
-    // Refresh every 30 seconds
-    const interval = setInterval(load, 30000)
+    fetchVehicles()
+    const interval = setInterval(fetchVehicles, 30000)
     return () => clearInterval(interval)
   }, [companyId])
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'available': return brandColors.status.success
+      case 'on_job': return brandColors.status.info
+      case 'unavailable': return brandColors.status.error
+      default: return brandColors.text.secondary
+    }
+  }
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'available': return 'Available'
+      case 'on_job': return 'On Job'
+      case 'unavailable': return 'Unavailable'
+      default: return status || 'Unknown'
+    }
+  }
+
   if (loading) {
     return (
-      <div style={{ padding: '16px', textAlign: 'center', color: brandColors.text.secondary }}>
-        Loading fleet status…
+      <div style={{ padding: '24px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+        <div style={{ color: brandColors.text.secondary }}>Loading vehicles...</div>
       </div>
     )
   }
 
   return (
     <div style={{ padding: '16px' }}>
-      <h1 style={{ fontSize: '18px', fontWeight: '700', color: brandColors.text.primary, marginBottom: '4px' }}>
-        Live Fleet
+      <h1 style={{ fontSize: '20px', fontWeight: '700', color: brandColors.text.primary, marginBottom: '4px' }}>
+        Live Tracking
       </h1>
       <p style={{ fontSize: '13px', color: brandColors.text.secondary, marginBottom: '16px' }}>
-        {vehicles.filter(v => v.is_available).length} of {vehicles.length} vehicles available · refreshes every 30 s
+        {vehicles.length} vehicle{vehicles.length !== 1 ? 's' : ''} in your fleet
       </p>
 
       {vehicles.length === 0 ? (
         <div style={{
-          background: brandColors.background.white,
-          border: `1px solid ${brandColors.border?.light ?? '#e5e7eb'}`,
-          borderRadius: '12px', padding: '32px', textAlign: 'center',
+          background: brandColors.mobile.cardBackground,
+          border: `1px solid ${brandColors.mobile.cardBorder}`,
+          borderRadius: '12px',
+          padding: '40px 20px',
+          textAlign: 'center',
         }}>
-          <div style={{ fontSize: '40px', marginBottom: '12px' }}>🚛</div>
-          <p style={{ color: brandColors.text.secondary, fontSize: '14px' }}>
-            No vehicles registered yet.
-          </p>
+          <div style={{ fontSize: '48px', marginBottom: '12px' }}>🚛</div>
+          <p style={{ color: brandColors.text.secondary, fontSize: '14px' }}>No vehicles found in your fleet.</p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {vehicles.map((v) => (
-            <div key={v.id} style={{
-              background: brandColors.background.white,
-              border: `1px solid ${brandColors.border?.light ?? '#e5e7eb'}`,
-              borderRadius: '12px', padding: '16px',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            }}>
-              <div>
-                <div style={{ fontSize: '15px', fontWeight: '700', color: brandColors.text.primary }}>
-                  {v.registration}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {vehicles.map((vehicle) => (
+            <div
+              key={vehicle.id}
+              style={{
+                background: brandColors.mobile.cardBackground,
+                border: `1px solid ${brandColors.mobile.cardBorder}`,
+                borderRadius: '12px',
+                padding: '16px',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                <div>
+                  <div style={{ fontSize: '15px', fontWeight: '700', color: brandColors.text.primary }}>
+                    {vehicle.registration}
+                  </div>
+                  <div style={{ fontSize: '13px', color: brandColors.text.secondary }}>
+                    {[vehicle.make, vehicle.model, vehicle.year].filter(Boolean).join(' ')}
+                  </div>
                 </div>
-                <div style={{ fontSize: '12px', color: brandColors.text.secondary, marginTop: '2px' }}>
-                  {[v.vehicle_type, v.make, v.model].filter(Boolean).join(' · ') || 'Vehicle'}
-                </div>
+                <span style={{
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  color: getStatusColor(vehicle.current_status),
+                  background: `${getStatusColor(vehicle.current_status)}20`,
+                  borderRadius: '20px',
+                  padding: '3px 10px',
+                  border: `1px solid ${getStatusColor(vehicle.current_status)}40`,
+                }}>
+                  {getStatusLabel(vehicle.current_status)}
+                </span>
               </div>
-              <span style={{
-                fontSize: '12px', fontWeight: '600',
-                padding: '4px 10px', borderRadius: '20px',
-                background: v.is_available ? '#dcfce7' : '#fee2e2',
-                color: v.is_available ? '#16a34a' : '#dc2626',
-              }}>
-                {v.is_available ? '● Available' : '● Unavailable'}
-              </span>
+
+              {vehicle.driver_name && (
+                <div style={{ fontSize: '13px', color: brandColors.text.secondary, marginBottom: '4px' }}>
+                  👤 {vehicle.driver_name}
+                </div>
+              )}
+              {vehicle.current_location && (
+                <div style={{ fontSize: '13px', color: brandColors.text.secondary, marginBottom: '4px' }}>
+                  📍 {vehicle.current_location}
+                </div>
+              )}
+              {vehicle.last_tracked_at && (
+                <div style={{ fontSize: '12px', color: brandColors.text.light }}>
+                  Last seen: {new Date(vehicle.last_tracked_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                </div>
+              )}
             </div>
           ))}
         </div>

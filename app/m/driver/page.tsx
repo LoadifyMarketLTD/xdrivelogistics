@@ -7,6 +7,15 @@ import { brandColors } from '@/lib/brandColors'
 import { useRouter } from 'next/navigation'
 import { updateDriverLocation } from '@/lib/driverLocation'
 
+interface ActiveJob {
+  id: string
+  pickup_location: string
+  delivery_location: string
+  pickup_datetime: string | null
+  status: string
+  vehicle_type: string | null
+}
+
 export default function DriverHomePage() {
   const { profile } = useAuth()
   const router = useRouter()
@@ -14,6 +23,7 @@ export default function DriverHomePage() {
     activeJobs: 0,
     completedToday: 0,
   })
+  const [currentJob, setCurrentJob] = useState<ActiveJob | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -24,9 +34,11 @@ export default function DriverHomePage() {
         // Get active jobs for this driver
         const { data: activeJobs } = await supabase
           .from('jobs')
-          .select('id')
+          .select('id,pickup_location,delivery_location,pickup_datetime,status,vehicle_type')
           .eq('driver_id', profile.id)
           .in('status', ['assigned', 'in_progress'])
+          .order('pickup_datetime', { ascending: true })
+          .limit(1)
 
         // Get completed jobs today
         const today = new Date()
@@ -42,6 +54,7 @@ export default function DriverHomePage() {
           activeJobs: activeJobs?.length || 0,
           completedToday: completedJobs?.length || 0,
         })
+        setCurrentJob(activeJobs?.[0] || null)
       } catch (err) {
         console.error('Error fetching stats:', err)
       } finally {
@@ -264,16 +277,44 @@ export default function DriverHomePage() {
         }}>
           Current Job
         </h2>
-        <div style={{
-          fontSize: '13px',
-          color: brandColors.text.secondary,
-          textAlign: 'center',
-          padding: '20px',
-        }}>
-          {stats.activeJobs > 0 
-            ? 'Job details will appear here'
-            : 'No active jobs at the moment'}
-        </div>
+        {currentJob ? (
+          <button
+            onClick={() => router.push(`/jobs/${currentJob.id}`)}
+            style={{
+              width: '100%', background: 'none', border: 'none', padding: 0,
+              cursor: 'pointer', textAlign: 'left',
+            }}
+          >
+            <div style={{ fontSize: '15px', fontWeight: '700', color: brandColors.text.primary, marginBottom: '6px' }}>
+              {currentJob.pickup_location} → {currentJob.delivery_location}
+            </div>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', fontSize: '13px', color: brandColors.text.secondary }}>
+              {currentJob.pickup_datetime && (
+                <span>📅 {new Date(currentJob.pickup_datetime).toLocaleDateString('en-GB')}</span>
+              )}
+              {currentJob.vehicle_type && <span>🚛 {currentJob.vehicle_type}</span>}
+              <span style={{
+                textTransform: 'capitalize',
+                color: currentJob.status === 'in_progress' ? brandColors.status.info : brandColors.status.warning,
+                fontWeight: '600',
+              }}>
+                {currentJob.status.replace('_', ' ')}
+              </span>
+            </div>
+            <div style={{ marginTop: '10px', fontSize: '13px', color: brandColors.primary.gold, fontWeight: '600' }}>
+              Tap to view details →
+            </div>
+          </button>
+        ) : (
+          <div style={{
+            fontSize: '13px',
+            color: brandColors.text.secondary,
+            textAlign: 'center',
+            padding: '20px',
+          }}>
+            No active jobs at the moment
+          </div>
+        )}
       </div>
     </div>
   )

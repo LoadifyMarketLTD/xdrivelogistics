@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import Image from 'next/image'
 import { supabase } from '@/lib/supabaseClient'
 import { UserProfileComplete } from '@/lib/types'
+import { useAuth } from '@/lib/AuthContext'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
@@ -12,18 +12,15 @@ export const dynamic = 'force-dynamic'
 export default function EditUserPage() {
   const params = useParams()
   const router = useRouter()
+  const { user: currentUser } = useAuth()
   const userId = params.id as string
-  const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [uploadingLogo, setUploadingLogo] = useState(false)
-  const [logoUrl, setLogoUrl] = useState<string | null>(null)
-  const [sendingPasswordReset, setSendingPasswordReset] = useState(false)
-  const [passwordResetSent, setPasswordResetSent] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [settings, setSettings] = useState<any>(null)
   const [roles, setRoles] = useState<string[]>([])
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
   
   // Form state
   const [formData, setFormData] = useState({
@@ -91,7 +88,6 @@ export default function EditUserPage() {
       setUser(profileData)
       setSettings(settingsData || {})
       setRoles(rolesData?.map(r => r.role_name) || [])
-      setLogoUrl(profileData.logo_url || null)
 
       // Populate form
       setFormData({
@@ -209,59 +205,6 @@ export default function EditUserPage() {
     } catch (err: any) {
       console.error('Error updating role:', err)
       alert('Failed to update role')
-    }
-  }
-
-  const handleLogoUpload = async (file: File) => {
-    if (!file) return
-    const maxSize = 2 * 1024 * 1024 // 2 MB
-    if (file.size > maxSize) {
-      alert('File size must be under 2 MB')
-      return
-    }
-    setUploadingLogo(true)
-    try {
-      const ext = file.name.split('.').pop()
-      const path = `avatars/${userId}.${ext}`
-      const { error: uploadError } = await supabase.storage
-        .from('profiles')
-        .upload(path, file, { upsert: true, contentType: file.type })
-
-      if (uploadError) throw uploadError
-
-      const { data: { publicUrl } } = supabase.storage.from('profiles').getPublicUrl(path)
-
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ logo_url: publicUrl, updated_at: new Date().toISOString() })
-        .eq('id', userId)
-
-      if (updateError) throw updateError
-      setLogoUrl(publicUrl)
-    } catch (err: any) {
-      console.error('Logo upload error:', err)
-      alert('Logo upload failed: ' + err.message)
-    } finally {
-      setUploadingLogo(false)
-    }
-  }
-
-  const handleSendPasswordReset = async () => {
-    const email = formData.email
-    if (!email) { alert('No email address found for this user'); return }
-    setSendingPasswordReset(true)
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      })
-      if (error) throw error
-      setPasswordResetSent(true)
-      setTimeout(() => setPasswordResetSent(false), 5000)
-    } catch (err: any) {
-      console.error('Password reset error:', err)
-      alert('Failed to send password reset: ' + err.message)
-    } finally {
-      setSendingPasswordReset(false)
     }
   }
 
@@ -635,43 +578,51 @@ export default function EditUserPage() {
             </div>
           </div>
 
-          <div style={{ marginTop: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
             <button
               type="button"
-              onClick={() => {
-                // Changing auth email requires the user to confirm — navigate to settings
-                router.push('/account/settings')
+              onClick={async () => {
+                const newEmail = window.prompt('Enter new email address:')
+                if (!newEmail || !newEmail.includes('@')) return
+                if (currentUser?.id === userId) {
+                  // Update own email via Supabase auth
+                  const { error } = await supabase.auth.updateUser({ email: newEmail })
+                  if (error) { alert('Failed to change email: ' + error.message); return }
+                  alert('A confirmation email has been sent to ' + newEmail + '. Please confirm to complete the change.')
+                  setFormData(prev => ({ ...prev, email: newEmail }))
+                } else {
+                  // For another user: send password reset (requires them to re-login with new email)
+                  const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+                    redirectTo: `${window.location.origin}/reset-password`,
+                  })
+                  if (error) { alert('Failed to send reset: ' + error.message); return }
+                  alert('Password reset email sent to ' + formData.email + '. The user should check their inbox and follow the link to set a new password.')
+                }
               }}
               style={{
-                padding: '10px 20px',
-                fontSize: '14px',
-                color: '#3b82f6',
-                backgroundColor: '#eff6ff',
-                border: '1px solid #3b82f6',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: '500'
+                padding: '10px 20px', fontSize: '14px', color: '#3b82f6',
+                backgroundColor: '#eff6ff', border: '1px solid #3b82f6',
+                borderRadius: '6px', cursor: 'pointer', fontWeight: '500',
               }}
             >
-              Change Email (via Account Settings)
+              Change Email
             </button>
             <button
               type="button"
-              onClick={handleSendPasswordReset}
-              disabled={sendingPasswordReset || passwordResetSent}
+              onClick={async () => {
+                const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+                  redirectTo: `${window.location.origin}/reset-password`,
+                })
+                if (error) { alert('Failed to send: ' + error.message); return }
+                alert('Password reset email sent to ' + formData.email + '. The user should check their inbox and follow the link to set a new password.')
+              }}
               style={{
-                padding: '10px 20px',
-                fontSize: '14px',
-                color: passwordResetSent ? '#166534' : '#3b82f6',
-                backgroundColor: passwordResetSent ? '#dcfce7' : '#eff6ff',
-                border: `1px solid ${passwordResetSent ? '#166534' : '#3b82f6'}`,
-                borderRadius: '6px',
-                cursor: sendingPasswordReset ? 'not-allowed' : 'pointer',
-                fontWeight: '500',
-                opacity: sendingPasswordReset ? 0.6 : 1,
+                padding: '10px 20px', fontSize: '14px', color: '#3b82f6',
+                backgroundColor: '#eff6ff', border: '1px solid #3b82f6',
+                borderRadius: '6px', cursor: 'pointer', fontWeight: '500',
               }}
             >
-              {sendingPasswordReset ? 'Sending…' : passwordResetSent ? '✓ Reset email sent' : 'Send Password Reset Email'}
+              Send an email to update a password
             </button>
           </div>
         </FormSection>
@@ -815,33 +766,46 @@ export default function EditUserPage() {
             <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '12px' }}>
               Maximum file size is 2MB. You can upload a BMP, GIF, JPG, JPEG or PNG file.
             </p>
-            {logoUrl && (
-              <Image
-                src={logoUrl}
-                alt={`${user?.full_name || user?.first_name || 'User'}'s profile picture`}
-                width={80}
-                height={80}
-                style={{ borderRadius: '50%', objectFit: 'cover', marginBottom: '12px', border: '2px solid #e5e7eb' }}
-              />
-            )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".bmp,.gif,.jpg,.jpeg,.png"
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file) handleLogoUpload(file)
-                }}
-                style={{ padding: '8px', fontSize: '14px', border: '1px solid #d1d5db', borderRadius: '6px' }}
-              />
-              {uploadingLogo && (
-                <span style={{ fontSize: '13px', color: '#6b7280' }}>Uploading…</span>
-              )}
-              {!uploadingLogo && logoUrl && (
-                <span style={{ fontSize: '13px', color: '#16a34a' }}>✓ Picture saved</span>
-              )}
-            </div>
+            <input
+              type="file"
+              accept=".bmp,.gif,.jpg,.jpeg,.png"
+              onChange={async (e) => {
+                const file = e.target.files?.[0]
+                if (!file) return
+                const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024
+                if (file.size > MAX_AVATAR_SIZE_BYTES) { alert('File size must be under 2MB'); return }
+                const ALLOWED_EXTENSIONS = ['bmp', 'gif', 'jpg', 'jpeg', 'png']
+                const rawExt = file.name.split('.').pop()?.toLowerCase() ?? ''
+                if (!ALLOWED_EXTENSIONS.includes(rawExt)) { alert('Invalid file type. Please upload BMP, GIF, JPG, JPEG or PNG.'); return }
+                const safeExt = rawExt
+                try {
+                  setUploadingAvatar(true)
+                  const path = `avatars/${userId}.${safeExt}`
+                  const { error: uploadError } = await supabase.storage
+                    .from('job-evidence')
+                    .upload(path, file, { upsert: true, contentType: file.type })
+                  if (uploadError) throw uploadError
+                  const { data: urlData } = supabase.storage.from('job-evidence').getPublicUrl(path)
+                  const publicUrl = urlData?.publicUrl
+                  const { error: updateError } = await supabase
+                    .from('profiles')
+                    .update({ logo_url: publicUrl, updated_at: new Date().toISOString() })
+                    .eq('id', userId)
+                  if (updateError) throw updateError
+                  alert('Profile picture uploaded successfully!')
+                } catch (err: any) {
+                  alert('Upload failed: ' + err.message)
+                } finally {
+                  setUploadingAvatar(false)
+                  e.target.value = ''
+                }
+              }}
+              disabled={uploadingAvatar}
+              style={{
+                padding: '8px', fontSize: '14px',
+                border: '1px solid #d1d5db', borderRadius: '6px',
+              }}
+            />
           </div>
         </FormSection>
 

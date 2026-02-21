@@ -1,152 +1,178 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/lib/AuthContext'
+import { supabase } from '@/lib/supabaseClient'
 import { brandColors } from '@/lib/brandColors'
 
 interface ActiveJob {
   id: string
   pickup_location: string
   delivery_location: string
+  pickup_datetime: string | null
+  delivery_datetime: string | null
+  status: string
   pickup_lat: number | null
   pickup_lng: number | null
   delivery_lat: number | null
   delivery_lng: number | null
-  status: string
+  vehicle_type: string | null
+  load_details: string | null
+}
+
+function mapsUrl(label: string, lat: number | null, lng: number | null, address: string): string {
+  if (lat && lng) return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(lat)},${encodeURIComponent(lng)}`
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`
+}
+
+function wazeUrl(lat: number | null, lng: number | null, address: string): string {
+  if (lat && lng) return `https://waze.com/ul?ll=${encodeURIComponent(lat)},${encodeURIComponent(lng)}&navigate=yes`
+  return `https://waze.com/ul?q=${encodeURIComponent(address)}&navigate=yes`
 }
 
 export default function DriverNavigationPage() {
   const { profile } = useAuth()
-  const [job, setJob] = useState<ActiveJob | null>(null)
+  const [activeJob, setActiveJob] = useState<ActiveJob | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!profile?.id) { setLoading(false); return }
-    const load = async () => {
+    if (!profile?.id) return
+    const fetch = async () => {
       try {
         const { data } = await supabase
           .from('jobs')
-          .select('id, pickup_location, delivery_location, pickup_lat, pickup_lng, delivery_lat, delivery_lng, status')
+          .select('id,pickup_location,delivery_location,pickup_datetime,delivery_datetime,status,pickup_lat,pickup_lng,delivery_lat,delivery_lng,vehicle_type,load_details')
           .eq('driver_id', profile.id)
           .in('status', ['assigned', 'in_progress'])
           .order('pickup_datetime', { ascending: true })
           .limit(1)
           .maybeSingle()
-        setJob(data)
-      } catch (e) {
-        console.error('Navigation error:', e)
+        setActiveJob(data || null)
+      } catch (err) {
+        console.error('Error fetching active job:', err)
       } finally {
         setLoading(false)
       }
     }
-    load()
+    fetch()
   }, [profile?.id])
 
-  const openGoogleMaps = (origin: string, destination: string) => {
-    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=driving`
-    window.open(url, '_blank', 'noopener')
-  }
-
-  const openGoogleMapsCoords = (lat: number, lng: number) => {
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`
-    window.open(url, '_blank', 'noopener')
-  }
-
   if (loading) {
-    return <div style={{ padding: '16px', color: brandColors.text.secondary }}>Loading navigation…</div>
+    return (
+      <div style={{ padding: '24px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+        <div style={{ color: brandColors.text.secondary }}>Loading navigation...</div>
+      </div>
+    )
   }
+
+  if (!activeJob) {
+    return (
+      <div style={{ padding: '16px' }}>
+        <h1 style={{ fontSize: '20px', fontWeight: '700', color: brandColors.text.primary, marginBottom: '16px' }}>
+          Navigation
+        </h1>
+        <div style={{
+          background: brandColors.mobile.cardBackground,
+          border: `1px solid ${brandColors.mobile.cardBorder}`,
+          borderRadius: '12px',
+          padding: '40px 20px',
+          textAlign: 'center',
+        }}>
+          <div style={{ fontSize: '48px', marginBottom: '12px' }}>📍</div>
+          <p style={{ color: brandColors.text.secondary, fontSize: '14px' }}>No active job. Navigation will appear when you have an assigned job.</p>
+        </div>
+      </div>
+    )
+  }
+
+  const NavButton = ({ label, icon, href }: { label: string; icon: string; href: string }) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        display: 'flex', alignItems: 'center', gap: '12px',
+        background: brandColors.primary.navy, color: '#fff',
+        borderRadius: '12px', padding: '14px 16px',
+        fontSize: '15px', fontWeight: '700',
+        textDecoration: 'none', marginBottom: '10px',
+      }}
+    >
+      <span style={{ fontSize: '22px' }}>{icon}</span>
+      {label}
+    </a>
+  )
 
   return (
     <div style={{ padding: '16px' }}>
-      <h1 style={{ fontSize: '18px', fontWeight: '700', color: brandColors.text.primary, marginBottom: '16px' }}>
+      <h1 style={{ fontSize: '20px', fontWeight: '700', color: brandColors.text.primary, marginBottom: '16px' }}>
         Navigation
       </h1>
 
-      {!job ? (
-        <div style={{
-          background: '#ffffff', border: '1px solid #e5e7eb',
-          borderRadius: '12px', padding: '32px', textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '40px', marginBottom: '12px' }}>📍</div>
-          <p style={{ color: brandColors.text.secondary, fontSize: '14px', marginBottom: '16px' }}>
-            No active job assigned. Accept a job first to get navigation.
-          </p>
+      {/* Job summary */}
+      <div style={{
+        background: brandColors.mobile.cardBackground,
+        border: `1px solid ${brandColors.mobile.cardBorder}`,
+        borderRadius: '12px',
+        padding: '16px',
+        marginBottom: '16px',
+      }}>
+        <div style={{ fontSize: '12px', fontWeight: '600', color: brandColors.primary.gold, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
+          Active Job
         </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {/* Job summary */}
-          <div style={{
-            background: '#ffffff', border: '1px solid #e5e7eb',
-            borderRadius: '12px', padding: '16px',
-          }}>
-            <div style={{ fontSize: '13px', color: brandColors.text.secondary, marginBottom: '4px' }}>Active Job</div>
-            <div style={{ fontSize: '15px', fontWeight: '700', color: brandColors.text.primary }}>
-              {job.pickup_location}
-            </div>
-            <div style={{ fontSize: '14px', color: brandColors.text.secondary, margin: '4px 0' }}>↓</div>
-            <div style={{ fontSize: '15px', fontWeight: '700', color: brandColors.text.primary }}>
-              {job.delivery_location}
-            </div>
+        <div style={{ fontSize: '16px', fontWeight: '700', color: brandColors.text.primary, marginBottom: '4px' }}>
+          {activeJob.pickup_location} → {activeJob.delivery_location}
+        </div>
+        {activeJob.pickup_datetime && (
+          <div style={{ fontSize: '13px', color: brandColors.text.secondary }}>
+            📅 Pickup: {new Date(activeJob.pickup_datetime).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
           </div>
+        )}
+        {activeJob.vehicle_type && (
+          <div style={{ fontSize: '13px', color: brandColors.text.secondary }}>
+            🚛 {activeJob.vehicle_type}
+          </div>
+        )}
+        {activeJob.load_details && (
+          <div style={{ fontSize: '13px', color: brandColors.text.secondary, marginTop: '6px', padding: '8px', background: brandColors.background.light, borderRadius: '8px' }}>
+            {activeJob.load_details}
+          </div>
+        )}
+      </div>
 
-          {/* Navigate to Pickup */}
-          <button
-            onClick={() => {
-              if (job.pickup_lat && job.pickup_lng) {
-                openGoogleMapsCoords(job.pickup_lat, job.pickup_lng)
-              } else {
-                openGoogleMaps('current location', job.pickup_location)
-              }
-            }}
-            style={{
-              background: brandColors.primary.gold, color: '#ffffff',
-              border: 'none', borderRadius: '12px', padding: '16px',
-              fontSize: '15px', fontWeight: '700', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: '12px',
-            }}
-          >
-            <span style={{ fontSize: '24px' }}>🟡</span>
-            Navigate to Pickup
-          </button>
+      {/* Navigate to pickup */}
+      <div style={{ marginBottom: '16px' }}>
+        <h2 style={{ fontSize: '15px', fontWeight: '700', color: brandColors.text.primary, marginBottom: '10px' }}>
+          Navigate to Pickup
+        </h2>
+        <NavButton
+          icon="🗺️"
+          label={`Google Maps → ${activeJob.pickup_location}`}
+          href={mapsUrl(activeJob.pickup_location, activeJob.pickup_lat, activeJob.pickup_lng, activeJob.pickup_location)}
+        />
+        <NavButton
+          icon="🚗"
+          label={`Waze → ${activeJob.pickup_location}`}
+          href={wazeUrl(activeJob.pickup_lat, activeJob.pickup_lng, activeJob.pickup_location)}
+        />
+      </div>
 
-          {/* Navigate to Delivery */}
-          <button
-            onClick={() => {
-              if (job.delivery_lat && job.delivery_lng) {
-                openGoogleMapsCoords(job.delivery_lat, job.delivery_lng)
-              } else {
-                openGoogleMaps(job.pickup_location, job.delivery_location)
-              }
-            }}
-            style={{
-              background: brandColors.primary.navy, color: '#ffffff',
-              border: 'none', borderRadius: '12px', padding: '16px',
-              fontSize: '15px', fontWeight: '700', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: '12px',
-            }}
-          >
-            <span style={{ fontSize: '24px' }}>📍</span>
-            Navigate to Delivery
-          </button>
-
-          {/* Full Route */}
-          <button
-            onClick={() => openGoogleMaps(job.pickup_location, job.delivery_location)}
-            style={{
-              background: '#f3f4f6', color: brandColors.text.primary,
-              border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px',
-              fontSize: '14px', fontWeight: '600', cursor: 'pointer',
-            }}
-          >
-            🗺️ View Full Route in Google Maps
-          </button>
-
-          <p style={{ fontSize: '12px', color: brandColors.text.secondary, textAlign: 'center' }}>
-            Opens Google Maps with turn-by-turn directions
-          </p>
-        </div>
-      )}
+      {/* Navigate to delivery */}
+      <div>
+        <h2 style={{ fontSize: '15px', fontWeight: '700', color: brandColors.text.primary, marginBottom: '10px' }}>
+          Navigate to Delivery
+        </h2>
+        <NavButton
+          icon="🗺️"
+          label={`Google Maps → ${activeJob.delivery_location}`}
+          href={mapsUrl(activeJob.delivery_location, activeJob.delivery_lat, activeJob.delivery_lng, activeJob.delivery_location)}
+        />
+        <NavButton
+          icon="🚗"
+          label={`Waze → ${activeJob.delivery_location}`}
+          href={wazeUrl(activeJob.delivery_lat, activeJob.delivery_lng, activeJob.delivery_location)}
+        />
+      </div>
     </div>
   )
 }

@@ -3,7 +3,11 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
-import '../globals.css'
+
+const pageWrap: React.CSSProperties = { minHeight: '100vh', background: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" }
+const card: React.CSSProperties = { background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '48px 40px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }
+const inputStyle: React.CSSProperties = { width: '100%', padding: '12px 16px', background: '#fff', border: '1px solid #d1d5db', borderRadius: '8px', color: '#1f2937', fontSize: '15px', boxSizing: 'border-box' }
+const btnStyle: React.CSSProperties = { width: '100%', padding: '14px', background: '#C8A64D', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '16px', fontWeight: 600, cursor: 'pointer', marginTop: '8px' }
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('')
@@ -15,267 +19,65 @@ export default function ResetPasswordPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Check if we have a valid session from the reset link
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setIsValidSession(true)
-      } else {
-        setError('Invalid or expired reset link. Please request a new one.')
-      }
+      if (session) { setIsValidSession(true) }
+      else { setError('Invalid or expired reset link. Please request a new one.') }
     })
   }, [])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    setError('')
-    setMessage('')
-    setLoading(true)
-
-    if (!password) {
-      setError('Please enter a new password')
-      setLoading(false)
-      return
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long')
-      setLoading(false)
-      return
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      setLoading(false)
-      return
-    }
-
+    setError(''); setMessage(''); setLoading(true)
+    if (!password) { setError('Please enter a new password'); setLoading(false); return }
+    if (password.length < 6) { setError('Password must be at least 6 characters long'); setLoading(false); return }
+    if (password !== confirmPassword) { setError('Passwords do not match'); setLoading(false); return }
     try {
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: password,
-      })
-
-      if (updateError) {
-        setError('Failed to update password. Please try again.')
-      } else {
-        setMessage('Password updated successfully! Redirecting to login...')
-        setTimeout(() => {
-          router.push('/login')
-        }, 2000)
-      }
-    } catch (err) {
-      setError('An error occurred. Please try again.')
-    } finally {
-      setLoading(false)
-    }
+      const { error: updateError } = await supabase.auth.updateUser({ password })
+      if (updateError) { setError('Failed to update password. Please try again.') }
+      else { setMessage('Password updated successfully! Redirecting to login...'); setTimeout(() => router.push('/login'), 2000) }
+    } catch { setError('An error occurred. Please try again.') }
+    finally { setLoading(false) }
   }
 
   return (
-    <div className="login-screen">
-      <style jsx global>{`
-        body {
-          margin: 0;
-          font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-          background: #f9fafb;
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
+    <div style={pageWrap}>
+      <div style={{ width: '100%', maxWidth: '420px', padding: '24px' }}>
+        <div style={card}>
+          <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#1f2937', margin: '0 0 16px 0', textAlign: 'center' }}>
+            <span style={{ color: '#C8A64D' }}>Reset</span> Password
+          </h1>
+          <p style={{ color: '#6b7280', fontSize: '14px', textAlign: 'center', marginBottom: '32px', lineHeight: 1.5 }}>
+            Enter your new password below.
+          </p>
 
-        .login-screen {
-          width: 100%;
-          max-width: 420px;
-          padding: 24px;
-        }
-
-        .login-card {
-          background: #ffffff;
-          border: 1px solid #e5e7eb;
-          border-radius: 12px;
-          padding: 48px 40px;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
-        .login-title {
-          font-size: 28px;
-          font-weight: 700;
-          color: #1f2937;
-          margin: 0 0 16px 0;
-          text-align: center;
-        }
-
-        .login-title-accent {
-          color: #C8A64D;
-        }
-
-        .subtitle {
-          color: #6b7280;
-          font-size: 14px;
-          text-align: center;
-          margin-bottom: 32px;
-          line-height: 1.5;
-        }
-
-        .form-group {
-          margin-bottom: 24px;
-        }
-
-        .form-label {
-          display: block;
-          color: #374151;
-          font-size: 14px;
-          font-weight: 500;
-          margin-bottom: 8px;
-        }
-
-        .form-input {
-          width: 100%;
-          padding: 12px 16px;
-          background: #ffffff;
-          border: 1px solid #d1d5db;
-          border-radius: 8px;
-          color: #1f2937;
-          font-size: 15px;
-          transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-          outline: none;
-          border-color: #C8A64D;
-        }
-
-        .form-input::placeholder {
-          color: #9ca3af;
-        }
-
-        .login-btn {
-          width: 100%;
-          padding: 14px;
-          background: #C8A64D;
-          border: none;
-          border-radius: 8px;
-          color: #ffffff;
-          font-size: 16px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          margin-top: 8px;
-        }
-
-        .login-btn:hover {
-          background: #B39543;
-        }
-
-        .login-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .error-message {
-          color: #dc2626;
-          font-size: 14px;
-          margin-top: 16px;
-          text-align: center;
-          padding: 12px;
-          background: #fef2f2;
-          border: 1px solid #fecaca;
-          border-radius: 8px;
-        }
-
-        .success-message {
-          color: #16a34a;
-          font-size: 14px;
-          margin-top: 16px;
-          text-align: center;
-          padding: 12px;
-          background: #f0fdf4;
-          border: 1px solid #bbf7d0;
-          border-radius: 8px;
-        }
-
-        .support-text {
-          text-align: center;
-          margin-top: 32px;
-          padding-top: 24px;
-          border-top: 1px solid #e5e7eb;
-          color: #6b7280;
-          font-size: 13px;
-          line-height: 1.6;
-        }
-
-        .support-phone {
-          color: #C8A64D;
-          font-weight: 600;
-          text-decoration: none;
-        }
-
-        .support-phone:hover {
-          color: #B39543;
-        }
-      `}</style>
-
-      <div className="login-card">
-        <h1 className="login-title">
-          <span className="login-title-accent">Reset</span> Password
-        </h1>
-        <p className="subtitle">
-          Enter your new password below.
-        </p>
-
-        {isValidSession ? (
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="password" className="form-label">
-                New Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                className="form-input"
-                placeholder="Enter new password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
-                minLength={6}
-              />
+          {isValidSession ? (
+            <form onSubmit={handleSubmit}>
+              <div style={{ marginBottom: '24px' }}>
+                <label htmlFor="password" style={{ display: 'block', color: '#374151', fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>New Password</label>
+                <input type="password" id="password" style={inputStyle} placeholder="Enter new password"
+                  value={password} onChange={e => setPassword(e.target.value)} required disabled={loading} minLength={6} />
+              </div>
+              <div style={{ marginBottom: '24px' }}>
+                <label htmlFor="confirmPassword" style={{ display: 'block', color: '#374151', fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>Confirm Password</label>
+                <input type="password" id="confirmPassword" style={inputStyle} placeholder="Confirm new password"
+                  value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={loading} minLength={6} />
+              </div>
+              <button type="submit" style={{ ...btnStyle, opacity: loading ? 0.6 : 1, cursor: loading ? 'not-allowed' : 'pointer' }} disabled={loading}>
+                {loading ? 'Updating...' : 'Update Password'}
+              </button>
+              {error && <div style={{ color: '#dc2626', fontSize: '14px', marginTop: '16px', textAlign: 'center', padding: '12px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px' }}>{error}</div>}
+              {message && <div style={{ color: '#16a34a', fontSize: '14px', marginTop: '16px', textAlign: 'center', padding: '12px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px' }}>{message}</div>}
+            </form>
+          ) : (
+            <div style={{ color: '#dc2626', fontSize: '14px', textAlign: 'center', padding: '12px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px' }}>
+              {error || 'Loading...'}
             </div>
+          )}
 
-            <div className="form-group">
-              <label htmlFor="confirmPassword" className="form-label">
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                className="form-input"
-                placeholder="Confirm new password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                disabled={loading}
-                minLength={6}
-              />
-            </div>
-
-            <button type="submit" className="login-btn" disabled={loading}>
-              {loading ? 'Updating...' : 'Update Password'}
-            </button>
-
-            {error && <div className="error-message">{error}</div>}
-            {message && <div className="success-message">{message}</div>}
-          </form>
-        ) : (
-          <div className="error-message">
-            {error || 'Loading...'}
+          <div style={{ textAlign: 'center', marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #e5e7eb', color: '#6b7280', fontSize: '13px', lineHeight: 1.6 }}>
+            Need help? Call or WhatsApp:<br />
+            <a href="tel:07423272138" style={{ color: '#C8A64D', fontWeight: 600, textDecoration: 'none' }}>07423272138</a>
           </div>
-        )}
-
-        <div className="support-text">
-          Need help? Call or WhatsApp:<br />
-          <a href="tel:07423272138" className="support-phone">
-            07423272138
-          </a>
         </div>
       </div>
     </div>

@@ -93,7 +93,7 @@ export default function FleetMorePage() {
         <MenuItem
           icon="📊"
           label="Reports"
-          onClick={() => router.push('/freight-vision')}
+          onClick={() => router.push('/invoices')}
         />
         <MenuItem
           icon="💳"
