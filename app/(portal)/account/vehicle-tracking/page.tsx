@@ -33,7 +33,7 @@ export default function VehicleTrackingPage() {
           background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '6px',
           padding: '8px 16px', fontSize: '13px', fontWeight: '600', color: '#3b82f6',
         }}>
-          🚀 Planned for Q3 2025
+          🚀 Coming soon
         </div>
       </div>
     </div>

@@ -14,6 +14,7 @@ export default function FleetDashboardPage() {
     pendingBids: 0,
     newLoads: 0,
   })
+  const [recentJobs, setRecentJobs] = useState<{ id: string; title: string; status: string; created_at: string }[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -43,11 +44,20 @@ export default function FleetDashboardPage() {
           .eq('status', 'open')
           .gte('created_at', twentyFourHoursAgo)
 
+        // Get recent jobs for activity feed
+        const { data: recent } = await supabase
+          .from('jobs')
+          .select('id, title, status, created_at')
+          .eq('company_id', companyId)
+          .order('created_at', { ascending: false })
+          .limit(5)
+
         setStats({
           activeJobs: jobs?.length || 0,
           pendingBids: bids?.length || 0,
           newLoads: newLoads?.length || 0,
         })
+        setRecentJobs(recent || [])
       } catch (err) {
         console.error('Error fetching stats:', err)
       } finally {
@@ -249,29 +259,47 @@ export default function FleetDashboardPage() {
         </div>
       </div>
 
-      {/* Recent Activity placeholder */}
+      {/* Recent Activity */}
       <div style={{
         background: brandColors.mobile.cardBackground,
         border: `1px solid ${brandColors.mobile.cardBorder}`,
         borderRadius: '12px',
         padding: '20px',
       }}>
-        <h2 style={{
-          fontSize: '16px',
-          fontWeight: '700',
-          color: brandColors.text.primary,
-          marginBottom: '12px',
-        }}>
+        <h2 style={{ fontSize: '16px', fontWeight: '700', color: brandColors.text.primary, marginBottom: '12px' }}>
           Recent Activity
         </h2>
-        <div style={{
-          fontSize: '13px',
-          color: brandColors.text.secondary,
-          textAlign: 'center',
-          padding: '20px',
-        }}>
-          Activity feed coming soon
-        </div>
+        {recentJobs.length === 0 ? (
+          <div style={{ fontSize: '13px', color: brandColors.text.secondary, textAlign: 'center', padding: '20px' }}>
+            No recent jobs found
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {recentJobs.map((job) => (
+              <button
+                key={job.id}
+                onClick={() => router.push(`/jobs/${job.id}`)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '10px 12px', background: '#f9fafb',
+                  border: '1px solid #e5e7eb', borderRadius: '8px',
+                  cursor: 'pointer', width: '100%', textAlign: 'left',
+                }}
+              >
+                <span style={{ fontSize: '13px', fontWeight: '600', color: brandColors.text.primary, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {job.title || `Job #${job.id.slice(0, 8)}`}
+                </span>
+                <span style={{
+                  fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '4px', marginLeft: '8px', flexShrink: 0,
+                  background: job.status === 'completed' ? '#d1fae5' : job.status === 'open' ? '#dbeafe' : '#fef3c7',
+                  color: job.status === 'completed' ? '#065f46' : job.status === 'open' ? '#1e40af' : '#92400e',
+                }}>
+                  {job.status}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
