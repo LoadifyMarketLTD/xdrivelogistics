@@ -133,13 +133,21 @@ export default function UsersManagementPage() {
   }
 
   const handleSendReminder = async (userId: string) => {
-    // TODO: Implement send reminder functionality
-    alert('Send reminder functionality coming soon!')
+    const u = users.find(u => u.id === userId)
+    if (!u?.email) return
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(u.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
+      if (error) throw error
+      alert(`Password reset email sent to ${u.email}. They should check their inbox and follow the link to set a new password.`)
+    } catch (err: any) {
+      alert('Failed to send reminder: ' + err.message)
+    }
   }
 
   const handleViewEventLog = (userId: string) => {
-    // TODO: Implement event log view
-    alert('Event log functionality coming soon!')
+    router.push(`/users/${userId}`)
   }
 
   if (loading) {

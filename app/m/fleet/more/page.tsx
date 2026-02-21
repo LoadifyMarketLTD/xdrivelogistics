@@ -93,17 +93,17 @@ export default function FleetMorePage() {
         <MenuItem
           icon="📊"
           label="Reports"
-          onClick={() => {}}
+          onClick={() => router.push('/invoices')}
         />
         <MenuItem
           icon="💳"
           label="Invoices"
-          onClick={() => router.push('/company/settings')}
+          onClick={() => router.push('/invoices')}
         />
         <MenuItem
           icon="ℹ️"
           label="Help & Support"
-          onClick={() => {}}
+          onClick={() => router.push('/account/feedback')}
         />
       </div>
     </div>

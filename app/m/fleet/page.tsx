@@ -6,6 +6,15 @@ import { supabase } from '@/lib/supabaseClient'
 import { brandColors } from '@/lib/brandColors'
 import { useRouter } from 'next/navigation'
 
+interface RecentJob {
+  id: string
+  pickup_location: string
+  delivery_location: string
+  status: string
+  created_at: string
+  budget: number | null
+}
+
 export default function FleetDashboardPage() {
   const { companyId, user } = useAuth()
   const router = useRouter()
@@ -14,6 +23,7 @@ export default function FleetDashboardPage() {
     pendingBids: 0,
     newLoads: 0,
   })
+  const [recentJobs, setRecentJobs] = useState<RecentJob[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -43,11 +53,20 @@ export default function FleetDashboardPage() {
           .eq('status', 'open')
           .gte('created_at', twentyFourHoursAgo)
 
+        // Get recent jobs for activity feed
+        const { data: recentJobsData } = await supabase
+          .from('jobs')
+          .select('id,pickup_location,delivery_location,status,created_at,budget')
+          .eq('posted_by_company_id', companyId)
+          .order('created_at', { ascending: false })
+          .limit(5)
+
         setStats({
           activeJobs: jobs?.length || 0,
           pendingBids: bids?.length || 0,
           newLoads: newLoads?.length || 0,
         })
+        setRecentJobs(recentJobsData || [])
       } catch (err) {
         console.error('Error fetching stats:', err)
       } finally {
@@ -249,7 +268,7 @@ export default function FleetDashboardPage() {
         </div>
       </div>
 
-      {/* Recent Activity placeholder */}
+      {/* Recent Activity */}
       <div style={{
         background: brandColors.mobile.cardBackground,
         border: `1px solid ${brandColors.mobile.cardBorder}`,
@@ -264,14 +283,37 @@ export default function FleetDashboardPage() {
         }}>
           Recent Activity
         </h2>
-        <div style={{
-          fontSize: '13px',
-          color: brandColors.text.secondary,
-          textAlign: 'center',
-          padding: '20px',
-        }}>
-          Activity feed coming soon
-        </div>
+        {recentJobs.length === 0 ? (
+          <div style={{ fontSize: '13px', color: brandColors.text.secondary, textAlign: 'center', padding: '20px' }}>
+            No recent jobs. Post a load to get started.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {recentJobs.map(job => (
+              <button
+                key={job.id}
+                onClick={() => router.push(`/loads/${job.id}`)}
+                style={{
+                  background: brandColors.background.light,
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px 12px',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  width: '100%',
+                }}
+              >
+                <div style={{ fontSize: '13px', fontWeight: '600', color: brandColors.text.primary }}>
+                  {job.pickup_location} → {job.delivery_location}
+                </div>
+                <div style={{ fontSize: '12px', color: brandColors.text.secondary, marginTop: '2px', display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ textTransform: 'capitalize' }}>{job.status}</span>
+                  <span>{new Date(job.created_at).toLocaleDateString('en-GB')}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

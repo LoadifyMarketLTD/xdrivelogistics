@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { UserProfileComplete } from '@/lib/types'
+import { useAuth } from '@/lib/AuthContext'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
@@ -11,6 +12,7 @@ export const dynamic = 'force-dynamic'
 export default function EditUserPage() {
   const params = useParams()
   const router = useRouter()
+  const { user: currentUser } = useAuth()
   const userId = params.id as string
   
   const [loading, setLoading] = useState(true)
@@ -18,6 +20,7 @@ export default function EditUserPage() {
   const [user, setUser] = useState<any>(null)
   const [settings, setSettings] = useState<any>(null)
   const [roles, setRoles] = useState<string[]>([])
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
   
   // Form state
   const [formData, setFormData] = useState({
@@ -578,32 +581,45 @@ export default function EditUserPage() {
           <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
             <button
               type="button"
-              onClick={() => alert('Change email functionality coming soon')}
+              onClick={async () => {
+                const newEmail = window.prompt('Enter new email address:')
+                if (!newEmail || !newEmail.includes('@')) return
+                if (currentUser?.id === userId) {
+                  // Update own email via Supabase auth
+                  const { error } = await supabase.auth.updateUser({ email: newEmail })
+                  if (error) { alert('Failed to change email: ' + error.message); return }
+                  alert('A confirmation email has been sent to ' + newEmail + '. Please confirm to complete the change.')
+                  setFormData(prev => ({ ...prev, email: newEmail }))
+                } else {
+                  // For another user: send password reset (requires them to re-login with new email)
+                  const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+                    redirectTo: `${window.location.origin}/reset-password`,
+                  })
+                  if (error) { alert('Failed to send reset: ' + error.message); return }
+                  alert('Password reset email sent to ' + formData.email + '. The user should check their inbox and follow the link to set a new password.')
+                }
+              }}
               style={{
-                padding: '10px 20px',
-                fontSize: '14px',
-                color: '#3b82f6',
-                backgroundColor: '#eff6ff',
-                border: '1px solid #3b82f6',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: '500'
+                padding: '10px 20px', fontSize: '14px', color: '#3b82f6',
+                backgroundColor: '#eff6ff', border: '1px solid #3b82f6',
+                borderRadius: '6px', cursor: 'pointer', fontWeight: '500',
               }}
             >
               Change Email
             </button>
             <button
               type="button"
-              onClick={() => alert('Password reset email will be sent')}
+              onClick={async () => {
+                const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+                  redirectTo: `${window.location.origin}/reset-password`,
+                })
+                if (error) { alert('Failed to send: ' + error.message); return }
+                alert('Password reset email sent to ' + formData.email + '. The user should check their inbox and follow the link to set a new password.')
+              }}
               style={{
-                padding: '10px 20px',
-                fontSize: '14px',
-                color: '#3b82f6',
-                backgroundColor: '#eff6ff',
-                border: '1px solid #3b82f6',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: '500'
+                padding: '10px 20px', fontSize: '14px', color: '#3b82f6',
+                backgroundColor: '#eff6ff', border: '1px solid #3b82f6',
+                borderRadius: '6px', cursor: 'pointer', fontWeight: '500',
               }}
             >
               Send an email to update a password
@@ -753,15 +769,41 @@ export default function EditUserPage() {
             <input
               type="file"
               accept=".bmp,.gif,.jpg,.jpeg,.png"
-              onChange={(e) => {
-                // TODO: Implement file upload
-                alert('Logo upload functionality coming soon')
+              onChange={async (e) => {
+                const file = e.target.files?.[0]
+                if (!file) return
+                const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024
+                if (file.size > MAX_AVATAR_SIZE_BYTES) { alert('File size must be under 2MB'); return }
+                const ALLOWED_EXTENSIONS = ['bmp', 'gif', 'jpg', 'jpeg', 'png']
+                const rawExt = file.name.split('.').pop()?.toLowerCase() ?? ''
+                if (!ALLOWED_EXTENSIONS.includes(rawExt)) { alert('Invalid file type. Please upload BMP, GIF, JPG, JPEG or PNG.'); return }
+                const safeExt = rawExt
+                try {
+                  setUploadingAvatar(true)
+                  const path = `avatars/${userId}.${safeExt}`
+                  const { error: uploadError } = await supabase.storage
+                    .from('job-evidence')
+                    .upload(path, file, { upsert: true, contentType: file.type })
+                  if (uploadError) throw uploadError
+                  const { data: urlData } = supabase.storage.from('job-evidence').getPublicUrl(path)
+                  const publicUrl = urlData?.publicUrl
+                  const { error: updateError } = await supabase
+                    .from('profiles')
+                    .update({ logo_url: publicUrl, updated_at: new Date().toISOString() })
+                    .eq('id', userId)
+                  if (updateError) throw updateError
+                  alert('Profile picture uploaded successfully!')
+                } catch (err: any) {
+                  alert('Upload failed: ' + err.message)
+                } finally {
+                  setUploadingAvatar(false)
+                  e.target.value = ''
+                }
               }}
+              disabled={uploadingAvatar}
               style={{
-                padding: '8px',
-                fontSize: '14px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px'
+                padding: '8px', fontSize: '14px',
+                border: '1px solid #d1d5db', borderRadius: '6px',
               }}
             />
           </div>
