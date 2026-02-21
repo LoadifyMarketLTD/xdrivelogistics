@@ -41,7 +41,7 @@ export default function AccountSettingsPage() {
           full_name: fullName.trim() || null,
           phone: phone.trim() || null,
         })
-        .eq('id', user.id)
+        .eq('user_id', user.id)
       if (updateError) throw updateError
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)

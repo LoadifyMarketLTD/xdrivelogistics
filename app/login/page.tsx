@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, FormEvent, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { supabase, isSupabaseConfigured } from '@/lib/supabaseClient'
 import Link from 'next/link'
@@ -13,9 +13,16 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [checking, setChecking] = useState(true)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   // If already authenticated, go through post-login routing
   useEffect(() => {
+    // Surface any error passed via query param (e.g. from /auth/callback)
+    const queryError = searchParams?.get('error')
+    if (queryError === 'auth_callback_failed') {
+      setError('Email confirmation failed. Please try again or re-register.')
+    }
+
     if (!isSupabaseConfigured) {
       setChecking(false)
       return
@@ -27,7 +34,7 @@ export default function LoginPage() {
         setChecking(false)
       }
     })
-  }, [router])
+  }, [router, searchParams])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()

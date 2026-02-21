@@ -30,7 +30,7 @@ export default function MobileAccountsPage() {
       try {
         const { data } = await supabase
           .from('profiles')
-          .select('id,full_name,first_name,last_name,email,is_driver,has_mobile_account,mobile_option')
+          .select('user_id,full_name,first_name,last_name,email,is_driver,has_mobile_account,mobile_option')
           .eq('company_id', companyId)
           .order('full_name', { ascending: true })
         setUsers(data || [])
@@ -49,9 +49,9 @@ export default function MobileAccountsPage() {
       const { error } = await supabase
         .from('profiles')
         .update({ has_mobile_account: !currentValue, updated_at: new Date().toISOString() })
-        .eq('id', userId)
+        .eq('user_id', userId)
       if (error) throw error
-      setUsers(prev => prev.map(u => u.id === userId ? { ...u, has_mobile_account: !currentValue } : u))
+      setUsers(prev => prev.map(u => u.user_id === userId ? { ...u, has_mobile_account: !currentValue } : u))
     } catch (err: any) {
       alert('Failed to update: ' + err.message)
     } finally {
@@ -65,9 +65,9 @@ export default function MobileAccountsPage() {
       const { error } = await supabase
         .from('profiles')
         .update({ mobile_option: option, updated_at: new Date().toISOString() })
-        .eq('id', userId)
+        .eq('user_id', userId)
       if (error) throw error
-      setUsers(prev => prev.map(u => u.id === userId ? { ...u, mobile_option: option } : u))
+      setUsers(prev => prev.map(u => u.user_id === userId ? { ...u, mobile_option: option } : u))
     } catch (err: any) {
       alert('Failed to update: ' + err.message)
     } finally {

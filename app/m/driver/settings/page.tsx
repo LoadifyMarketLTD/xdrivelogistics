@@ -15,11 +15,11 @@ export default function DriverSettingsPage() {
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    if (!profile?.id) return
+    if (!profile?.user_id) return
     supabase
       .from('user_settings')
       .select('enable_load_alerts,send_booking_confirmation')
-      .eq('user_id', profile.id)
+      .eq('user_id', profile.user_id)
       .maybeSingle()
       .then(({ data }) => {
         if (data) {
@@ -27,16 +27,16 @@ export default function DriverSettingsPage() {
           setSendBookingConfirmation(data.send_booking_confirmation !== false)
         }
       })
-  }, [profile?.id])
+  }, [profile?.user_id])
 
   const handleSave = async () => {
-    if (!profile?.id) return
+    if (!profile?.user_id) return
     try {
       setSaving(true)
       const { error } = await supabase
         .from('user_settings')
         .upsert({
-          user_id: profile.id,
+          user_id: profile.user_id,
           enable_load_alerts: enableLoadAlerts,
           send_booking_confirmation: sendBookingConfirmation,
           updated_at: new Date().toISOString(),

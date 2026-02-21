@@ -62,7 +62,7 @@ export default function EditUserPage() {
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', userId)
+        .eq('user_id', userId)
         .single()
 
       if (profileError) throw profileError
@@ -147,7 +147,7 @@ export default function EditUserPage() {
           interface_language: formData.interface_language,
           updated_at: new Date().toISOString()
         })
-        .eq('id', userId)
+        .eq('user_id', userId)
 
       if (profileError) throw profileError
 
@@ -790,7 +790,7 @@ export default function EditUserPage() {
                   const { error: updateError } = await supabase
                     .from('profiles')
                     .update({ logo_url: publicUrl, updated_at: new Date().toISOString() })
-                    .eq('id', userId)
+                    .eq('user_id', userId)
                   if (updateError) throw updateError
                   alert('Profile picture uploaded successfully!')
                 } catch (err: any) {

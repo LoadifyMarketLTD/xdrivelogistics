@@ -16,6 +16,7 @@ export default function RegisterCompanyPage() {
   const [companyName, setCompanyName] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [registered, setRegistered] = useState(false)
 
   const gold = '#C8A64D'
 
@@ -30,24 +31,26 @@ export default function RegisterCompanyPage() {
     setLoading(true)
     try {
       // 1. Sign up with Supabase Auth
-      const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin}/auth/callback`,
+        },
+      })
       if (signUpError) throw signUpError
 
-      let session = data.session
-      if (!session) {
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-        if (signInError) {
-          setError('Account already exists. Please sign in instead.')
-          setLoading(false)
-          return
-        }
-        session = signInData.session
+      if (!data.session) {
+        // Email confirmation is required — show "check your email" screen.
+        // Profile will be created via /onboarding after the user confirms.
+        setRegistered(true)
+        setLoading(false)
+        return
       }
 
-      if (!session) throw new Error('Could not establish session')
-
-      // 2. Call RPC to create company_admin profile + company row (both pending)
-      const { data: companyJson, error: rpcError } = await supabase.rpc('register_company_pending', {
+      // Email confirmation disabled (dev) — session available immediately.
+      // 2. Call RPC to create company_admin profile + company row (both pending).
+      const { error: rpcError } = await supabase.rpc('register_company_pending', {
         p_company_name: companyName.trim(),
         p_full_name: fullName.trim() || null,
         p_phone: phone.trim() || null,
@@ -74,6 +77,37 @@ export default function RegisterCompanyPage() {
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
       <div style={{ width: '100%', maxWidth: '460px' }}>
         <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '48px 40px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', border: '1px solid #e5e7eb' }}>
+
+          {registered ? (
+            /* ── Check-email screen ────────────────────────────────── */
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ marginBottom: '16px' }}>
+                <Image src="/logo.webp" alt="XDrive Logistics LTD" width={140} height={40} style={{ display: 'inline-block' }} priority />
+              </div>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>✉️</div>
+              <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#1f2937', margin: '0 0 12px' }}>Check your email</h1>
+              <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.6', marginBottom: '24px' }}>
+                We sent a confirmation link to <strong>{email}</strong>.<br />
+                Click the link in the email to verify your address, then return here.
+              </p>
+              <div style={{ backgroundColor: '#fffbf0', border: '1px solid #f3d990', borderRadius: '8px', padding: '12px 14px', marginBottom: '24px', fontSize: '13px', color: '#92741a' }}>
+                ℹ️ After confirming, complete your profile on the next screen to finish registration.
+              </div>
+              <button
+                type="button"
+                onClick={() => router.push('/login')}
+                style={{ width: '100%', padding: '13px', backgroundColor: gold, border: 'none', borderRadius: '8px', color: '#ffffff', fontSize: '15px', fontWeight: '600', cursor: 'pointer' }}
+              >
+                I confirmed — continue →
+              </button>
+              <div style={{ marginTop: '16px', fontSize: '13px', color: '#6b7280' }}>
+                <button type="button" onClick={() => setRegistered(false)} style={{ background: 'none', border: 'none', color: gold, cursor: 'pointer', fontSize: '13px', textDecoration: 'underline', padding: 0 }}>
+                  ← Use a different email
+                </button>
+              </div>
+            </div>
+          ) : (
+          <>
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
             <div style={{ marginBottom: '12px' }}>
               <Image src="/logo.webp" alt="XDrive Logistics LTD" width={140} height={40} style={{ display: 'inline-block' }} priority />
@@ -148,6 +182,8 @@ export default function RegisterCompanyPage() {
             {' · '}
             <Link href="/login" style={{ color: gold, textDecoration: 'none' }}>Sign in</Link>
           </div>
+          </>
+          )}
         </div>
       </div>
     </div>
