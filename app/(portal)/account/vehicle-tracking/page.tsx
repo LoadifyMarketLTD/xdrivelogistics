@@ -53,7 +53,7 @@ export default function VehicleTrackingPage() {
           Vehicle Tracking
         </h1>
         <p style={{ fontSize: '1rem', color: '#6b7280' }}>
-          Fleet status overview. Real-time GPS tracking coming in a future update.
+        Fleet status overview for all your registered vehicles.
         </p>
       </div>
 

@@ -818,7 +818,7 @@ export default function EditUserPage() {
             {logoUrl && (
               <Image
                 src={logoUrl}
-                alt="Profile picture"
+                alt={`${user?.full_name || user?.first_name || 'User'}'s profile picture`}
                 width={80}
                 height={80}
                 style={{ borderRadius: '50%', objectFit: 'cover', marginBottom: '12px', border: '2px solid #e5e7eb' }}

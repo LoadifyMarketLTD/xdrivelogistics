@@ -34,6 +34,8 @@ function groupByMonth(jobs: { created_at: string; budget?: number; status?: stri
     .map(([, v]) => v)
 }
 
+function formatRevenueTick(v: number) { return `£${v}` }
+
 export default function FreightVisionPage() {
   const { companyId, user } = useAuth()
   const [stats, setStats] = useState({ totalJobs: 0, completedJobs: 0, totalRevenue: 0, activeBids: 0 })
@@ -140,7 +142,7 @@ export default function FreightVisionPage() {
                 <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
                   <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `£${v}`} />
+                  <YAxis tick={{ fontSize: 12 }} tickFormatter={formatRevenueTick} />
                   <Tooltip formatter={(v: number) => [`£${v.toFixed(0)}`, 'Revenue']} />
                   <Line type="monotone" dataKey="revenue" name="Revenue" stroke="#1B63C6" strokeWidth={2} dot={{ r: 4 }} />
                   <Legend />

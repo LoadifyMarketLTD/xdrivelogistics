@@ -243,7 +243,7 @@ export default function DriverHomePage() {
           <QuickAction
             icon="📷"
             label="Upload POD"
-            onClick={() => {}}
+            onClick={() => router.push('/m/driver/jobs')}
             color={brandColors.status.success}
           />
         </div>
