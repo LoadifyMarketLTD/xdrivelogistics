@@ -143,12 +143,21 @@ CREATE INDEX IF NOT EXISTS idx_bids_status ON public.job_bids(status);
 -- ============================================================
 
 -- Function to get current user's company_id
+-- NOTE: also exposed as get_user_company_id() for compatibility with supabase-schema.sql
 CREATE OR REPLACE FUNCTION public.current_user_company_id()
 RETURNS UUID AS $$
 BEGIN
   RETURN (
     SELECT company_id FROM public.profiles WHERE id = auth.uid()
   );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
+
+-- Alias: same logic as current_user_company_id(), kept for compatibility
+CREATE OR REPLACE FUNCTION public.get_user_company_id()
+RETURNS UUID AS $$
+BEGIN
+  RETURN public.current_user_company_id();
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 
