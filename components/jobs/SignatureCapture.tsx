@@ -171,7 +171,7 @@ export default function SignatureCapture({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: 'signature',
+          evidence_type: 'signature',
           phase,
           file_url: publicUrl,
           file_name: fileName,
