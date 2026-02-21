@@ -13,10 +13,11 @@ export type RoleStatusRow = { role: UserRole; status: UserStatus }
  * Uses existing portal routes — single source of truth.
  */
 export function routeForRoleStatus(row: RoleStatusRow): string {
-  if (row.status === 'pending') return '/pending'
   if (row.status === 'blocked') return '/blocked'
+  // Owner is never subject to pending approval
+  if (row.role === 'owner') return '/admin/approvals'
+  if (row.status === 'pending') return '/pending'
   switch (row.role) {
-    case 'owner':         return '/admin/approvals'
     case 'broker':        return '/dashboard/broker'
     case 'company_admin': return '/dashboard/company'
     case 'driver':        return '/dashboard/driver'

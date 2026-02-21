@@ -71,6 +71,10 @@ export async function middleware(request: NextRequest) {
 
   // Handle non-active statuses before route-specific checks
   if (status === 'pending') {
+    // Owner never needs approval — treat as active
+    if (role === 'owner') {
+      return response
+    }
     // Pending company_admin may still complete their company profile
     if (role === 'company_admin' && pathname.startsWith(PENDING_COMPANY_ALLOWED)) {
       return response
