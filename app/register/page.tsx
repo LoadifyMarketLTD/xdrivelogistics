@@ -4,7 +4,7 @@ import { useState, FormEvent, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import Link from 'next/link'
-import { ROLES, ROLE_LABEL, DEFAULT_ROLE, type Role } from '@/lib/roles'
+import { ROLES, ROLE_LABEL, ROLE_DESCRIPTION, ROLE_ICON, DEFAULT_ROLE, type Role } from '@/lib/roles'
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -160,7 +160,7 @@ export default function RegisterPage() {
                     onClick={() => setSelectedRole(role)}
                     style={{
                       display: 'flex',
-                      alignItems: 'center',
+                      alignItems: 'flex-start',
                       padding: '12px 14px',
                       border: `2px solid ${selectedRole === role ? '#C8A64D' : '#d1d5db'}`,
                       borderRadius: '8px',
@@ -176,6 +176,7 @@ export default function RegisterPage() {
                       border: `2px solid ${selectedRole === role ? '#C8A64D' : '#9ca3af'}`,
                       marginRight: '12px',
                       flexShrink: 0,
+                      marginTop: '2px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -189,13 +190,21 @@ export default function RegisterPage() {
                         }} />
                       )}
                     </div>
-                    <span style={{
-                      fontSize: '14px',
-                      fontWeight: selectedRole === role ? '600' : '400',
-                      color: selectedRole === role ? '#1f2937' : '#4b5563',
-                    }}>
-                      {ROLE_LABEL[role]}
-                    </span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+                        <span style={{ fontSize: '16px' }}>{ROLE_ICON[role]}</span>
+                        <span style={{
+                          fontSize: '14px',
+                          fontWeight: selectedRole === role ? '600' : '500',
+                          color: selectedRole === role ? '#1f2937' : '#4b5563',
+                        }}>
+                          {ROLE_LABEL[role]}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#6b7280', lineHeight: '1.4' }}>
+                        {ROLE_DESCRIPTION[role]}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
