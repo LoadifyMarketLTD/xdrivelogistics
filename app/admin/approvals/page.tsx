@@ -73,28 +73,45 @@ export default function ApprovalsPage() {
 
       if (brokerErr) throw brokerErr
 
-      // Fetch pending company admins + their company
-      const { data: companyData, error: companyErr } = await supabase
+      // Fetch pending company admins
+      const { data: companyAdminData, error: companyAdminErr } = await supabase
         .from('profiles')
-        .select(`
-          user_id, full_name, phone, created_at,
-          companies:companies!companies_created_by_fkey(id, name, status, registration_no, contact_email, contact_phone)
-        `)
+        .select('user_id, full_name, phone, created_at')
         .eq('role', 'company_admin')
         .eq('status', 'pending')
         .order('created_at', { ascending: true })
 
-      if (companyErr) throw companyErr
+      if (companyAdminErr) throw companyAdminErr
 
       setBrokers((brokerData ?? []) as PendingBroker[])
 
-      // companies join returns array — pick first company per user
-      const mapped: PendingCompany[] = (companyData ?? []).map((row: any) => ({
+      // Fetch companies for those admins via created_by
+      const adminUserIds = (companyAdminData ?? []).map((p: any) => p.user_id)
+      const companiesMap: Record<string, PendingCompany['company']> = {}
+      if (adminUserIds.length > 0) {
+        const { data: companiesData, error: companiesErr } = await supabase
+          .from('companies')
+          .select('id, name, status, registration_no, contact_email, contact_phone, created_by')
+          .in('created_by', adminUserIds)
+        if (companiesErr) throw companiesErr
+        for (const c of (companiesData ?? [])) {
+          companiesMap[c.created_by] = {
+            id: c.id,
+            name: c.name,
+            status: c.status,
+            registration_no: c.registration_no,
+            contact_email: c.contact_email,
+            contact_phone: c.contact_phone,
+          }
+        }
+      }
+
+      const mapped: PendingCompany[] = (companyAdminData ?? []).map((row: any) => ({
         user_id: row.user_id,
         full_name: row.full_name,
         phone: row.phone,
         created_at: row.created_at,
-        company: Array.isArray(row.companies) ? (row.companies[0] ?? null) : (row.companies ?? null),
+        company: companiesMap[row.user_id] ?? null,
       }))
       setCompanies(mapped)
     } catch (err: any) {
