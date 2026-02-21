@@ -7,7 +7,9 @@ begin;
 create extension if not exists "pgcrypto";
 
 -- 1) Helpers: updated_at trigger
-create or replace function public.set_updated_at()
+-- NOTE: also aliased as set_updated_at() in some older schema files —
+-- update_updated_at_column() is the canonical name used across all files.
+create or replace function public.update_updated_at_column()
 returns trigger
 language plpgsql
 as $$
@@ -163,8 +165,8 @@ create table if not exists public.job_bids (
   currency text default 'GBP',
   message text,
 
-  status text not null default 'pending'
-    check (status in ('pending','accepted','rejected','withdrawn')),
+  status text not null default 'submitted'
+    check (status in ('submitted','accepted','rejected','withdrawn')),
 
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -283,8 +285,8 @@ begin
     select 1 from information_schema.columns
     where table_schema='public' and table_name='job_bids' and column_name='status'
   ) then
-    alter table public.job_bids add column status text not null default 'pending'
-      check (status in ('pending','accepted','rejected','withdrawn'));
+    alter table public.job_bids add column status text not null default 'submitted'
+      check (status in ('submitted','accepted','rejected','withdrawn'));
   end if;
 end $$;
 
@@ -311,7 +313,7 @@ begin
     -- create trigger only if table exists
     if exists (select 1 from information_schema.tables where table_schema='public' and table_name=t) then
       execute format('drop trigger if exists trg_%s_updated_at on public.%I;', t, t);
-      execute format('create trigger trg_%s_updated_at before update on public.%I for each row execute function public.set_updated_at();', t, t);
+      execute format('create trigger trg_%s_updated_at before update on public.%I for each row execute function public.update_updated_at_column();', t, t);
     end if;
   end loop;
 end $$;

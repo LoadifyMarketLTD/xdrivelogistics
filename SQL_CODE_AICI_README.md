@@ -1,127 +1,258 @@
-# 🎯 SQL CODE AICI - COPIAZĂ ȘI RULEAZĂ
+<!-- ============================================================
+     ATENTIE / WARNING: ACESTA ESTE UN FISIER MARKDOWN -- NU SQL!
+     THIS IS A MARKDOWN FILE -- NOT SQL!
+     NU COPIA ACEST FISIER IN SUPABASE SQL EDITOR.
+     DO NOT COPY THIS FILE INTO SUPABASE SQL EDITOR.
+     Vei primi erori de sintaxa! / You will get syntax errors!
+     Copiaza DOAR blocul SQL de mai jos / Copy ONLY the SQL block below.
+     ============================================================ -->
 
-## ⚠️ ATENȚIE - ERORI COMUNE!
+# SQL CODE AICI -- COPIAZA SI RULEAZA IN SUPABASE
 
-### ❌ NU face asta:
-```
-SQL_CODE_AICI.sql   ← GREȘIT! Acesta e doar un nume de fișier!
-```
+## COPIAZA TOT CODUL SQL DE MAI JOS / COPY ALL THE SQL CODE BELOW
 
-### ❌ NU copia asta:
+> **Cum sa folosesti / How to use:**
+> 1. Apasa butonul **Copy** (coltul din dreapta sus al blocului de cod) / Click the **Copy** button (top-right of code block)
+> 2. Deschide **Supabase > SQL Editor**
+> 3. Lipeste (Ctrl+V) si apasa **Run**
+>
+> **ATENTIE / WARNING:** Daca citesti acest fisier in format RAW, NU copia tot fisierul.
+> Copiaza DOAR codul din blocul de mai jos (intre ```sql si ```).
+> Copierea intregului fisier Markdown in Supabase cauzeaza erori de sintaxa!
+
 ```sql
-CREATE TABLE public.invoices (
-  id UUID ...,
-  ...   ← GREȘIT! "..." NU este cod SQL valid!
+-- ============================================================
+-- SQL CODE COMPLET - COPIAZĂ ȘI RULEAZĂ ÎN SUPABASE
+-- COMPLETE SQL CODE - COPY AND RUN IN SUPABASE
+-- ============================================================
+--
+-- CONȚINUT / CONTENTS:
+--   PART 1: Fix job_bids status constraint (eroare "Failed to submit bid")
+--   PART 2: Create invoices table
+--
+-- ============================================================
+
+
+-- ============================================================
+-- PART 1: FIX job_bids STATUS CONSTRAINT
+-- Fixes: "Failed to submit bid: new row for relation job_bids
+--         violates check constraint job_bids_status_check"
+-- ============================================================
+
+-- 1a. Migrate any existing 'pending' bids to 'submitted'
+UPDATE public.job_bids
+SET status = 'submitted'
+WHERE status = 'pending';
+
+-- 1b. Fix the column default
+ALTER TABLE public.job_bids
+  ALTER COLUMN status SET DEFAULT 'submitted';
+
+-- 1c. Drop any check constraint on job_bids.status that references 'pending'
+DO $$
+DECLARE
+  r RECORD;
+BEGIN
+  FOR r IN
+    SELECT con.conname
+    FROM pg_constraint con
+    JOIN pg_class rel ON rel.oid = con.conrelid
+    JOIN pg_namespace nsp ON nsp.oid = rel.relnamespace
+    WHERE nsp.nspname = 'public'
+      AND rel.relname = 'job_bids'
+      AND con.contype = 'c'
+      AND pg_get_constraintdef(con.oid) LIKE '%pending%'
+  LOOP
+    EXECUTE 'ALTER TABLE public.job_bids DROP CONSTRAINT IF EXISTS ' || quote_ident(r.conname);
+  END LOOP;
+END $$;
+
+-- 1d. Drop and re-add the named constraint with the correct set of values
+ALTER TABLE public.job_bids
+  DROP CONSTRAINT IF EXISTS job_bids_status_check;
+
+ALTER TABLE public.job_bids
+  ADD CONSTRAINT job_bids_status_check
+  CHECK (status IN ('submitted', 'withdrawn', 'rejected', 'accepted'));
+
+-- 1e. Ensure essential columns exist (safe – skips if already present)
+DO $$
+BEGIN
+  -- bidder_id
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'job_bids' AND column_name = 'bidder_id'
+  ) THEN
+    IF EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'job_bids' AND column_name = 'bidder_user_id'
+    ) THEN
+      ALTER TABLE public.job_bids RENAME COLUMN bidder_user_id TO bidder_id;
+    ELSE
+      ALTER TABLE public.job_bids ADD COLUMN bidder_id UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+    END IF;
+  END IF;
+
+  -- amount_gbp
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'job_bids' AND column_name = 'amount_gbp'
+  ) THEN
+    IF EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'job_bids' AND column_name = 'quote_amount'
+    ) THEN
+      ALTER TABLE public.job_bids RENAME COLUMN quote_amount TO amount_gbp;
+      ALTER TABLE public.job_bids ALTER COLUMN amount_gbp TYPE NUMERIC(12,2);
+    ELSIF EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'job_bids' AND column_name = 'amount'
+    ) THEN
+      ALTER TABLE public.job_bids RENAME COLUMN amount TO amount_gbp;
+      ALTER TABLE public.job_bids ALTER COLUMN amount_gbp TYPE NUMERIC(12,2);
+    ELSE
+      ALTER TABLE public.job_bids ADD COLUMN amount_gbp NUMERIC(12,2) NOT NULL DEFAULT 0;
+    END IF;
+  END IF;
+
+  -- message
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'job_bids' AND column_name = 'message'
+  ) THEN
+    ALTER TABLE public.job_bids ADD COLUMN message TEXT;
+  END IF;
+END $$;
+
+-- 1f. Indexes for job_bids
+CREATE INDEX IF NOT EXISTS idx_job_bids_bidder_id ON public.job_bids(bidder_id);
+CREATE INDEX IF NOT EXISTS idx_job_bids_status    ON public.job_bids(status);
+
+
+-- ============================================================
+-- PART 2: CREATE INVOICES TABLE / CREEAZĂ TABELUL INVOICES
+-- ============================================================
+
+-- 2a. Create the invoices table
+CREATE TABLE IF NOT EXISTS public.invoices (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  invoice_number VARCHAR(20) UNIQUE NOT NULL,
+  job_id UUID REFERENCES public.jobs(id) ON DELETE CASCADE,
+  customer_name TEXT NOT NULL,
+  customer_email TEXT,
+  amount DECIMAL(10,2) NOT NULL,
+  vat_amount DECIMAL(10,2) DEFAULT 0,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'sent', 'paid', 'overdue', 'cancelled')),
+  issue_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  due_date DATE NOT NULL,
+  paid_date DATE,
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- 2b. Auto-generate invoice number / Auto-generează numărul facturii
+CREATE SEQUENCE IF NOT EXISTS invoice_number_seq START 1001;
+
+CREATE OR REPLACE FUNCTION generate_invoice_number()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.invoice_number IS NULL OR NEW.invoice_number = '' THEN
+    NEW.invoice_number := 'INV-' || TO_CHAR(NOW(), 'YYYY') || '-' || LPAD(NEXTVAL('invoice_number_seq')::TEXT, 4, '0');
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS set_invoice_number ON public.invoices;
+CREATE TRIGGER set_invoice_number
+  BEFORE INSERT ON public.invoices
+  FOR EACH ROW
+  EXECUTE FUNCTION generate_invoice_number();
+
+-- 2c. Indexes for invoices
+CREATE INDEX IF NOT EXISTS idx_invoices_company_id ON public.invoices(company_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_job_id ON public.invoices(job_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_status ON public.invoices(status);
+
+-- 2d. Enable Row Level Security
+ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
+
+-- 2e. RLS Policies
+DROP POLICY IF EXISTS "Users can view company invoices" ON public.invoices;
+CREATE POLICY "Users can view company invoices"
+  ON public.invoices FOR SELECT
+  USING (
+    company_id IN (
+      SELECT company_id FROM public.profiles WHERE id = auth.uid()
+    )
+  );
+
+DROP POLICY IF EXISTS "Users can manage company invoices" ON public.invoices;
+CREATE POLICY "Users can manage company invoices"
+  ON public.invoices FOR ALL
+  USING (
+    company_id IN (
+      SELECT company_id FROM public.profiles WHERE id = auth.uid()
+    )
+  );
+
+
+-- ============================================================
+-- VERIFICARE / VERIFICATION
+-- ============================================================
+
+-- Check job_bids.status column and constraint
+SELECT column_name, data_type, is_nullable, column_default
+FROM information_schema.columns
+WHERE table_schema = 'public' AND table_name = 'job_bids' AND column_name = 'status';
+
+-- Check invoices table exists
+SELECT table_name FROM information_schema.tables
+WHERE table_schema = 'public' AND table_name = 'invoices';
+
+
+-- ============================================================
+-- SUCCES! / SUCCESS!
+-- ============================================================
+-- PART 1: job_bids status constraint fixed!
+--   - Bids can now be submitted without errors.
+--   - All existing 'pending' bids migrated to 'submitted'.
+--
+-- PART 2: invoices table created!
+--   - Crea facturi / Create invoices
+--   - Urmări statusul / Track status
+--   - Auto-genera numere / Auto-generate numbers
+--   - Lega de joburi / Link to jobs
+-- ============================================================
 ```
 
-### Erori pe care le poți primi:
+---
 
-1. **"syntax error at or near SQL_CODE_AICI"**
-   - **Cauză:** Ai copiat NUMELE fișierului, nu conținutul
-   - **Soluție:** [FIX_EROARE_SQL_CODE_AICI.md](FIX_EROARE_SQL_CODE_AICI.md)
+## ✅ CE FACE ACEST COD / WHAT THIS CODE DOES
 
-2. **"syntax error at or near .."**
-   - **Cauză:** Ai copiat cod cu `...` (trei puncte) ca placeholders
-   - **Soluție:** [FIX_EROARE_ELLIPSIS_SQL.md](FIX_EROARE_ELLIPSIS_SQL.md) ⭐
+| # | Acțiune / Action |
+|---|-----------------|
+| 1 | **Repară `job_bids`** — rezolvă eroarea *"Failed to submit bid"* (constraint `job_bids_status_check`) |
+| 2 | **Creează tabelul `invoices`** cu numere auto-generate, securitate RLS și indexuri |
 
 ---
 
-## 📁 FIȘIERUL CU COD SQL
+## 🆘 DACĂ AI ERORI / IF YOU GET ERRORS
 
-### ➡️ **Deschide fișierul: `SQL_CODE_AICI.sql`** ⬅️
-### ✅ **Apoi copiază TOT conținutul din el (113 linii)!** ✅
-### ❌ **NU copia versiuni cu "..." (placeholders)!** ❌
-
----
-
-## 🚀 CUM SĂ RULEZI CORECT
-
-### Pasul 1: Deschide fișierul în editor
-- NU copia numele "SQL_CODE_AICI.sql"
-- NU copia cod cu "..." (trei puncte)
-- Deschide fișierul în VS Code / GitHub / Editor
-- Click pe fișier pentru a vedea conținutul complet
-
-### Pasul 2: Selectează TOT conținutul din fișier
-- Selectează tot (Ctrl+A sau Cmd+A)
-- Trebuie să vezi cod SQL complet (CREATE TABLE, CREATE FUNCTION, etc.)
-- NU doar numele fișierului!
-- NU cod cu "..."!
-
-### Pasul 3: Copiază conținutul
-- Copiază (Ctrl+C sau Cmd+C)
-- Conținutul trebuie să înceapă cu: `-- ============================================================`
-- Trebuie să ai ~113 linii, nu doar 10-20 linii!
-
-### Pasul 3: Deschide Supabase
-- Mergi pe https://supabase.com
-- Selectează proiectul tău
-- Click pe "SQL Editor" în meniul din stânga
-
-### Pasul 4: Rulează codul
-- Lipește codul în SQL Editor (Ctrl+V sau Cmd+V)
-- Click pe butonul "Run" (sau F5)
-- Așteaptă să termine
-
-### Pasul 5: Verifică succesul
-- Ar trebui să vezi: "Success!" sau mesaje de confirmare
-- Tabelul `invoices` este acum creat în baza ta de date
+| Eroare / Error | Soluție / Solution |
+|---|---|
+| `relation "job_bids" does not exist` | Rulează mai întâi `supabase-schema.sql` |
+| `relation "companies" does not exist` | Rulează mai întâi schema principală |
+| `relation "jobs" does not exist` | Rulează mai întâi schema principală |
+| `syntax error` | Asigură-te că ai copiat TOT codul, de la primul `--` până la ultimul `--` |
 
 ---
 
-## ✅ CE VA FACE ACEST COD
+## 🎉 DUPĂ SUCCES / AFTER SUCCESS
 
-1. **Creează tabelul `invoices`** cu:
-   - Câmpuri pentru facturi (număr, sumă, TVA, status)
-   - Link către companii și joburi
-   - Date de emitere și scadență
-
-2. **Auto-generează numere de facturi**:
-   - Format: INV-2026-1001, INV-2026-1002, etc.
-   - Automat la fiecare factură nouă
-
-3. **Adaugă securitate (RLS)**:
-   - Fiecare companie vede doar propriile facturi
-   - Protecție automată a datelor
-
-4. **Optimizează performanța**:
-   - Indexuri pentru căutări rapide
-   - Funcționează eficient cu multe facturi
-
----
-
-## 🆘 DACĂ AI ERORI
-
-### Eroare: "column company_id does not exist"
-**Soluție**: Rulează mai întâi schema principală (`supabase-schema.sql`)
-
-### Eroare: "relation companies does not exist"
-**Soluție**: Trebuie să existe tabelul `companies` mai întâi
-
-### Eroare: "syntax error"
-**Soluție**: Verifică că ai copiat TOT codul, de la început până la sfârșit
-
----
-
-## 📞 AJUTOR
-
-Dacă întâmpini probleme:
-1. Verifică că ai copiat ÎNTREG fișierul `SQL_CODE_AICI.sql`
-2. Verifică că există deja tabelele `companies` și `profiles`
-3. Verifică că ești logat în Supabase cu contul corect
-
----
-
-## 🎉 SUCCES!
-
-După ce rulezi cu succes, vei putea:
-- ✅ Crea facturi în aplicație
-- ✅ Urmări statusul facturilor
-- ✅ Genera automat numere de facturi
-- ✅ Lega facturi de joburi
-
----
-
-**Numele fișierului: `SQL_CODE_AICI.sql`**
-**Acțiune: Copiază TOT și rulează în Supabase SQL Editor**
+- ✅ Poți trimite oferte (bids) fără erori / Can submit bids without errors
+- ✅ Poți crea facturi în aplicație / Can create invoices
+- ✅ Numere de facturi se generează automat / Invoice numbers auto-generated
+- ✅ Fiecare companie vede doar datele proprii (RLS) / Each company sees only its own data

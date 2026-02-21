@@ -68,6 +68,7 @@ export default function FleetLoadsPage() {
         job_id: selectedLoad.id, bidder_id: authUser.id,
         amount_gbp: numericBid, bid_price_gbp: numericBid,
         message: bidMessage?.trim() || null,
+        status: 'submitted',
       })
       if (error) throw error
       alert('Bid placed successfully!')
