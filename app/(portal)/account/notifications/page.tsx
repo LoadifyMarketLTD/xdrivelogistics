@@ -1,6 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabaseClient'
+import { useAuth } from '@/lib/AuthContext'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
@@ -45,6 +47,10 @@ function NotifToggle({ label, description, checked, onChange }: NotifToggleProps
 }
 
 export default function NotificationsPage() {
+  const { user } = useAuth()
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [loadingPrefs, setLoadingPrefs] = useState(true)
   const [prefs, setPrefs] = useState({
     newLoads: true,
     bidUpdates: true,
@@ -54,12 +60,68 @@ export default function NotificationsPage() {
     emailDigest: false,
   })
 
+  // Load existing preferences from Supabase
+  useEffect(() => {
+    if (!user) { setLoadingPrefs(false); return }
+
+    const load = async () => {
+      try {
+        const { data } = await supabase
+          .from('user_settings')
+          .select('show_notification_bar,enable_load_alerts,send_booking_confirmation')
+          .eq('user_id', user.id)
+          .maybeSingle()
+
+        if (data) {
+          setPrefs((p) => ({
+            ...p,
+            newLoads: data.enable_load_alerts ?? true,
+            bidUpdates: data.send_booking_confirmation ?? true,
+            jobStatus: data.show_notification_bar ?? true,
+          }))
+        }
+      } catch (e) {
+        console.error('Error loading notification prefs:', e)
+      } finally {
+        setLoadingPrefs(false)
+      }
+    }
+    load()
+  }, [user])
+
   const toggle = (key: keyof typeof prefs) => (v: boolean) =>
     setPrefs((p) => ({ ...p, [key]: v }))
 
-  const handleSave = () => {
-    // In production this would POST to /api/profile/notifications
-    alert('Notification preferences saved!')
+  const handleSave = async () => {
+    if (!user) return
+    setSaving(true)
+    setSaved(false)
+    try {
+      const { error } = await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user.id,
+          enable_load_alerts: prefs.newLoads,
+          send_booking_confirmation: prefs.bidUpdates,
+          show_notification_bar: prefs.jobStatus,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' })
+
+      if (error) throw error
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Failed to save notification prefs:', msg)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loadingPrefs) {
+    return (
+      <div className="loading-screen"><div>Loading preferences…</div></div>
+    )
   }
 
   return (
@@ -104,18 +166,28 @@ export default function NotificationsPage() {
           </div>
         </section>
 
-        <button
-          onClick={handleSave}
-          style={{
-            alignSelf: 'flex-start', padding: '10px 24px',
-            background: '#C8A64D', color: '#ffffff', border: 'none',
-            borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
-          }}
-        >
-          Save Preferences
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            style={{
+              padding: '10px 24px',
+              background: saving ? '#9ca3af' : '#C8A64D', color: '#ffffff', border: 'none',
+              borderRadius: '8px', fontSize: '14px', fontWeight: '600',
+              cursor: saving ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {saving ? 'Saving…' : 'Save Preferences'}
+          </button>
+          {saved && (
+            <span style={{ fontSize: '14px', color: '#16a34a', fontWeight: '500' }}>
+              ✓ Preferences saved
+            </span>
+          )}
+        </div>
       </div>
     </div>
   )
 }
+
 

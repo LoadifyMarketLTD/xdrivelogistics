@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabaseClient'
 import { UserProfileComplete } from '@/lib/types'
 import '@/styles/portal.css'
@@ -12,9 +13,14 @@ export default function EditUserPage() {
   const params = useParams()
   const router = useRouter()
   const userId = params.id as string
+  const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [logoUrl, setLogoUrl] = useState<string | null>(null)
+  const [sendingPasswordReset, setSendingPasswordReset] = useState(false)
+  const [passwordResetSent, setPasswordResetSent] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [settings, setSettings] = useState<any>(null)
   const [roles, setRoles] = useState<string[]>([])
@@ -85,6 +91,7 @@ export default function EditUserPage() {
       setUser(profileData)
       setSettings(settingsData || {})
       setRoles(rolesData?.map(r => r.role_name) || [])
+      setLogoUrl(profileData.logo_url || null)
 
       // Populate form
       setFormData({
@@ -202,6 +209,59 @@ export default function EditUserPage() {
     } catch (err: any) {
       console.error('Error updating role:', err)
       alert('Failed to update role')
+    }
+  }
+
+  const handleLogoUpload = async (file: File) => {
+    if (!file) return
+    const maxSize = 2 * 1024 * 1024 // 2 MB
+    if (file.size > maxSize) {
+      alert('File size must be under 2 MB')
+      return
+    }
+    setUploadingLogo(true)
+    try {
+      const ext = file.name.split('.').pop()
+      const path = `avatars/${userId}.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from('profiles')
+        .upload(path, file, { upsert: true, contentType: file.type })
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage.from('profiles').getPublicUrl(path)
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ logo_url: publicUrl, updated_at: new Date().toISOString() })
+        .eq('id', userId)
+
+      if (updateError) throw updateError
+      setLogoUrl(publicUrl)
+    } catch (err: any) {
+      console.error('Logo upload error:', err)
+      alert('Logo upload failed: ' + err.message)
+    } finally {
+      setUploadingLogo(false)
+    }
+  }
+
+  const handleSendPasswordReset = async () => {
+    const email = formData.email
+    if (!email) { alert('No email address found for this user'); return }
+    setSendingPasswordReset(true)
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
+      if (error) throw error
+      setPasswordResetSent(true)
+      setTimeout(() => setPasswordResetSent(false), 5000)
+    } catch (err: any) {
+      console.error('Password reset error:', err)
+      alert('Failed to send password reset: ' + err.message)
+    } finally {
+      setSendingPasswordReset(false)
     }
   }
 
@@ -575,10 +635,13 @@ export default function EditUserPage() {
             </div>
           </div>
 
-          <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
+          <div style={{ marginTop: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
             <button
               type="button"
-              onClick={() => alert('Change email functionality coming soon')}
+              onClick={() => {
+                // Changing auth email requires the user to confirm — navigate to settings
+                router.push('/account/settings')
+              }}
               style={{
                 padding: '10px 20px',
                 fontSize: '14px',
@@ -590,23 +653,25 @@ export default function EditUserPage() {
                 fontWeight: '500'
               }}
             >
-              Change Email
+              Change Email (via Account Settings)
             </button>
             <button
               type="button"
-              onClick={() => alert('Password reset email will be sent')}
+              onClick={handleSendPasswordReset}
+              disabled={sendingPasswordReset || passwordResetSent}
               style={{
                 padding: '10px 20px',
                 fontSize: '14px',
-                color: '#3b82f6',
-                backgroundColor: '#eff6ff',
-                border: '1px solid #3b82f6',
+                color: passwordResetSent ? '#166534' : '#3b82f6',
+                backgroundColor: passwordResetSent ? '#dcfce7' : '#eff6ff',
+                border: `1px solid ${passwordResetSent ? '#166534' : '#3b82f6'}`,
                 borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: '500'
+                cursor: sendingPasswordReset ? 'not-allowed' : 'pointer',
+                fontWeight: '500',
+                opacity: sendingPasswordReset ? 0.6 : 1,
               }}
             >
-              Send an email to update a password
+              {sendingPasswordReset ? 'Sending…' : passwordResetSent ? '✓ Reset email sent' : 'Send Password Reset Email'}
             </button>
           </div>
         </FormSection>
@@ -750,20 +815,33 @@ export default function EditUserPage() {
             <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '12px' }}>
               Maximum file size is 2MB. You can upload a BMP, GIF, JPG, JPEG or PNG file.
             </p>
-            <input
-              type="file"
-              accept=".bmp,.gif,.jpg,.jpeg,.png"
-              onChange={(e) => {
-                // TODO: Implement file upload
-                alert('Logo upload functionality coming soon')
-              }}
-              style={{
-                padding: '8px',
-                fontSize: '14px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px'
-              }}
-            />
+            {logoUrl && (
+              <Image
+                src={logoUrl}
+                alt="Profile picture"
+                width={80}
+                height={80}
+                style={{ borderRadius: '50%', objectFit: 'cover', marginBottom: '12px', border: '2px solid #e5e7eb' }}
+              />
+            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".bmp,.gif,.jpg,.jpeg,.png"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) handleLogoUpload(file)
+                }}
+                style={{ padding: '8px', fontSize: '14px', border: '1px solid #d1d5db', borderRadius: '6px' }}
+              />
+              {uploadingLogo && (
+                <span style={{ fontSize: '13px', color: '#6b7280' }}>Uploading…</span>
+              )}
+              {!uploadingLogo && logoUrl && (
+                <span style={{ fontSize: '13px', color: '#16a34a' }}>✓ Picture saved</span>
+              )}
+            </div>
           </div>
         </FormSection>
 
