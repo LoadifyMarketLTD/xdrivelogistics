@@ -50,10 +50,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // Fetch profile to check role and status
+  // Fetch profile to check role and status.
+  // Only select columns that are guaranteed to exist in the schema.
+  // Selecting a non-existent column causes PostgREST to return an error
+  // which silently makes `data` null and breaks routing for all users.
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role, status, is_active')
+    .select('role, status')
     .eq('user_id', user.id)
     .maybeSingle()
 
@@ -64,8 +67,7 @@ export async function middleware(request: NextRequest) {
     (user.user_metadata?.role as string | undefined) ??
     (user.app_metadata?.role as string | undefined) ??
     ''
-  // Support both new `status` column and legacy `is_active` boolean
-  const isActive = profile?.status === 'active' || (!profile?.status && profile?.is_active !== false)
+  const isActive = profile?.status === 'active' || profile?.status == null
   const isNotActive = profile?.status === 'pending' || profile?.status === 'blocked'
 
   // /admin routes: owner only

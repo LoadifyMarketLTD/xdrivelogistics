@@ -101,7 +101,7 @@ export default function CompanyDashboardPage() {
   const navy = '#0A2239'
 
   return (
-    <RequireRole allowedRoles={['company']}>
+    <RequireRole allowedRoles={['company_admin', 'company']}>
       <ResponsiveContainer maxWidth="xl">
 
         {/* ── WELCOME BANNER (first visit) ─────────────────────── */}
