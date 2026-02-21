@@ -54,13 +54,13 @@ export async function middleware(request: NextRequest) {
   const { data: profile } = await supabase
     .from('profiles')
     .select('role, status, is_active')
-    .eq('id', user.id)
+    .eq('user_id', user.id)
     .maybeSingle()
 
   const role: string = profile?.role ?? ''
   // Support both new `status` column and legacy `is_active` boolean
   const isActive = profile?.status === 'active' || (!profile?.status && profile?.is_active !== false)
-  const isPending = profile?.status === 'pending' || profile?.status === 'blocked'
+  const isNotActive = profile?.status === 'pending' || profile?.status === 'blocked'
 
   // /admin routes: owner only
   if (pathname.startsWith('/admin')) {
@@ -72,7 +72,7 @@ export async function middleware(request: NextRequest) {
 
   // /dashboard routes: active users only, with special pending exception
   if (pathname.startsWith('/dashboard')) {
-    if (!isActive && isPending) {
+    if (!isActive && isNotActive) {
       // Pending company_admin may ONLY access the company profile page
       if (role === 'company_admin' && pathname.startsWith(PENDING_COMPANY_ALLOWED)) {
         return response

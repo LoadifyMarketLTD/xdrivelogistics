@@ -28,7 +28,7 @@ export default function LoginPage() {
         const { data: profileData } = await supabase
           .from('profiles')
           .select('role, status, is_active')
-          .eq('id', session.user.id)
+          .eq('user_id', session.user.id)
           .maybeSingle()
 
         const isActive = profileData?.status === 'active' ||
@@ -82,7 +82,7 @@ export default function LoginPage() {
         const { data: profileData } = await supabase
           .from('profiles')
           .select('role, status, is_active')
-          .eq('id', data.user.id)
+          .eq('user_id', data.user.id)
           .maybeSingle()
 
         const isActive = profileData?.status === 'active' ||
