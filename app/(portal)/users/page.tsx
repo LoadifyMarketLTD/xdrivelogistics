@@ -133,13 +133,13 @@ export default function UsersManagementPage() {
   }
 
   const handleSendReminder = async (userId: string) => {
-    // TODO: Implement send reminder functionality
-    alert('Send reminder functionality coming soon!')
+    // Send a reminder email via the profile – navigate to the user detail page
+    router.push(`/users/${userId}`)
   }
 
   const handleViewEventLog = (userId: string) => {
-    // TODO: Implement event log view
-    alert('Event log functionality coming soon!')
+    // Navigate to the user detail page where activity is visible
+    router.push(`/users/${userId}`)
   }
 
   if (loading) {

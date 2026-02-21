@@ -23,6 +23,7 @@ export default function LiveAvailabilityPage() {
       try {
         const { data, error } = await supabase.from('vehicles').select('*').eq('company_id', companyId).eq('is_available', true)
         if (error) throw error
+        if (!mounted) return
         setVehicles(data || [])
       } catch (e) {
         console.error('Error fetching available vehicles:', e)

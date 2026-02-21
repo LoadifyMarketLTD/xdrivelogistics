@@ -237,14 +237,18 @@ export default function Footer() {
                 padding: 0,
                 margin: 0,
               }}>
-                {['Terms & Conditions', 'Privacy Policy', 'Cookie Policy', 'GDPR'].map((item) => (
-                  <li key={item} style={{ marginBottom: '0.5rem' }}>
-                    <a href="#" style={{
+                {[
+                    { label: 'Terms & Conditions', href: '/terms' },
+                    { label: 'Privacy Policy', href: '/privacy' },
+                    { label: 'Cookie Policy', href: '/cookies' },
+                  ].map(({ label, href }) => (
+                  <li key={label} style={{ marginBottom: '0.5rem' }}>
+                    <a href={href} style={{
                       color: 'var(--muted)',
                       fontSize: '0.875rem',
                       textDecoration: 'none',
                     }}>
-                      {item}
+                      {label}
                     </a>
                   </li>
                 ))}

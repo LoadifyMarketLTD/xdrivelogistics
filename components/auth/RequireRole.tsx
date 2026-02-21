@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
@@ -15,17 +15,15 @@ interface RequireRoleProps {
 export default function RequireRole({ allowedRoles, children }: RequireRoleProps) {
   const router = useRouter()
   const { profile, loading, profileLoading } = useAuth()
-  const [hasRedirected, setHasRedirected] = useState(false)
 
   useEffect(() => {
     if (loading || profileLoading) return
 
     const role = profile?.role as Role | undefined
-    if (!hasRedirected && role && !allowedRoles.includes(role)) {
-      setHasRedirected(true)
+    if (role && !allowedRoles.includes(role)) {
       router.replace(getDefaultDashboardPath(role))
     }
-  }, [loading, profileLoading, profile, allowedRoles, router, hasRedirected])
+  }, [loading, profileLoading, profile, allowedRoles, router])
 
   if (loading || profileLoading) {
     return (

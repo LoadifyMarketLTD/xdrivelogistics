@@ -1,6 +1,13 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { AuthProvider } from '@/lib/AuthContext'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#0A2239',
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://xdrivelogistics.co.uk'),
