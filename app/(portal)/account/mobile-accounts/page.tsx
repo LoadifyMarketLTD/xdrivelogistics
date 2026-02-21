@@ -8,7 +8,7 @@ import '@/styles/portal.css'
 export const dynamic = 'force-dynamic'
 
 interface MobileUser {
-  id: string
+  user_id: string
   full_name: string | null
   first_name: string | null
   last_name: string | null
@@ -30,7 +30,7 @@ export default function MobileAccountsPage() {
       try {
         const { data } = await supabase
           .from('profiles')
-          .select('id,full_name,first_name,last_name,email,is_driver,has_mobile_account,mobile_option')
+          .select('user_id,full_name,first_name,last_name,email,is_driver,has_mobile_account,mobile_option')
           .eq('company_id', companyId)
           .order('full_name', { ascending: true })
         setUsers(data || [])
@@ -49,9 +49,9 @@ export default function MobileAccountsPage() {
       const { error } = await supabase
         .from('profiles')
         .update({ has_mobile_account: !currentValue, updated_at: new Date().toISOString() })
-        .eq('id', userId)
+        .eq('user_id', userId)
       if (error) throw error
-      setUsers(prev => prev.map(u => u.id === userId ? { ...u, has_mobile_account: !currentValue } : u))
+      setUsers(prev => prev.map(u => u.user_id === userId ? { ...u, has_mobile_account: !currentValue } : u))
     } catch (err: any) {
       alert('Failed to update: ' + err.message)
     } finally {
@@ -65,9 +65,9 @@ export default function MobileAccountsPage() {
       const { error } = await supabase
         .from('profiles')
         .update({ mobile_option: option, updated_at: new Date().toISOString() })
-        .eq('id', userId)
+        .eq('user_id', userId)
       if (error) throw error
-      setUsers(prev => prev.map(u => u.id === userId ? { ...u, mobile_option: option } : u))
+      setUsers(prev => prev.map(u => u.user_id === userId ? { ...u, mobile_option: option } : u))
     } catch (err: any) {
       alert('Failed to update: ' + err.message)
     } finally {
@@ -121,7 +121,7 @@ export default function MobileAccountsPage() {
             </thead>
             <tbody>
               {users.map((u, i) => (
-                <tr key={u.id} style={{ borderBottom: i < users.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                <tr key={u.user_id} style={{ borderBottom: i < users.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
                   <td style={{ padding: '14px 16px', fontWeight: '600', fontSize: '14px', color: '#1f2937' }}>
                     {u.full_name || [u.first_name, u.last_name].filter(Boolean).join(' ') || '—'}
                   </td>
@@ -139,13 +139,13 @@ export default function MobileAccountsPage() {
                   </td>
                   <td style={{ padding: '14px 16px' }}>
                     <button
-                      onClick={() => toggleMobileAccess(u.id, u.has_mobile_account)}
-                      disabled={saving === u.id}
+                      onClick={() => toggleMobileAccess(u.user_id, u.has_mobile_account)}
+                      disabled={saving === u.user_id}
                       style={{
                         width: '44px', height: '24px', borderRadius: '12px', border: 'none',
                         background: u.has_mobile_account ? '#16A34A' : '#d1d5db',
                         cursor: 'pointer', position: 'relative',
-                        opacity: saving === u.id ? 0.6 : 1,
+                        opacity: saving === u.user_id ? 0.6 : 1,
                       }}
                     >
                       <span style={{
@@ -159,8 +159,8 @@ export default function MobileAccountsPage() {
                   <td style={{ padding: '14px 16px' }}>
                     <select
                       value={u.mobile_option || 'FREE'}
-                      onChange={e => updateMobileOption(u.id, e.target.value)}
-                      disabled={!u.has_mobile_account || saving === u.id}
+                      onChange={e => updateMobileOption(u.user_id, e.target.value)}
+                      disabled={!u.has_mobile_account || saving === u.user_id}
                       style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '13px', cursor: 'pointer', background: u.has_mobile_account ? '#fff' : '#f9fafb', color: u.has_mobile_account ? '#374151' : '#9ca3af' }}
                     >
                       <option value="FREE">Free</option>

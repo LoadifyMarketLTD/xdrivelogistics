@@ -39,7 +39,7 @@ export default function CompanyDashboardPage() {
 
         const [{ data: drivers }, { data: vehicles }, { data: acceptedBids }] =
           await Promise.all([
-            supabase.from('profiles').select('id').eq('company_id', companyId).eq('role', 'driver'),
+            supabase.from('profiles').select('user_id').eq('company_id', companyId).eq('role', 'driver'),
             supabase.from('vehicles').select('id').eq('company_id', companyId),
             jobIds.length > 0
               ? supabase.from('job_bids').select('id, created_at').in('job_id', jobIds).eq('status', 'accepted')

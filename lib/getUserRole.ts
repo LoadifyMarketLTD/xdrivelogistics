@@ -6,7 +6,7 @@ export async function getUserRole(userId: string): Promise<Role> {
     const { data } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', userId)
+      .eq('user_id', userId)
       .maybeSingle()
 
     if (data?.role && ROLES.includes(data.role as Role)) {

@@ -39,7 +39,7 @@ export async function GET(
     const { data: profile } = await supabase
       .from('profiles')
       .select('role, company_id')
-      .eq('id', userId)
+      .eq('user_id', userId)
       .single()
 
     const isJobPoster = profile?.company_id === job.posted_by_company_id
@@ -127,7 +127,7 @@ export async function POST(
     const { data: profile } = await supabase
       .from('profiles')
       .select('role, company_id')
-      .eq('id', userId)
+      .eq('user_id', userId)
       .single()
 
     const isJobPoster = profile?.company_id === job.posted_by_company_id
@@ -172,7 +172,7 @@ export async function POST(
       const { data: bidderProfile } = await supabase
         .from('profiles')
         .select('company_id')
-        .eq('id', bid.bidder_id)
+        .eq('user_id', bid.bidder_id)
         .single()
 
       // 1. Mark the accepted bid as 'accepted'

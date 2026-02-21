@@ -45,12 +45,12 @@ export default function DriverJobsPage() {
   const mountedRef = useRef(true)
 
   const fetchJobs = useCallback(async () => {
-    if (!profile?.id) return
+    if (!profile?.user_id) return
     try {
       const { data } = await supabase
         .from('jobs')
         .select('id,pickup_location,delivery_location,pickup_datetime,delivery_datetime,status,vehicle_type,budget,distance_miles')
-        .eq('driver_id', profile.id)
+        .eq('driver_id', profile.user_id)
         .order('pickup_datetime', { ascending: false })
         .limit(50)
       if (mountedRef.current) setJobs(data || [])
@@ -59,7 +59,7 @@ export default function DriverJobsPage() {
     } finally {
       if (mountedRef.current) setLoading(false)
     }
-  }, [profile?.id])
+  }, [profile?.user_id])
 
   useEffect(() => {
     mountedRef.current = true

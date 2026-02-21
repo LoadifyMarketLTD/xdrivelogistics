@@ -71,7 +71,7 @@ CREATE TRIGGER companies_updated_at
 -- 3. PROFILES  (extinde auth.users 1-la-1)
 -- ────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.profiles (
-  id           UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id      UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   company_id   UUID REFERENCES public.companies(id) ON DELETE SET NULL,
 
   -- Rol (folosit pentru rutare după autentificare)
@@ -120,13 +120,13 @@ CREATE TRIGGER profiles_updated_at
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, role)
+  INSERT INTO public.profiles (user_id, email, role)
   VALUES (
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'role', 'driver')
   )
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT (user_id) DO NOTHING;
   RETURN NEW;
 END;
 $$;
@@ -159,7 +159,7 @@ BEGIN
   -- Leagă utilizatorul de compania nou-creată
   UPDATE public.profiles
   SET company_id = new_id
-  WHERE id = uid;
+  WHERE user_id = uid;
 
   RETURN new_id;
 END;
@@ -230,10 +230,10 @@ CREATE TABLE IF NOT EXISTS public.jobs (
 
   -- Cine a postat
   posted_by_company_id UUID REFERENCES public.companies(id) ON DELETE SET NULL,
-  posted_by_user_id    UUID REFERENCES public.profiles(id)  ON DELETE SET NULL,
+  posted_by_user_id    UUID REFERENCES public.profiles(user_id)  ON DELETE SET NULL,
 
   -- Șofer și vehicul atribuit
-  driver_id            UUID REFERENCES public.profiles(id)  ON DELETE SET NULL,
+  driver_id            UUID REFERENCES public.profiles(user_id)  ON DELETE SET NULL,
   vehicle_id           UUID REFERENCES public.vehicles(id)  ON DELETE SET NULL,
 
   -- Stare
@@ -308,7 +308,7 @@ CREATE TRIGGER jobs_updated_at
 CREATE TABLE IF NOT EXISTS public.job_bids (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   job_id     UUID NOT NULL REFERENCES public.jobs(id) ON DELETE CASCADE,
-  bidder_id  UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  bidder_id  UUID NOT NULL REFERENCES public.profiles(user_id) ON DELETE CASCADE,
   company_id UUID REFERENCES public.companies(id) ON DELETE SET NULL,
   amount_gbp NUMERIC(10,2) NOT NULL,
   message    TEXT,
@@ -337,7 +337,7 @@ CREATE TABLE IF NOT EXISTS public.invoices (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   invoice_number  TEXT UNIQUE,
   company_id      UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-  created_by_id   UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  created_by_id   UUID REFERENCES public.profiles(user_id) ON DELETE SET NULL,
   job_id          UUID REFERENCES public.jobs(id)     ON DELETE SET NULL,
 
   -- Date client (beneficiar)
@@ -418,31 +418,31 @@ CREATE POLICY "companies_update" ON public.companies
 -- ── PROFILES ────────────────────────────────────────────────
 DROP POLICY IF EXISTS "profiles_select_own" ON public.profiles;
 CREATE POLICY "profiles_select_own" ON public.profiles
-  FOR SELECT USING (auth.uid() = id);
+  FOR SELECT USING (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "profiles_select_company" ON public.profiles;
 CREATE POLICY "profiles_select_company" ON public.profiles
   FOR SELECT USING (
     company_id IS NOT NULL AND
     company_id IN (
-      SELECT company_id FROM public.profiles WHERE id = auth.uid()
+      SELECT company_id FROM public.profiles WHERE user_id = auth.uid()
     )
   );
 
 DROP POLICY IF EXISTS "profiles_update_own" ON public.profiles;
 CREATE POLICY "profiles_update_own" ON public.profiles
-  FOR UPDATE USING (auth.uid() = id);
+  FOR UPDATE USING (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "profiles_insert_own" ON public.profiles;
 CREATE POLICY "profiles_insert_own" ON public.profiles
-  FOR INSERT WITH CHECK (auth.uid() = id);
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- ── DRIVERS ─────────────────────────────────────────────────
 DROP POLICY IF EXISTS "drivers_company_select" ON public.drivers;
 CREATE POLICY "drivers_company_select" ON public.drivers
   FOR SELECT USING (
     company_id IN (
-      SELECT company_id FROM public.profiles WHERE id = auth.uid() AND company_id IS NOT NULL
+      SELECT company_id FROM public.profiles WHERE user_id = auth.uid() AND company_id IS NOT NULL
     )
   );
 
@@ -450,7 +450,7 @@ DROP POLICY IF EXISTS "drivers_company_insert" ON public.drivers;
 CREATE POLICY "drivers_company_insert" ON public.drivers
   FOR INSERT WITH CHECK (
     company_id IN (
-      SELECT company_id FROM public.profiles WHERE id = auth.uid() AND company_id IS NOT NULL
+      SELECT company_id FROM public.profiles WHERE user_id = auth.uid() AND company_id IS NOT NULL
     )
   );
 
@@ -458,7 +458,7 @@ DROP POLICY IF EXISTS "drivers_company_update" ON public.drivers;
 CREATE POLICY "drivers_company_update" ON public.drivers
   FOR UPDATE USING (
     company_id IN (
-      SELECT company_id FROM public.profiles WHERE id = auth.uid() AND company_id IS NOT NULL
+      SELECT company_id FROM public.profiles WHERE user_id = auth.uid() AND company_id IS NOT NULL
     )
   );
 
@@ -466,7 +466,7 @@ DROP POLICY IF EXISTS "drivers_company_delete" ON public.drivers;
 CREATE POLICY "drivers_company_delete" ON public.drivers
   FOR DELETE USING (
     company_id IN (
-      SELECT company_id FROM public.profiles WHERE id = auth.uid() AND company_id IS NOT NULL
+      SELECT company_id FROM public.profiles WHERE user_id = auth.uid() AND company_id IS NOT NULL
     )
   );
 
@@ -479,7 +479,7 @@ DROP POLICY IF EXISTS "vehicles_company_insert" ON public.vehicles;
 CREATE POLICY "vehicles_company_insert" ON public.vehicles
   FOR INSERT WITH CHECK (
     company_id IN (
-      SELECT company_id FROM public.profiles WHERE id = auth.uid() AND company_id IS NOT NULL
+      SELECT company_id FROM public.profiles WHERE user_id = auth.uid() AND company_id IS NOT NULL
     )
   );
 
@@ -487,7 +487,7 @@ DROP POLICY IF EXISTS "vehicles_company_update" ON public.vehicles;
 CREATE POLICY "vehicles_company_update" ON public.vehicles
   FOR UPDATE USING (
     company_id IN (
-      SELECT company_id FROM public.profiles WHERE id = auth.uid() AND company_id IS NOT NULL
+      SELECT company_id FROM public.profiles WHERE user_id = auth.uid() AND company_id IS NOT NULL
     )
   );
 
@@ -501,7 +501,7 @@ CREATE POLICY "jobs_insert_company" ON public.jobs
   FOR INSERT WITH CHECK (
     auth.uid() IS NOT NULL AND
     posted_by_company_id IN (
-      SELECT company_id FROM public.profiles WHERE id = auth.uid() AND company_id IS NOT NULL
+      SELECT company_id FROM public.profiles WHERE user_id = auth.uid() AND company_id IS NOT NULL
     )
   );
 
@@ -509,7 +509,7 @@ DROP POLICY IF EXISTS "jobs_update_company" ON public.jobs;
 CREATE POLICY "jobs_update_company" ON public.jobs
   FOR UPDATE USING (
     posted_by_company_id IN (
-      SELECT company_id FROM public.profiles WHERE id = auth.uid() AND company_id IS NOT NULL
+      SELECT company_id FROM public.profiles WHERE user_id = auth.uid() AND company_id IS NOT NULL
     )
     OR driver_id = auth.uid()
   );
@@ -522,7 +522,7 @@ CREATE POLICY "bids_select" ON public.job_bids
     OR job_id IN (
       SELECT id FROM public.jobs
       WHERE posted_by_company_id IN (
-        SELECT company_id FROM public.profiles WHERE id = auth.uid() AND company_id IS NOT NULL
+        SELECT company_id FROM public.profiles WHERE user_id = auth.uid() AND company_id IS NOT NULL
       )
     )
   );
@@ -538,7 +538,7 @@ CREATE POLICY "bids_update_own" ON public.job_bids
     OR job_id IN (
       SELECT id FROM public.jobs
       WHERE posted_by_company_id IN (
-        SELECT company_id FROM public.profiles WHERE id = auth.uid() AND company_id IS NOT NULL
+        SELECT company_id FROM public.profiles WHERE user_id = auth.uid() AND company_id IS NOT NULL
       )
     )
   );
@@ -548,7 +548,7 @@ DROP POLICY IF EXISTS "invoices_company_select" ON public.invoices;
 CREATE POLICY "invoices_company_select" ON public.invoices
   FOR SELECT USING (
     company_id IN (
-      SELECT company_id FROM public.profiles WHERE id = auth.uid() AND company_id IS NOT NULL
+      SELECT company_id FROM public.profiles WHERE user_id = auth.uid() AND company_id IS NOT NULL
     )
   );
 
@@ -556,7 +556,7 @@ DROP POLICY IF EXISTS "invoices_company_insert" ON public.invoices;
 CREATE POLICY "invoices_company_insert" ON public.invoices
   FOR INSERT WITH CHECK (
     company_id IN (
-      SELECT company_id FROM public.profiles WHERE id = auth.uid() AND company_id IS NOT NULL
+      SELECT company_id FROM public.profiles WHERE user_id = auth.uid() AND company_id IS NOT NULL
     )
   );
 
@@ -564,7 +564,7 @@ DROP POLICY IF EXISTS "invoices_company_update" ON public.invoices;
 CREATE POLICY "invoices_company_update" ON public.invoices
   FOR UPDATE USING (
     company_id IN (
-      SELECT company_id FROM public.profiles WHERE id = auth.uid() AND company_id IS NOT NULL
+      SELECT company_id FROM public.profiles WHERE user_id = auth.uid() AND company_id IS NOT NULL
     )
   );
 

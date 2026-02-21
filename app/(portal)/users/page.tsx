@@ -79,7 +79,7 @@ export default function UsersManagementPage() {
       if (profilesError) throw profilesError
 
       // Fetch auth users to get email verification status
-      const userIds = profilesData?.map(p => p.id) || []
+      const userIds = profilesData?.map(p => p.user_id) || []
       
       // Fetch settings for all users
       const { data: settingsData, error: settingsError } = await supabase
@@ -95,11 +95,11 @@ export default function UsersManagementPage() {
 
       // Combine the data
       const combinedUsers = profilesData?.map(profile => {
-        const settings = settingsData?.find(s => s.user_id === profile.id)
-        const userRoles = rolesData?.filter(r => r.user_id === profile.id).map(r => r.role_name) || []
+        const settings = settingsData?.find(s => s.user_id === profile.user_id)
+        const userRoles = rolesData?.filter(r => r.user_id === profile.user_id).map(r => r.role_name) || []
         
         return {
-          id: profile.id,
+          id: profile.user_id,
           email: profile.email,
           full_name: profile.full_name || `${profile.first_name || ''} ${profile.last_name || ''}`.trim(),
           first_name: profile.first_name,

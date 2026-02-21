@@ -83,7 +83,7 @@ export async function POST(
     const { data: profile } = await supabase
       .from('profiles')
       .select('role, company_id')
-      .eq('id', userId)
+      .eq('user_id', userId)
       .single()
 
     const isAdmin = profile?.role === 'admin'
@@ -221,7 +221,7 @@ export async function GET(
     const { data: profile } = await supabase
       .from('profiles')
       .select('role, company_id')
-      .eq('id', userId)
+      .eq('user_id', userId)
       .single()
 
     const isDriver = job.driver_id === userId
@@ -352,7 +352,7 @@ export async function DELETE(
     const { data: profile } = await supabase
       .from('profiles')
       .select('role, company_id')
-      .eq('id', userId)
+      .eq('user_id', userId)
       .single()
 
     const isUploader = evidence.uploaded_by === userId
