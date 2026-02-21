@@ -5,7 +5,7 @@ import { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabaseClient'
 
 interface Profile {
-  id: string
+  user_id: string
   email: string
   full_name: string | null
   display_name: string | null

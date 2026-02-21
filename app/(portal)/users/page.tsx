@@ -79,7 +79,7 @@ export default function UsersManagementPage() {
       if (profilesError) throw profilesError
 
       // Fetch auth users to get email verification status
-      const userIds = profilesData?.map(p => p.id) || []
+      const userIds = profilesData?.map(p => p.user_id) || []
       
       // Fetch settings for all users
       const { data: settingsData, error: settingsError } = await supabase
