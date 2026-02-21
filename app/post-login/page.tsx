@@ -19,7 +19,12 @@ export default function PostLoginPage() {
       }
 
       try {
-        const row = await getMyRoleStatus()
+        // Race the RPC against an 8-second timeout so the page never hangs
+        // indefinitely when the database is slow or the function is missing.
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Profile lookup timed out')), 8000)
+        )
+        const row = await Promise.race([getMyRoleStatus(), timeoutPromise])
         if (cancelled) return
 
         if (!row) {
@@ -30,7 +35,7 @@ export default function PostLoginPage() {
 
         router.replace(routeForRoleStatus(row))
       } catch {
-        router.replace('/onboarding')
+        if (!cancelled) router.replace('/onboarding')
       }
     }
 
