@@ -10,6 +10,13 @@ const PENDING_COMPANY_ALLOWED = '/dashboard/company/profile'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // Short-circuit immediately for non-protected routes so public pages
+  // (landing, login, register, etc.) never wait on a Supabase network call.
+  const isProtected = PROTECTED_PREFIXES.some(p => pathname.startsWith(p))
+  if (!isProtected) {
+    return NextResponse.next()
+  }
+
   // Create response FIRST
   const response = NextResponse.next()
 
@@ -35,14 +42,8 @@ export async function middleware(request: NextRequest) {
     },
   })
 
-  // Refresh session
+  // Validate session (network call to Supabase — only runs for protected routes)
   const { data: { user } } = await supabase.auth.getUser()
-
-  const isProtected = PROTECTED_PREFIXES.some(p => pathname.startsWith(p))
-
-  if (!isProtected) {
-    return response
-  }
 
   // Not authenticated → redirect to login
   if (!user) {
