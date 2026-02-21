@@ -16,6 +16,14 @@ export default function DashboardPage() {
     if (loading || profileLoading) return
 
     const role = profile?.role
+    const status = profile?.status
+
+    // Pending users must go to /pending (middleware also enforces this, belt-and-suspenders)
+    if (status === 'pending' || status === 'blocked') {
+      router.replace('/pending')
+      return
+    }
+
     router.replace(getDefaultDashboardPath(role))
   }, [loading, profileLoading, profile, router])
 

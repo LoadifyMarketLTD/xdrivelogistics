@@ -1,388 +1,127 @@
 'use client'
 
-import { useState, FormEvent, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabaseClient'
+import Image from 'next/image'
 import Link from 'next/link'
-import { ROLES, ROLE_LABEL, ROLE_DESCRIPTION, ROLE_ICON, DEFAULT_ROLE, type Role } from '@/lib/roles'
+import { supabase } from '@/lib/supabaseClient'
 
 export default function RegisterPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [selectedRole, setSelectedRole] = useState<Role>(DEFAULT_ROLE)
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [checking, setChecking] = useState(true)
   const router = useRouter()
+  const [checking, setChecking] = useState(true)
 
-  // Check if user is already authenticated
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+    supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        router.push('/dashboard')
+        router.replace('/dashboard')
       } else {
         setChecking(false)
       }
-    }
-    checkAuth()
+    })
   }, [router])
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-
-    // Validation
-    if (!email) {
-      setError('Please enter an email address')
-      setLoading(false)
-      return
-    }
-
-    if (!password) {
-      setError('Please enter a password')
-      setLoading(false)
-      return
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters')
-      setLoading(false)
-      return
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      setLoading(false)
-      return
-    }
-
-    try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { role: selectedRole } },
-      })
-
-      if (signUpError) {
-        setError(signUpError.message)
-        setPassword('')
-        setConfirmPassword('')
-      } else if (data.user) {
-        // Persist role in profiles table (upsert is safe with or without DB trigger)
-        await supabase
-          .from('profiles')
-          .upsert({ id: data.user.id, email, role: selectedRole }, { onConflict: 'id' })
-
-        // New users always need onboarding — go there first
-        router.push('/onboarding')
-      }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Show loading state while checking authentication
   if (checking) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        backgroundColor: '#f9fafb',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div style={{ textAlign: 'center', color: '#6b7280' }}>
-          Loading...
-        </div>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f9fafb' }}>
+        <div style={{ color: '#6b7280' }}>Loading...</div>
       </div>
     )
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#f9fafb',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px'
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '420px'
-      }}>
-        <div style={{
-          backgroundColor: '#ffffff',
-          borderRadius: '12px',
-          padding: '48px 40px',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-          border: '1px solid #e5e7eb'
-        }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+      <div style={{ width: '100%', maxWidth: '480px' }}>
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '48px 40px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', border: '1px solid #e5e7eb' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <h1 style={{
-              fontSize: '28px',
-              fontWeight: '700',
-              color: '#1f2937',
-              margin: '0 0 8px 0'
-            }}>
+            <div style={{ marginBottom: '16px' }}>
+              <Image src="/logo.webp" alt="XDrive Logistics LTD" width={160} height={46} style={{ display: 'inline-block' }} priority />
+            </div>
+            <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', margin: '0 0 8px 0' }}>
               Join <span style={{ color: '#C8A64D' }}>XDrive Logistics LTD</span>
             </h1>
-            <p style={{
-              fontSize: '15px',
-              color: '#6b7280',
-              margin: 0
-            }}>
-              Create your account to get started
+            <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
+              Choose your account type to get started
             </p>
           </div>
 
-          <form onSubmit={handleSubmit}>
-            {/* Role Selection */}
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{
-                display: 'block',
-                color: '#374151',
-                fontSize: '14px',
-                fontWeight: '500',
-                marginBottom: '10px',
-              }}>
-                I am a…
-              </label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {ROLES.map((role) => (
-                  <div
-                    key={role}
-                    onClick={() => setSelectedRole(role)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      padding: '12px 14px',
-                      border: `2px solid ${selectedRole === role ? '#C8A64D' : '#d1d5db'}`,
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      background: selectedRole === role ? '#fffbf0' : '#ffffff',
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    <div style={{
-                      width: '18px',
-                      height: '18px',
-                      borderRadius: '50%',
-                      border: `2px solid ${selectedRole === role ? '#C8A64D' : '#9ca3af'}`,
-                      marginRight: '12px',
-                      flexShrink: 0,
-                      marginTop: '2px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                      {selectedRole === role && (
-                        <div style={{
-                          width: '9px',
-                          height: '9px',
-                          borderRadius: '50%',
-                          background: '#C8A64D',
-                        }} />
-                      )}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
-                        <span style={{ fontSize: '16px' }}>{ROLE_ICON[role]}</span>
-                        <span style={{
-                          fontSize: '14px',
-                          fontWeight: selectedRole === role ? '600' : '500',
-                          color: selectedRole === role ? '#1f2937' : '#4b5563',
-                        }}>
-                          {ROLE_LABEL[role]}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '12px', color: '#6b7280', lineHeight: '1.4' }}>
-                        {ROLE_DESCRIPTION[role]}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '20px' }}>
-              <label htmlFor="email" style={{
-                display: 'block',
-                color: '#374151',
-                fontSize: '14px',
-                fontWeight: '500',
-                marginBottom: '8px'
-              }}>
-                Email Address
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-                placeholder="your@email.com"
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  color: '#1f2937',
-                  fontSize: '15px',
-                  transition: 'all 0.2s',
-                  outline: 'none'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#C8A64D'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-              />
-            </div>
-
-            <div style={{ marginBottom: '20px' }}>
-              <label htmlFor="password" style={{
-                display: 'block',
-                color: '#374151',
-                fontSize: '14px',
-                fontWeight: '500',
-                marginBottom: '8px'
-              }}>
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
-                placeholder="Minimum 6 characters"
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  color: '#1f2937',
-                  fontSize: '15px',
-                  transition: 'all 0.2s',
-                  outline: 'none'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#C8A64D'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-              />
-            </div>
-
-            <div style={{ marginBottom: '24px' }}>
-              <label htmlFor="confirmPassword" style={{
-                display: 'block',
-                color: '#374151',
-                fontSize: '14px',
-                fontWeight: '500',
-                marginBottom: '8px'
-              }}>
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                disabled={loading}
-                placeholder="Re-enter password"
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  color: '#1f2937',
-                  fontSize: '15px',
-                  transition: 'all 0.2s',
-                  outline: 'none'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#C8A64D'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: '100%',
-                padding: '14px',
-                backgroundColor: '#C8A64D',
-                border: 'none',
-                borderRadius: '8px',
-                color: '#ffffff',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s',
-                opacity: loading ? 0.6 : 1
-              }}
-              onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = '#B39543')}
-              onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = '#C8A64D')}
-            >
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </button>
-
-            {error && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {/* Broker Option */}
+            <Link href="/register/broker" style={{ textDecoration: 'none' }}>
               <div style={{
-                marginTop: '16px',
-                padding: '12px',
-                backgroundColor: '#fef2f2',
-                border: '1px solid #fecaca',
-                borderRadius: '8px',
-                color: '#dc2626',
-                fontSize: '14px',
-                textAlign: 'center'
-              }}>
-                {error}
+                display: 'flex', alignItems: 'flex-start', padding: '18px 20px',
+                border: '2px solid #e5e7eb', borderRadius: '10px', cursor: 'pointer',
+                background: '#ffffff', transition: 'all 0.15s',
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = '#C8A64D'; (e.currentTarget as HTMLDivElement).style.background = '#fffbf0' }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = '#e5e7eb'; (e.currentTarget as HTMLDivElement).style.background = '#ffffff' }}
+              >
+                <span style={{ fontSize: '28px', marginRight: '14px', flexShrink: 0 }}>📋</span>
+                <div>
+                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#1f2937', marginBottom: '4px' }}>
+                    Broker / Dispatcher
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#6b7280', lineHeight: '1.5' }}>
+                    Post loads, manage shipments and connect with carriers.
+                  </div>
+                  <div style={{ marginTop: '8px', fontSize: '12px', color: '#C8A64D', fontWeight: '600' }}>
+                    Requires approval → Register →
+                  </div>
+                </div>
               </div>
-            )}
-          </form>
+            </Link>
 
-          <div style={{
-            marginTop: '24px',
-            paddingTop: '24px',
-            borderTop: '1px solid #e5e7eb',
-            textAlign: 'center',
-            color: '#6b7280',
-            fontSize: '14px'
-          }}>
-            Already have an account?{' '}
-            <Link href="/login" style={{
-              color: '#C8A64D',
-              textDecoration: 'none',
-              fontWeight: '600'
+            {/* Company Option */}
+            <Link href="/register/company" style={{ textDecoration: 'none' }}>
+              <div style={{
+                display: 'flex', alignItems: 'flex-start', padding: '18px 20px',
+                border: '2px solid #e5e7eb', borderRadius: '10px', cursor: 'pointer',
+                background: '#ffffff', transition: 'all 0.15s',
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = '#C8A64D'; (e.currentTarget as HTMLDivElement).style.background = '#fffbf0' }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = '#e5e7eb'; (e.currentTarget as HTMLDivElement).style.background = '#ffffff' }}
+              >
+                <span style={{ fontSize: '28px', marginRight: '14px', flexShrink: 0 }}>🏢</span>
+                <div>
+                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#1f2937', marginBottom: '4px' }}>
+                    Transport Company
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#6b7280', lineHeight: '1.5' }}>
+                    Manage your fleet, post jobs and invite drivers to your team.
+                  </div>
+                  <div style={{ marginTop: '8px', fontSize: '12px', color: '#C8A64D', fontWeight: '600' }}>
+                    Requires approval → Register →
+                  </div>
+                </div>
+              </div>
+            </Link>
+
+            {/* Driver notice */}
+            <div style={{
+              padding: '14px 16px', borderRadius: '8px',
+              backgroundColor: '#f8fafc', border: '1px solid #e2e8f0',
+              display: 'flex', alignItems: 'flex-start', gap: '10px',
             }}>
-              Login here
+              <span style={{ fontSize: '20px', flexShrink: 0 }}>🚚</span>
+              <div>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#374151' }}>Driver?</div>
+                <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px', lineHeight: '1.5' }}>
+                  Drivers can only join via a company invite link. Ask your company manager for an invite.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid #e5e7eb', textAlign: 'center', color: '#6b7280', fontSize: '14px' }}>
+            Already have an account?{' '}
+            <Link href="/login" style={{ color: '#C8A64D', textDecoration: 'none', fontWeight: '600' }}>
+              Sign in
             </Link>
           </div>
         </div>
 
-        <div style={{
-          marginTop: '24px',
-          textAlign: 'center',
-          color: '#6b7280',
-          fontSize: '13px'
-        }}>
+        <div style={{ marginTop: '16px', textAlign: 'center', color: '#6b7280', fontSize: '13px' }}>
           Need help? Call or WhatsApp:{' '}
-          <a href="tel:07423272138" style={{
-            color: '#C8A64D',
-            fontWeight: '600',
-            textDecoration: 'none'
-          }}>
-            07423272138
-          </a>
+          <a href="tel:07423272138" style={{ color: '#C8A64D', fontWeight: '600', textDecoration: 'none' }}>07423272138</a>
         </div>
       </div>
     </div>
