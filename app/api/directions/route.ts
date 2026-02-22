@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 interface Coords {
   lat: number;
@@ -18,6 +19,12 @@ function isValidCoords(c: unknown): c is Coords {
 
 export async function POST(req: Request) {
   try {
+    const supabase = await createClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const key = process.env.GOOGLE_MAPS_API_KEY;
     if (!key) return NextResponse.json({ error: "Missing API key" }, { status: 500 });
 

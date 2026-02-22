@@ -40,9 +40,9 @@ export async function GET(
 
     // Get user profile to check role
     const { data: profile } = await supabase
-      .from('users')
+      .from('profiles')
       .select('role, company_id')
-      .eq('id', userId)
+      .eq('user_id', userId)
       .single()
 
     // Get job details

@@ -196,6 +196,17 @@ export default function LoadsPage() {
           return false
         }
       }
+
+      // Radius filter (max job distance in miles)
+      if (radius) {
+        const maxMiles = parseFloat(radius)
+        if (!isNaN(maxMiles) && maxMiles > 0) {
+          const jobMiles = load.distance_miles ?? null
+          if (jobMiles === null || jobMiles > maxMiles) {
+            return false
+          }
+        }
+      }
       
       return true
     })
@@ -217,7 +228,7 @@ export default function LoadsPage() {
     })
     
     return filtered
-  }, [loads, activeTab, statusFilter, fromPostcode, toPostcode, vehicleSize, dateFilter, sortBy])
+  }, [loads, activeTab, statusFilter, fromPostcode, toPostcode, vehicleSize, dateFilter, sortBy, radius])
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {
