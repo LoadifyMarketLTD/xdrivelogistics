@@ -1,40 +1,41 @@
-'use client';
-import Link from 'next/link';
-import { COMPANY_CONFIG } from '../config/company';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Terms & Conditions',
+  description: 'Danny Courier Terms and Conditions for the use of our transport platform and services.',
+};
+
+const LAST_UPDATED = '20 February 2026';
 
 export default function TermsPage() {
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#F4F7FA', padding: '2rem 1rem' }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto', backgroundColor: 'white', borderRadius: '12px', padding: '2.5rem', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-        <Link href="/" style={{ color: '#1E4E8C', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-block', marginBottom: '1.5rem' }}>← Back to Home</Link>
-        <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#0A2239', marginBottom: '0.5rem' }}>Terms & Conditions</h1>
-        <p style={{ color: '#6B7280', marginBottom: '2rem', fontSize: '0.9rem' }}>Last updated: January 2025</p>
-
-        <section style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0A2239', marginBottom: '1rem' }}>1. Introduction</h2>
-          <p style={{ color: '#374151', lineHeight: 1.7 }}>These Terms and Conditions govern your use of the Danny Courier platform operated by {COMPANY_CONFIG.legalName} (Company No. {COMPANY_CONFIG.companyNumber}). By using our services, you agree to these terms.</p>
-        </section>
-
-        <section style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0A2239', marginBottom: '1rem' }}>2. Services</h2>
-          <p style={{ color: '#374151', lineHeight: 1.7 }}>Danny Courier provides a transport platform connecting businesses with self-employed courier drivers across the UK and Europe. We act as an intermediary and logistics coordinator.</p>
-        </section>
-
-        <section style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0A2239', marginBottom: '1rem' }}>3. Payment Terms</h2>
-          <p style={{ color: '#374151', lineHeight: 1.7 }}>Payment is due as specified on each invoice. {COMPANY_CONFIG.payment.lateFeeAmount} We accept bank transfer and PayPal.</p>
-        </section>
-
-        <section style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0A2239', marginBottom: '1rem' }}>4. Liability</h2>
-          <p style={{ color: '#374151', lineHeight: 1.7 }}>While we take all reasonable precautions, our liability for loss or damage to goods in transit is limited to the declared value of the goods, subject to our insurance coverage. We recommend appropriate goods-in-transit insurance for high-value items.</p>
-        </section>
-
-        <section style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0A2239', marginBottom: '1rem' }}>5. Contact</h2>
-          <p style={{ color: '#374151', lineHeight: 1.7 }}>For any queries regarding these terms, contact us at <a href={`mailto:${COMPANY_CONFIG.email}`} style={{ color: '#1E4E8C' }}>{COMPANY_CONFIG.email}</a>.</p>
-        </section>
+    <main style={{ minHeight: '100vh', backgroundColor: 'var(--color-primary-navy-dark)', color: 'var(--color-text-white)', padding: '6rem 24px 4rem' }}>
+      <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+        <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-gold-primary)', textDecoration: 'none', fontSize: '0.9rem', marginBottom: '2rem' }}>
+          ← Back to Home
+        </a>
+        <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 800, color: 'var(--color-text-white)', marginBottom: '0.5rem' }}>Terms &amp; Conditions</h1>
+        <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '2.5rem', fontSize: '0.9rem' }}>Last updated: {LAST_UPDATED}</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', lineHeight: '1.7', color: 'rgba(255,255,255,0.82)' }}>
+          <Section title="1. Introduction">These Terms govern your use of the Danny Courier platform operated by XDrive Logistics Ltd (Company Number 13171804), 101 Cornelian Street, Blackburn, BB1 9QL.</Section>
+          <Section title="2. Services">XDrive Logistics Ltd provides an online platform connecting self-employed courier drivers with businesses requiring freight and transport services.</Section>
+          <Section title="3. User Accounts">You are responsible for maintaining confidentiality of your login credentials and all activities under your account.</Section>
+          <Section title="4. Driver Requirements">All drivers must hold valid CPC qualification, tachograph card, comprehensive goods-in-transit insurance, and other licences required by UK law.</Section>
+          <Section title="5. Payments & Fees">Late payments may incur administrative charges of £25 per full week beyond the agreed due date.</Section>
+          <Section title="6. Liability">XDrive Logistics Ltd shall not be liable for any indirect, incidental, or consequential loss. Total liability shall not exceed the amount paid in the preceding three months.</Section>
+          <Section title="7. Governing Law">These Terms are governed by the laws of England and Wales.</Section>
+          <Section title="8. Contact">XDrive Logistics Ltd, 101 Cornelian Street, Blackburn, BB1 9QL. Email: dannycourierltd@gmail.com</Section>
+        </div>
       </div>
+    </main>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--color-gold-primary)', marginBottom: '0.75rem' }}>{title}</h2>
+      <p style={{ margin: 0 }}>{children}</p>
     </div>
   );
 }

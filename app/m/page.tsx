@@ -1,106 +1,47 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../components/AuthContext';
-import { supabase } from '../../lib/supabaseClient';
-import { JOB_STATUS } from '../config/company';
 
-interface Job {
-  id: string;
-  job_ref: string;
-  status: string;
-  collection_address: string;
-  delivery_address: string;
-  collection_time?: string;
-  delay_minutes?: number;
-  customer_name?: string;
-}
+import ProtectedRoute from '../components/ProtectedRoute';
+import { useAuth } from '../components/AuthContext';
 
 export default function MobilePage() {
-  const { user, isLoading, logout } = useAuth();
-  const router = useRouter();
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loadingJobs, setLoadingJobs] = useState(true);
+  const { user, logout } = useAuth();
 
-  useEffect(() => {
-    if (!isLoading && !user) {
-      router.push('/login');
-    } else if (!isLoading && user && user.role !== 'mobile') {
-      router.push('/admin');
-    }
-  }, [user, isLoading, router]);
-
-  useEffect(() => {
-    if (user?.role === 'mobile') {
-      fetchJobs();
-    }
-  }, [user]);
-
-  const fetchJobs = async () => {
-    try {
-      const { data } = await supabase
-        .from('jobs')
-        .select('id, job_ref, status, collection_address, delivery_address, collection_time, delay_minutes, customer_name')
-        .in('status', [JOB_STATUS.ALLOCATED, JOB_STATUS.POSTED])
-        .order('collection_time', { ascending: true });
-      setJobs(data ?? []);
-    } catch {
-      // silently fail
-    } finally {
-      setLoadingJobs(false);
-    }
-  };
-
-  if (isLoading || !user) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0A2239' }}>
-      <div style={{ color: '#D4AF37', fontSize: '1.25rem' }}>Loading...</div>
-    </div>
-  );
+  const tiles = [
+    { id: 'active', label: 'Active Jobs', icon: '🚚', color: '#1F7A3D' },
+    { id: 'pickup', label: 'Pickup', icon: '📦', color: '#f59e0b' },
+    { id: 'delivery', label: 'Delivery', icon: '✅', color: '#2F6FB3' },
+    { id: 'history', label: 'History', icon: '📋', color: '#0A2239' },
+  ];
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0A2239', color: 'white' }}>
-      <header style={{ backgroundColor: '#1F3A5F', padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
-        <h1 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#D4AF37', margin: 0 }}>Danny Courier</h1>
-        <button onClick={logout} style={{ padding: '0.4rem 1rem', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '6px', color: 'white', cursor: 'pointer', fontSize: '0.875rem' }}>Logout</button>
-      </header>
-
-      <main style={{ padding: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '1rem', color: 'rgba(255,255,255,0.9)' }}>Your Jobs</h2>
-
-        {loadingJobs ? (
-          <p style={{ color: 'rgba(255,255,255,0.6)', textAlign: 'center', padding: '2rem' }}>Loading jobs...</p>
-        ) : jobs.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'rgba(255,255,255,0.5)' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>��</div>
-            <p>No jobs assigned at the moment</p>
+    <ProtectedRoute>
+      <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6', padding: 0 }}>
+        <header style={{ backgroundColor: '#0A2239', color: 'white', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+          <div>
+            <h1 style={{ fontSize: '1.25rem', fontWeight: '700', margin: 0 }}>Mobile Ops</h1>
+            <p style={{ fontSize: '0.85rem', margin: '0.25rem 0 0 0', opacity: 0.9 }}>{user?.email}</p>
           </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {jobs.map((job) => (
-              <div
-                key={job.id}
-                onClick={() => router.push(`/m/jobs/${job.id}`)}
-                style={{ backgroundColor: '#1F3A5F', borderRadius: '10px', padding: '1rem 1.25rem', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.1)', transition: 'all 0.2s' }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2a4a7a'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1F3A5F'}
+          <button onClick={logout} style={{ backgroundColor: 'rgba(255,255,255,0.2)', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.9rem', fontWeight: '600', cursor: 'pointer' }}>Logout</button>
+        </header>
+        <div style={{ padding: '1rem', maxWidth: '600px', margin: '0 auto' }}>
+          <div style={{ backgroundColor: 'white', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+            <p style={{ margin: 0, fontSize: '1rem', color: '#374151', textAlign: 'center' }}>Welcome! Select an option below to get started.</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+            {tiles.map((tile) => (
+              <button key={tile.id} onClick={() => window.location.href = '/m/jobs'}
+                style={{ backgroundColor: 'white', border: 'none', borderRadius: '12px', padding: '2rem 1rem', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', transition: 'all 0.2s', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', minHeight: '150px', position: 'relative' }}
+                onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.95)'; }}
+                onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <span style={{ fontWeight: '700', color: '#D4AF37' }}>{job.job_ref}</span>
-                  <span style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem', borderRadius: '20px', backgroundColor: job.status === 'Allocated' ? 'rgba(16,185,129,0.2)' : 'rgba(59,130,246,0.2)', color: job.status === 'Allocated' ? '#6EE7B7' : '#93C5FD' }}>{job.status}</span>
-                </div>
-                {job.customer_name && <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', margin: '0 0 0.5rem' }}>{job.customer_name}</p>}
-                <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}>
-                  <p style={{ margin: '0.2rem 0' }}>📍 From: {job.collection_address}</p>
-                  <p style={{ margin: '0.2rem 0' }}>🎯 To: {job.delivery_address}</p>
-                  {job.delay_minutes && job.delay_minutes > 0 && (
-                    <p style={{ margin: '0.2rem 0', color: '#FCD34D' }}>⚠️ Delayed: {job.delay_minutes} mins</p>
-                  )}
-                </div>
-              </div>
+                <div style={{ fontSize: '3rem', lineHeight: 1 }}>{tile.icon}</div>
+                <div style={{ fontSize: '1.1rem', fontWeight: '600', color: '#1f2937', textAlign: 'center' }}>{tile.label}</div>
+                <div style={{ position: 'absolute', bottom: '0.5rem', width: '60%', height: '3px', backgroundColor: tile.color, borderRadius: '2px' }} />
+              </button>
             ))}
           </div>
-        )}
-      </main>
-    </div>
+        </div>
+      </div>
+    </ProtectedRoute>
   );
 }
