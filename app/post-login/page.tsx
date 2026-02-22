@@ -1,15 +1,81 @@
-// Restored code from commit 93bdcd9af89c012e0666e2c3278f718309209bbe
-// Minimal routing changes implemented
+'use client'
 
-if (!row) {
-    window.location.href = '/onboarding';
-} else if (status === 'blocked') {
-    window.location.href = '/blocked';
-} else if (status === 'pending' && role !== 'owner') {
-    window.location.href = '/pending';
-} else {
-    window.location.href = '/loads';
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabaseClient'
+import { getMyRoleStatus } from '@/lib/rbac'
+
+export default function PostLoginPage() {
+  const router = useRouter()
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function handlePostLogin() {
+      try {
+        const {
+          data: { session }
+        } = await supabase.auth.getSession()
+
+        if (!session) {
+          router.replace('/login')
+          return
+        }
+
+        // Timeout safety (avoid infinite waiting)
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout fetching role')), 8000)
+        )
+
+        const roleStatusPromise = getMyRoleStatus()
+
+        const { row } = (await Promise.race([
+          roleStatusPromise,
+          timeoutPromise
+        ])) as any
+
+        if (cancelled) return
+
+        // 🔴 No profile row yet
+        if (!row) {
+          router.replace('/onboarding')
+          return
+        }
+
+        const role = row.role
+        const status = row.status
+
+        // 🔴 Blocked users
+        if (status === 'blocked') {
+          router.replace('/blocked')
+          return
+        }
+
+        // 🔴 Pending (except owner)
+        if (status === 'pending' && role !== 'owner') {
+          router.replace('/pending')
+          return
+        }
+
+        // ✅ MAIN landing for active users + owner
+        router.replace('/loads')
+        return
+      } catch (error) {
+        console.error('Post-login error:', error)
+        router.replace('/login')
+      }
+    }
+
+    handlePostLogin()
+
+    return () => {
+      cancelled = true
+    }
+  }, [router])
+
+  return (
+    <div style={{ padding: '40px', textAlign: 'center' }}>
+      <h2>Se încarcă contul...</h2>
+    </div>
+  )
 }
-
-// Existing timeout Promise.race and cancelled guard and session check kept here
-
