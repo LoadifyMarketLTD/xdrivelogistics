@@ -19,7 +19,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     label: '📋 Site Audit',
-    path: '/analytics/audit',
+    path: '/analytics/site-audit',
     icon: '📋',
     allowedRoles: ['owner'],
     section: 'main',
