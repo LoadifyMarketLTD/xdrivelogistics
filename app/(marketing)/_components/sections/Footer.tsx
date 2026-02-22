@@ -166,14 +166,14 @@ export default function Footer() {
 
             {/* Companie */}
             <div>
-              <h4 style={{
+              <h3 style={{
                 fontWeight: '600',
                 fontSize: '0.9375rem',
                 color: 'var(--text)',
                 marginBottom: '1rem',
               }}>
                 Company
-              </h4>
+              </h3>
               <ul style={{
                 listStyle: 'none',
                 padding: 0,
@@ -195,14 +195,14 @@ export default function Footer() {
 
             {/* Services */}
             <div>
-              <h4 style={{
+              <h3 style={{
                 fontWeight: '600',
                 fontSize: '0.9375rem',
                 color: 'var(--text)',
                 marginBottom: '1rem',
               }}>
                 Services
-              </h4>
+              </h3>
               <ul style={{
                 listStyle: 'none',
                 padding: 0,
@@ -224,14 +224,14 @@ export default function Footer() {
 
             {/* Legal */}
             <div>
-              <h4 style={{
+              <h3 style={{
                 fontWeight: '600',
                 fontSize: '0.9375rem',
                 color: 'var(--text)',
                 marginBottom: '1rem',
               }}>
                 Legal
-              </h4>
+              </h3>
               <ul style={{
                 listStyle: 'none',
                 padding: 0,

@@ -133,14 +133,14 @@ export default function Benefits() {
             }}>
               {benefit.icon}
             </div>
-            <h4 style={{
+            <h3 style={{
               fontSize: '1.125rem',
               fontWeight: '600',
               color: 'var(--text)',
               marginBottom: '0.5rem',
             }}>
               {benefit.title}
-            </h4>
+            </h3>
             <p style={{
               fontSize: '0.9375rem',
               color: 'var(--muted)',
