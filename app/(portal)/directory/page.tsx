@@ -331,7 +331,20 @@ export default function DirectoryPage() {
                 </div>
 
                 <div className="modal-actions">
-                  <button className="btn-success">
+                  <button
+                    className="btn-success"
+                    onClick={() => {
+                      const email = selectedCompany.company.email
+                      const phone = selectedCompany.company.phone
+                      if (email) {
+                        window.location.href = `mailto:${email}`
+                      } else if (phone) {
+                        window.location.href = `tel:${phone}`
+                      } else {
+                        alert('No contact information available for this company.')
+                      }
+                    }}
+                  >
                     Contact Company
                   </button>
                   <button

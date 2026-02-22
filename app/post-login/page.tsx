@@ -75,7 +75,7 @@ export default function PostLoginPage() {
 
   return (
     <div style={{ padding: '40px', textAlign: 'center' }}>
-      <h2>Se încarcă contul...</h2>
+      <h2>Loading account...</h2>
     </div>
   )
 }

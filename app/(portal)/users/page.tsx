@@ -31,7 +31,8 @@ export default function UsersManagementPage() {
   const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [itemsPerPage, setItemsPerPage] = useState(250)
+  const [itemsPerPage, setItemsPerPage] = useState(25)
+  const [currentPage, setCurrentPage] = useState(1)
   const [activeTab, setActiveTab] = useState<'all' | 'users' | 'drivers'>('all')
 
   useEffect(() => {
@@ -63,6 +64,7 @@ export default function UsersManagementPage() {
     }
 
     setFilteredUsers(filtered)
+    setCurrentPage(1)
   }, [searchTerm, users, activeTab])
 
   const fetchUsers = async () => {
@@ -276,7 +278,7 @@ export default function UsersManagementPage() {
           </label>
           <select
             value={itemsPerPage}
-            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+            onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1) }}
             className="portal-filter-input"
             style={{ width: 'auto' }}
           >
@@ -293,7 +295,7 @@ export default function UsersManagementPage() {
           color: 'var(--portal-text-secondary)',
           marginBottom: '16px'
         }}>
-          1-{Math.min(filteredUsers.length, itemsPerPage)} of {filteredUsers.length}
+          {filteredUsers.length === 0 ? '0 of 0' : `${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, filteredUsers.length)} of ${filteredUsers.length}`}
         </div>
 
         {/* Users Table */}
@@ -347,7 +349,7 @@ export default function UsersManagementPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.slice(0, itemsPerPage).map((user, index) => (
+                  {filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((user, index) => (
                     <tr
                       key={user.id}
                       style={{
@@ -454,12 +456,33 @@ export default function UsersManagementPage() {
 
         {/* Results Footer */}
         <div style={{
-          fontSize: '14px',
-          color: 'var(--portal-text-secondary)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px',
           marginTop: '16px',
-          textAlign: 'center'
+          fontSize: '14px',
+          color: 'var(--portal-text-secondary)'
         }}>
-          1-{Math.min(filteredUsers.length, itemsPerPage)} of {filteredUsers.length}
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage <= 1}
+            className="portal-btn portal-btn-outline"
+            style={{ padding: '4px 12px', fontSize: '12px' }}
+          >
+            Previous
+          </button>
+          <span>
+            Page {filteredUsers.length === 0 ? 0 : currentPage} of {Math.ceil(filteredUsers.length / itemsPerPage) || 0}
+          </span>
+          <button
+            onClick={() => setCurrentPage(p => Math.min(Math.ceil(filteredUsers.length / itemsPerPage), p + 1))}
+            disabled={filteredUsers.length === 0 || currentPage >= Math.ceil(filteredUsers.length / itemsPerPage)}
+            className="portal-btn portal-btn-outline"
+            style={{ padding: '4px 12px', fontSize: '12px' }}
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>
