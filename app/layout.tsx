@@ -14,7 +14,10 @@ export const metadata: Metadata = {
   title: 'XDrive Logistics LTD - Enterprise Exchange',
   description: 'B2B logistics exchange platform connecting drivers, carriers and brokers across the UK.',
   icons: {
-    icon: '/logo.png',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/logo.png', type: 'image/png' },
+    ],
   },
   openGraph: {
     title: 'XDrive Logistics LTD - Enterprise Exchange',
