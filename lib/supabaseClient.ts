@@ -14,6 +14,7 @@ if (!isConfigured && typeof window !== 'undefined') {
   );
 }
 
+// Always create a client (may be non-functional if not configured)
 export const supabase: SupabaseClient = createClient(
   isConfigured ? supabaseUrl : 'https://placeholder.supabase.co',
   isConfigured ? supabaseAnonKey : 'placeholder-key',

@@ -8,8 +8,10 @@ import type { DriverDocument, VehicleDocument, DocStatus } from '../../../lib/ty
 type AnyDoc = (DriverDocument & { kind: 'driver'; subject_name?: string }) | (VehicleDocument & { kind: 'vehicle'; subject_name?: string });
 
 const STATUS_COLORS: Record<DocStatus, { bg: string; text: string }> = {
-  pending: { bg: '#fef3c7', text: '#92400e' }, approved: { bg: '#d1fae5', text: '#065f46' },
-  rejected: { bg: '#fee2e2', text: '#991b1b' }, expired: { bg: '#f3f4f6', text: '#6b7280' },
+  pending: { bg: '#fef3c7', text: '#92400e' },
+  approved: { bg: '#d1fae5', text: '#065f46' },
+  rejected: { bg: '#fee2e2', text: '#991b1b' },
+  expired: { bg: '#f3f4f6', text: '#6b7280' },
 };
 
 export default function DocumentsPage() {
@@ -39,7 +41,10 @@ export default function DocumentsPage() {
     loadDocs();
   };
 
-  const tabStyle = (active: boolean) => ({ padding: '0.75rem 1.5rem', border: 'none', borderRadius: '8px', fontSize: '0.95rem', fontWeight: '600' as const, cursor: 'pointer', backgroundColor: active ? '#1F7A3D' : 'white', color: active ? 'white' : '#6b7280' });
+  const tabStyle = (active: boolean) => ({
+    padding: '0.75rem 1.5rem', border: 'none', borderRadius: '8px', fontSize: '0.95rem', fontWeight: '600' as const, cursor: 'pointer',
+    backgroundColor: active ? '#1F7A3D' : 'white', color: active ? 'white' : '#6b7280',
+  });
 
   return (
     <ProtectedRoute>
@@ -49,17 +54,26 @@ export default function DocumentsPage() {
             <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937', margin: 0 }}>Documents</h1>
             <p style={{ color: '#6b7280', margin: '0.5rem 0 0 0' }}>Review and verify driver & vehicle documents</p>
           </div>
+
           {!isSupabaseConfigured && (
-            <div style={{ backgroundColor: '#fef3c7', border: '1px solid #f59e0b', borderRadius: '8px', padding: '1rem', marginBottom: '1.5rem', color: '#92400e' }}>⚠️ Supabase is not configured.</div>
+            <div style={{ backgroundColor: '#fef3c7', border: '1px solid #f59e0b', borderRadius: '8px', padding: '1rem', marginBottom: '1.5rem', color: '#92400e' }}>
+              ⚠️ Supabase is not configured. Database features are disabled.
+            </div>
           )}
+
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
             <button style={tabStyle(tab === 'driver')} onClick={() => setTab('driver')}>🪪 Driver Documents</button>
             <button style={tabStyle(tab === 'vehicle')} onClick={() => setTab('vehicle')}>🚛 Vehicle Documents</button>
           </div>
+
           <div style={{ backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-            {loading ? <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>Loading...</div>
-            : docs.length === 0 ? (
-              <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}><div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📄</div><p>No documents found.</p></div>
+            {loading ? (
+              <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>Loading...</div>
+            ) : docs.length === 0 ? (
+              <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📄</div>
+                <p>No documents found.</p>
+              </div>
             ) : (
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>

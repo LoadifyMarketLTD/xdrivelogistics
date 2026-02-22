@@ -20,14 +20,15 @@ export default function VehiclesPage() {
   const loadVehicles = async () => {
     setLoading(true);
     if (!isSupabaseConfigured) { setLoading(false); return; }
-    const { data } = await supabase.from('vehicles').select('*').order('created_at', { ascending: false });
-    if (data) setVehicles(data as Vehicle[]);
+    const { data, error } = await supabase.from('vehicles').select('*').order('created_at', { ascending: false });
+    if (!error && data) setVehicles(data as Vehicle[]);
     setLoading(false);
   };
 
   const loadCompanies = async () => {
     if (!isSupabaseConfigured) return;
-    const { data } = await supabase.from('companies').select('id, name').order('name');
+    const { data, error } = await supabase.from('companies').select('id, name').order('name');
+    if (error) { console.error('Failed to load companies:', error.message); return; }
     if (data) setCompanies(data as Company[]);
   };
 
@@ -54,15 +55,25 @@ export default function VehiclesPage() {
               <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937', margin: 0 }}>Vehicles</h1>
               <p style={{ color: '#6b7280', margin: '0.5rem 0 0 0' }}>Manage fleet vehicles</p>
             </div>
-            <button onClick={() => setShowModal(true)} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#1F7A3D', color: 'white', border: 'none', borderRadius: '8px', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer' }}>+ Add Vehicle</button>
+            <button onClick={() => setShowModal(true)} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#1F7A3D', color: 'white', border: 'none', borderRadius: '8px', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer' }}>
+              + Add Vehicle
+            </button>
           </div>
+
           {!isSupabaseConfigured && (
-            <div style={{ backgroundColor: '#fef3c7', border: '1px solid #f59e0b', borderRadius: '8px', padding: '1rem', marginBottom: '1.5rem', color: '#92400e' }}>⚠️ Supabase is not configured.</div>
+            <div style={{ backgroundColor: '#fef3c7', border: '1px solid #f59e0b', borderRadius: '8px', padding: '1rem', marginBottom: '1.5rem', color: '#92400e' }}>
+              ⚠️ Supabase is not configured. Database features are disabled.
+            </div>
           )}
+
           <div style={{ backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-            {loading ? <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>Loading...</div>
-            : vehicles.length === 0 ? (
-              <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}><div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚛</div><p>No vehicles yet.</p></div>
+            {loading ? (
+              <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>Loading...</div>
+            ) : vehicles.length === 0 ? (
+              <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚛</div>
+                <p>No vehicles yet. Add your first vehicle.</p>
+              </div>
             ) : (
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
@@ -88,6 +99,7 @@ export default function VehiclesPage() {
             )}
           </div>
         </div>
+
         {showModal && (
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
             <div style={{ backgroundColor: 'white', borderRadius: '12px', width: '90%', maxWidth: '500px' }}>
@@ -97,8 +109,19 @@ export default function VehiclesPage() {
               </div>
               <div style={{ padding: '1.5rem', display: 'grid', gap: '1rem' }}>
                 {error && <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '6px', padding: '0.75rem', color: '#dc2626', fontSize: '0.9rem' }}>{error}</div>}
-                <div><label style={labelStyle}>Company *</label><select style={inputStyle} value={formData.company_id} onChange={e => setFormData({...formData, company_id: e.target.value})}><option value="">Select a company…</option>{companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
-                <div><label style={labelStyle}>Vehicle Type *</label><select style={inputStyle} value={formData.type} onChange={e => setFormData({...formData, type: e.target.value as VehicleType})}>{VEHICLE_TYPES.map(t => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}</select></div>
+                <div>
+                  <label style={labelStyle}>Company *</label>
+                  <select style={inputStyle} value={formData.company_id} onChange={e => setFormData({...formData, company_id: e.target.value})}>
+                    <option value="">Select a company…</option>
+                    {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>Vehicle Type *</label>
+                  <select style={inputStyle} value={formData.type} onChange={e => setFormData({...formData, type: e.target.value as VehicleType})}>
+                    {VEHICLE_TYPES.map(t => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}
+                  </select>
+                </div>
                 <div><label style={labelStyle}>Reg Plate</label><input style={inputStyle} value={formData.reg_plate} onChange={e => setFormData({...formData, reg_plate: e.target.value})} placeholder="AB12 CDE" /></div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div><label style={labelStyle}>Make</label><input style={inputStyle} value={formData.make} onChange={e => setFormData({...formData, make: e.target.value})} placeholder="Ford" /></div>

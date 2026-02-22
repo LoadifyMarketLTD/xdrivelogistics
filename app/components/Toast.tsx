@@ -45,7 +45,7 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
         </span>
         <span>{message}</span>
       </div>
-      <style jsx>{\`
+      <style jsx>{`
         @keyframes slideIn {
           from {
             transform: translateX(100%);
@@ -56,7 +56,7 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
             opacity: 1;
           }
         }
-      \`}</style>
+      `}</style>
     </div>
   );
 }

@@ -1,20 +1,25 @@
 'use client';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../components/AuthContext';
 import ProtectedRoute from '../../components/ProtectedRoute';
+import { useAuth } from '../../components/AuthContext';
 import { COMPANY_CONFIG } from '../../config/company';
 
-type Tab = 'company' | 'account' | 'notifications' | 'system';
+const TABS = [
+  { id: 'company', label: 'Company Info', icon: '🏢' },
+  { id: 'account', label: 'Account', icon: '👤' },
+  { id: 'notifications', label: 'Notifications', icon: '🔔' },
+  { id: 'system', label: 'System', icon: '⚙️' },
+];
 
 export default function SettingsPage() {
-  const { user, logout } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<Tab>('company');
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('company');
   const [saved, setSaved] = useState(false);
 
-  /* Company Info state (sourced from config, editable in-session) */
-  const [company, setCompany] = useState({
+  const [companyForm, setCompanyForm] = useState({
     name: COMPANY_CONFIG.name,
     legalName: COMPANY_CONFIG.legalName,
     companyNumber: COMPANY_CONFIG.companyNumber,
@@ -27,129 +32,264 @@ export default function SettingsPage() {
     invoicePrefix: COMPANY_CONFIG.invoice.invoicePrefix,
   });
 
-  /* Notifications state */
-  const [notif, setNotif] = useState({
-    newJob: true,
-    jobDelivered: true,
-    invoicePaid: true,
-    quoteReceived: false,
-    emailAlerts: true,
-    whatsappAlerts: false,
+  const [notifForm, setNotifForm] = useState({
+    emailNewJob: true,
+    emailStatusChange: true,
+    emailInvoicePaid: true,
+    emailBidReceived: false,
   });
 
-  /* System state */
-  const [sys, setSys] = useState({
+  const [systemForm, setSystemForm] = useState({
     defaultVatRate: String(COMPANY_CONFIG.vat.defaultRate),
-    defaultPaymentTerms: COMPANY_CONFIG.payment.terms[1],
+    paymentTerms: COMPANY_CONFIG.payment.terms[0] as string,
+    currency: 'GBP',
+    dateFormat: 'DD/MM/YYYY',
     bankAccountName: COMPANY_CONFIG.payment.bankTransfer.accountName,
     bankSortCode: COMPANY_CONFIG.payment.bankTransfer.sortCode,
     bankAccountNumber: COMPANY_CONFIG.payment.bankTransfer.accountNumber,
-    paypalEmail: COMPANY_CONFIG.payment.paypal.email,
-    lateFeeNote: COMPANY_CONFIG.payment.lateFeeAmount,
   });
 
+  const SETTINGS_KEY = 'danny_admin_settings';
+
   const handleSave = () => {
+    const settings = { companyForm, notifForm, systemForm };
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    setTimeout(() => setSaved(false), 3000);
   };
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '0.65rem 0.85rem', border: '1.5px solid #E5E7EB', borderRadius: '8px', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', backgroundColor: 'white' };
-  const labelStyle: React.CSSProperties = { display: 'block', marginBottom: '0.35rem', fontSize: '0.8rem', fontWeight: 600, color: '#374151' };
-  const sectionHdr: React.CSSProperties = { fontSize: '0.8rem', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '1.5rem 0 0.85rem', paddingBottom: '0.4rem', borderBottom: '1px solid #F3F4F6' };
+  const inputStyle = {
+    width: '100%',
+    padding: '0.75rem',
+    border: '1px solid #d1d5db',
+    borderRadius: '6px',
+    fontSize: '0.95rem',
+    boxSizing: 'border-box' as const,
+    backgroundColor: 'white',
+  };
 
-  const TABS: { id: Tab; label: string; emoji: string }[] = [
-    { id: 'company', label: 'Company Info', emoji: '🏢' },
-    { id: 'account', label: 'Account', emoji: '👤' },
-    { id: 'notifications', label: 'Notifications', emoji: '🔔' },
-    { id: 'system', label: 'System', emoji: '⚙️' },
-  ];
+  const labelStyle = {
+    display: 'block',
+    fontSize: '0.9rem',
+    fontWeight: '500' as const,
+    color: '#374151',
+    marginBottom: '0.5rem',
+  };
+
+  const fieldGroupStyle = {
+    display: 'grid' as const,
+    gridTemplateColumns: '1fr 1fr',
+    gap: '1.25rem',
+    marginBottom: '1.25rem',
+  };
+
+  const sectionTitleStyle = {
+    fontSize: '1rem',
+    fontWeight: '600' as const,
+    color: '#1f2937',
+    marginBottom: '1.25rem',
+    paddingBottom: '0.5rem',
+    borderBottom: '1px solid #e5e7eb',
+  };
 
   return (
     <ProtectedRoute>
-      <div style={{ minHeight: '100vh', backgroundColor: '#F3F4F6' }}>
-        <header style={{ backgroundColor: '#0A2239', color: 'white', padding: '0.9rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button onClick={() => router.push('/admin')} style={{ color: 'rgba(255,255,255,0.75)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}>← Back</button>
-            <h1 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>⚙️ Settings</h1>
+      <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6', padding: '2rem' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+          <div>
+            <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937', margin: '0 0 0.5rem 0' }}>
+              Settings
+            </h1>
+            <p style={{ color: '#6b7280', margin: 0 }}>
+              Configure system and company settings
+            </p>
           </div>
-          <button onClick={logout} style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', borderRadius: '6px', padding: '0.45rem 0.8rem', cursor: 'pointer', fontSize: '0.82rem' }}>Logout</button>
-        </header>
+          <button
+            onClick={() => router.push('/admin')}
+            style={{
+              padding: '0.75rem 1.5rem',
+              backgroundColor: 'white',
+              color: '#0A2239',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '0.95rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#f9fafb';
+              e.currentTarget.style.borderColor = '#0A2239';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'white';
+              e.currentTarget.style.borderColor = '#d1d5db';
+            }}
+          >
+            ← Back to Dashboard
+          </button>
+        </div>
 
-        <div style={{ maxWidth: '860px', margin: '1.5rem auto', padding: '0 1rem', display: 'grid', gridTemplateColumns: '200px 1fr', gap: '1.25rem', alignItems: 'start' }}>
-          {/* Sidebar */}
-          <nav style={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #E5E7EB', overflow: 'hidden' }}>
-            {TABS.map((t) => (
-              <button key={t.id} onClick={() => setActiveTab(t.id)} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', width: '100%', padding: '0.85rem 1rem', border: 'none', borderLeft: activeTab === t.id ? '3px solid #0A2239' : '3px solid transparent', backgroundColor: activeTab === t.id ? '#F0F4F9' : 'white', cursor: 'pointer', fontSize: '0.875rem', fontWeight: activeTab === t.id ? 700 : 500, color: activeTab === t.id ? '#0A2239' : '#374151', textAlign: 'left', transition: 'all 0.15s' }}>
-                <span>{t.emoji}</span>{t.label}
+        {saved && (
+          <div style={{
+            backgroundColor: '#dcfce7',
+            border: '1px solid #1F7A3D',
+            borderRadius: '8px',
+            padding: '1rem 1.5rem',
+            marginBottom: '1.5rem',
+            color: '#14532d',
+            fontWeight: '600',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+          }}>
+            ✅ Settings saved successfully!
+          </div>
+        )}
+
+        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
+          {/* Tab Sidebar */}
+          <div style={{
+            width: '220px',
+            flexShrink: 0,
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            overflow: 'hidden',
+          }}>
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  width: '100%',
+                  padding: '1rem 1.25rem',
+                  backgroundColor: activeTab === tab.id ? '#f0fdf4' : 'transparent',
+                  color: activeTab === tab.id ? '#1F7A3D' : '#374151',
+                  border: 'none',
+                  borderLeft: activeTab === tab.id ? '4px solid #1F7A3D' : '4px solid transparent',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  fontSize: '0.95rem',
+                  fontWeight: activeTab === tab.id ? '600' : '400',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  if (activeTab !== tab.id) e.currentTarget.style.backgroundColor = '#f9fafb';
+                }}
+                onMouseLeave={(e) => {
+                  if (activeTab !== tab.id) e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <span>{tab.icon}</span>
+                {tab.label}
               </button>
             ))}
-          </nav>
+          </div>
 
-          {/* Content */}
-          <div style={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #E5E7EB', padding: '1.5rem' }}>
-            {saved && (
-              <div style={{ padding: '0.65rem 0.9rem', marginBottom: '1rem', backgroundColor: '#F0FDF4', color: '#15803D', borderRadius: '7px', fontSize: '0.875rem', border: '1px solid #BBF7D0' }}>
-                ✓ Settings saved successfully (in-session only — edit config/company.ts to persist)
-              </div>
-            )}
+          {/* Content Panel */}
+          <div style={{ flex: 1, backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', padding: '2rem' }}>
 
             {/* Company Info Tab */}
             {activeTab === 'company' && (
               <div>
-                <h2 style={{ margin: '0 0 0.25rem', fontSize: '1.1rem', fontWeight: 700, color: '#0A2239' }}>Company Information</h2>
-                <p style={{ margin: '0 0 1.25rem', fontSize: '0.85rem', color: '#6B7280' }}>View and edit your company details used on invoices and documents.</p>
-
-                <p style={sectionHdr}>Business Identity</p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <h2 style={sectionTitleStyle}>Company Information</h2>
+                <div style={fieldGroupStyle}>
                   <div>
                     <label style={labelStyle}>Trading Name</label>
-                    <input style={inputStyle} value={company.name} onChange={(e) => setCompany({ ...company, name: e.target.value })} />
+                    <input
+                      style={inputStyle}
+                      value={companyForm.name}
+                      onChange={(e) => setCompanyForm({ ...companyForm, name: e.target.value })}
+                    />
                   </div>
                   <div>
                     <label style={labelStyle}>Legal Name</label>
-                    <input style={inputStyle} value={company.legalName} onChange={(e) => setCompany({ ...company, legalName: e.target.value })} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Company Number</label>
-                    <input style={inputStyle} value={company.companyNumber} onChange={(e) => setCompany({ ...company, companyNumber: e.target.value })} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Email</label>
-                    <input type="email" style={inputStyle} value={company.email} onChange={(e) => setCompany({ ...company, email: e.target.value })} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Phone</label>
-                    <input type="tel" style={inputStyle} value={company.phone} onChange={(e) => setCompany({ ...company, phone: e.target.value })} />
+                    <input
+                      style={inputStyle}
+                      value={companyForm.legalName}
+                      onChange={(e) => setCompanyForm({ ...companyForm, legalName: e.target.value })}
+                    />
                   </div>
                 </div>
-
-                <p style={sectionHdr}>Address</p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div style={{ gridColumn: 'span 2' }}>
-                    <label style={labelStyle}>Street Address</label>
-                    <input style={inputStyle} value={company.street} onChange={(e) => setCompany({ ...company, street: e.target.value })} />
+                <div style={fieldGroupStyle}>
+                  <div>
+                    <label style={labelStyle}>Company Number</label>
+                    <input
+                      style={inputStyle}
+                      value={companyForm.companyNumber}
+                      onChange={(e) => setCompanyForm({ ...companyForm, companyNumber: e.target.value })}
+                    />
                   </div>
                   <div>
+                    <label style={labelStyle}>Email Address</label>
+                    <input
+                      type="email"
+                      style={inputStyle}
+                      value={companyForm.email}
+                      onChange={(e) => setCompanyForm({ ...companyForm, email: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <label style={labelStyle}>Phone Number</label>
+                  <input
+                    type="tel"
+                    style={inputStyle}
+                    value={companyForm.phone}
+                    onChange={(e) => setCompanyForm({ ...companyForm, phone: e.target.value })}
+                  />
+                </div>
+
+                <h2 style={{ ...sectionTitleStyle, marginTop: '1.5rem' }}>Address</h2>
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <label style={labelStyle}>Street Address</label>
+                  <input
+                    style={inputStyle}
+                    value={companyForm.street}
+                    onChange={(e) => setCompanyForm({ ...companyForm, street: e.target.value })}
+                  />
+                </div>
+                <div style={fieldGroupStyle}>
+                  <div>
                     <label style={labelStyle}>City</label>
-                    <input style={inputStyle} value={company.city} onChange={(e) => setCompany({ ...company, city: e.target.value })} />
+                    <input
+                      style={inputStyle}
+                      value={companyForm.city}
+                      onChange={(e) => setCompanyForm({ ...companyForm, city: e.target.value })}
+                    />
                   </div>
                   <div>
                     <label style={labelStyle}>Postcode</label>
-                    <input style={inputStyle} value={company.postcode} onChange={(e) => setCompany({ ...company, postcode: e.target.value })} />
+                    <input
+                      style={inputStyle}
+                      value={companyForm.postcode}
+                      onChange={(e) => setCompanyForm({ ...companyForm, postcode: e.target.value })}
+                    />
                   </div>
                 </div>
 
-                <p style={sectionHdr}>Reference Prefixes</p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <h2 style={{ ...sectionTitleStyle, marginTop: '1.5rem' }}>Reference Prefixes</h2>
+                <div style={fieldGroupStyle}>
                   <div>
-                    <label style={labelStyle}>Job Ref Prefix</label>
-                    <input style={inputStyle} value={company.jobRefPrefix} onChange={(e) => setCompany({ ...company, jobRefPrefix: e.target.value })} placeholder="e.g. DC" />
-                    <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: '#9CA3AF' }}>Preview: {company.jobRefPrefix}-001234</p>
+                    <label style={labelStyle}>Job Reference Prefix</label>
+                    <input
+                      style={inputStyle}
+                      value={companyForm.jobRefPrefix}
+                      onChange={(e) => setCompanyForm({ ...companyForm, jobRefPrefix: e.target.value })}
+                    />
                   </div>
                   <div>
                     <label style={labelStyle}>Invoice Prefix</label>
-                    <input style={inputStyle} value={company.invoicePrefix} onChange={(e) => setCompany({ ...company, invoicePrefix: e.target.value })} placeholder="e.g. INV" />
-                    <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: '#9CA3AF' }}>Preview: {company.invoicePrefix}-001234</p>
+                    <input
+                      style={inputStyle}
+                      value={companyForm.invoicePrefix}
+                      onChange={(e) => setCompanyForm({ ...companyForm, invoicePrefix: e.target.value })}
+                    />
                   </div>
                 </div>
               </div>
@@ -158,21 +298,37 @@ export default function SettingsPage() {
             {/* Account Tab */}
             {activeTab === 'account' && (
               <div>
-                <h2 style={{ margin: '0 0 0.25rem', fontSize: '1.1rem', fontWeight: 700, color: '#0A2239' }}>Account</h2>
-                <p style={{ margin: '0 0 1.25rem', fontSize: '0.85rem', color: '#6B7280' }}>Your login and session information.</p>
-                <div style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '1.25rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#0A2239', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', fontWeight: 700 }}>
-                      {user?.email?.charAt(0).toUpperCase() ?? '?'}
-                    </div>
-                    <div>
-                      <p style={{ margin: 0, fontWeight: 700, color: '#0A2239' }}>{user?.email}</p>
-                      <p style={{ margin: '0.15rem 0 0', fontSize: '0.82rem', color: '#6B7280' }}>Administrator · {COMPANY_CONFIG.name}</p>
-                    </div>
-                  </div>
+                <h2 style={sectionTitleStyle}>Account Details</h2>
+                <div style={{
+                  backgroundColor: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  padding: '1.25rem',
+                  marginBottom: '1.5rem',
+                }}>
+                  <div style={{ fontSize: '0.9rem', color: '#6b7280', marginBottom: '0.25rem' }}>Logged in as</div>
+                  <div style={{ fontSize: '1rem', fontWeight: '600', color: '#1f2937' }}>{user?.email}</div>
                 </div>
-                <div style={{ marginTop: '1.5rem', padding: '1rem', backgroundColor: '#FEF3C7', border: '1px solid #FCD34D', borderRadius: '8px' }}>
-                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#92400E' }}>🔐 To change your password or email, use Supabase Auth settings or contact your system administrator.</p>
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <label style={labelStyle}>Email Address</label>
+                  <input
+                    type="email"
+                    style={{ ...inputStyle, backgroundColor: '#f9fafb', color: '#6b7280' }}
+                    value={user?.email || ''}
+                    readOnly
+                  />
+                  <p style={{ fontSize: '0.8rem', color: '#9ca3af', marginTop: '0.25rem' }}>
+                    Contact your administrator to change your email address.
+                  </p>
+                </div>
+                <h2 style={{ ...sectionTitleStyle, marginTop: '1.5rem' }}>Change Password</h2>
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <label style={labelStyle}>New Password</label>
+                  <input type="password" style={inputStyle} placeholder="Enter new password" />
+                </div>
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <label style={labelStyle}>Confirm New Password</label>
+                  <input type="password" style={inputStyle} placeholder="Confirm new password" />
                 </div>
               </div>
             )}
@@ -180,37 +336,39 @@ export default function SettingsPage() {
             {/* Notifications Tab */}
             {activeTab === 'notifications' && (
               <div>
-                <h2 style={{ margin: '0 0 0.25rem', fontSize: '1.1rem', fontWeight: 700, color: '#0A2239' }}>Notifications</h2>
-                <p style={{ margin: '0 0 1.25rem', fontSize: '0.85rem', color: '#6B7280' }}>Choose which events trigger notifications.</p>
-
-                <p style={sectionHdr}>Events</p>
-                {([
-                  { key: 'newJob', label: 'New job created', desc: 'Alert when a new job is added' },
-                  { key: 'jobDelivered', label: 'Job delivered', desc: 'Alert when a job is marked delivered' },
-                  { key: 'invoicePaid', label: 'Invoice paid', desc: 'Alert when an invoice is marked paid' },
-                  { key: 'quoteReceived', label: 'Quote request received', desc: 'Alert on new customer quote requests' },
-                ] as const).map((item) => (
-                  <label key={item.key} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '1rem', cursor: 'pointer' }}>
-                    <input type="checkbox" checked={notif[item.key]} onChange={(e) => setNotif({ ...notif, [item.key]: e.target.checked })} style={{ marginTop: '0.2rem', width: '16px', height: '16px', cursor: 'pointer', accentColor: '#0A2239' }} />
+                <h2 style={sectionTitleStyle}>Email Notifications</h2>
+                <p style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+                  Choose which events trigger an email notification.
+                </p>
+                {[
+                  { key: 'emailNewJob', label: 'New job created', description: 'Receive an email when a new job is added' },
+                  { key: 'emailStatusChange', label: 'Job status changed', description: 'Receive an email when a job status is updated' },
+                  { key: 'emailInvoicePaid', label: 'Invoice paid', description: 'Receive an email when an invoice is marked as paid' },
+                  { key: 'emailBidReceived', label: 'Bid received', description: 'Receive an email when a driver places a bid on a job' },
+                ].map((item) => (
+                  <div
+                    key={item.key}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '1rem',
+                      borderBottom: '1px solid #f3f4f6',
+                    }}
+                  >
                     <div>
-                      <p style={{ margin: 0, fontWeight: 600, fontSize: '0.875rem', color: '#111827' }}>{item.label}</p>
-                      <p style={{ margin: '0.1rem 0 0', fontSize: '0.78rem', color: '#9CA3AF' }}>{item.desc}</p>
+                      <div style={{ fontWeight: '600', color: '#1f2937', fontSize: '0.95rem' }}>{item.label}</div>
+                      <div style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '0.2rem' }}>{item.description}</div>
                     </div>
-                  </label>
-                ))}
-
-                <p style={sectionHdr}>Channels</p>
-                {([
-                  { key: 'emailAlerts', label: 'Email notifications', desc: `Send to ${COMPANY_CONFIG.email}` },
-                  { key: 'whatsappAlerts', label: 'WhatsApp notifications', desc: `Send to ${COMPANY_CONFIG.phoneDisplay}` },
-                ] as const).map((item) => (
-                  <label key={item.key} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '1rem', cursor: 'pointer' }}>
-                    <input type="checkbox" checked={notif[item.key]} onChange={(e) => setNotif({ ...notif, [item.key]: e.target.checked })} style={{ marginTop: '0.2rem', width: '16px', height: '16px', cursor: 'pointer', accentColor: '#0A2239' }} />
-                    <div>
-                      <p style={{ margin: 0, fontWeight: 600, fontSize: '0.875rem', color: '#111827' }}>{item.label}</p>
-                      <p style={{ margin: '0.1rem 0 0', fontSize: '0.78rem', color: '#9CA3AF' }}>{item.desc}</p>
-                    </div>
-                  </label>
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={notifForm[item.key as keyof typeof notifForm]}
+                        onChange={(e) => setNotifForm({ ...notifForm, [item.key]: e.target.checked })}
+                        style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#1F7A3D' }}
+                      />
+                    </label>
+                  </div>
                 ))}
               </div>
             )}
@@ -218,60 +376,110 @@ export default function SettingsPage() {
             {/* System Tab */}
             {activeTab === 'system' && (
               <div>
-                <h2 style={{ margin: '0 0 0.25rem', fontSize: '1.1rem', fontWeight: 700, color: '#0A2239' }}>System Settings</h2>
-                <p style={{ margin: '0 0 1.25rem', fontSize: '0.85rem', color: '#6B7280' }}>Configure VAT, payment terms, and bank details used on invoices.</p>
-
-                <p style={sectionHdr}>Tax & Payment Defaults</p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <h2 style={sectionTitleStyle}>System Settings</h2>
+                <div style={fieldGroupStyle}>
                   <div>
-                    <label style={labelStyle}>Default VAT Rate</label>
-                    <select style={inputStyle} value={sys.defaultVatRate} onChange={(e) => setSys({ ...sys, defaultVatRate: e.target.value })}>
-                      {COMPANY_CONFIG.vat.rates.map((r) => <option key={r} value={r}>{r}%</option>)}
+                    <label style={labelStyle}>Default VAT Rate (%)</label>
+                    <select
+                      style={inputStyle}
+                      value={systemForm.defaultVatRate}
+                      onChange={(e) => setSystemForm({ ...systemForm, defaultVatRate: e.target.value })}
+                    >
+                      {COMPANY_CONFIG.vat.rates.map((r) => (
+                        <option key={r} value={String(r)}>{r}%</option>
+                      ))}
                     </select>
                   </div>
                   <div>
                     <label style={labelStyle}>Default Payment Terms</label>
-                    <select style={inputStyle} value={sys.defaultPaymentTerms} onChange={(e) => setSys({ ...sys, defaultPaymentTerms: e.target.value })}>
-                      {COMPANY_CONFIG.payment.terms.map((t) => <option key={t} value={t}>{t}</option>)}
+                    <select
+                      style={inputStyle}
+                      value={systemForm.paymentTerms}
+                      onChange={(e) => setSystemForm({ ...systemForm, paymentTerms: e.target.value })}
+                    >
+                      {COMPANY_CONFIG.payment.terms.map((t) => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
                     </select>
                   </div>
-                  <div style={{ gridColumn: 'span 2' }}>
-                    <label style={labelStyle}>Late Fee Note</label>
-                    <input style={inputStyle} value={sys.lateFeeNote} onChange={(e) => setSys({ ...sys, lateFeeNote: e.target.value })} />
+                </div>
+                <div style={fieldGroupStyle}>
+                  <div>
+                    <label style={labelStyle}>Currency</label>
+                    <select
+                      style={inputStyle}
+                      value={systemForm.currency}
+                      onChange={(e) => setSystemForm({ ...systemForm, currency: e.target.value })}
+                    >
+                      <option value="GBP">GBP – British Pound</option>
+                      <option value="EUR">EUR – Euro</option>
+                      <option value="USD">USD – US Dollar</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Date Format</label>
+                    <select
+                      style={inputStyle}
+                      value={systemForm.dateFormat}
+                      onChange={(e) => setSystemForm({ ...systemForm, dateFormat: e.target.value })}
+                    >
+                      <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                      <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                      <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                    </select>
                   </div>
                 </div>
 
-                <p style={sectionHdr}>Bank Transfer Details</p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div style={{ gridColumn: 'span 2' }}>
+                <h2 style={{ ...sectionTitleStyle, marginTop: '1.5rem' }}>Bank Transfer Details</h2>
+                <div style={fieldGroupStyle}>
+                  <div>
                     <label style={labelStyle}>Account Name</label>
-                    <input style={inputStyle} value={sys.bankAccountName} onChange={(e) => setSys({ ...sys, bankAccountName: e.target.value })} />
+                    <input
+                      style={inputStyle}
+                      value={systemForm.bankAccountName}
+                      onChange={(e) => setSystemForm({ ...systemForm, bankAccountName: e.target.value })}
+                    />
                   </div>
                   <div>
                     <label style={labelStyle}>Sort Code</label>
-                    <input style={inputStyle} value={sys.bankSortCode} onChange={(e) => setSys({ ...sys, bankSortCode: e.target.value })} placeholder="XX-XX-XX" />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Account Number</label>
-                    <input style={inputStyle} value={sys.bankAccountNumber} onChange={(e) => setSys({ ...sys, bankAccountNumber: e.target.value })} placeholder="12345678" />
-                  </div>
-                  <div style={{ gridColumn: 'span 2' }}>
-                    <label style={labelStyle}>PayPal Email</label>
-                    <input type="email" style={inputStyle} value={sys.paypalEmail} onChange={(e) => setSys({ ...sys, paypalEmail: e.target.value })} />
+                    <input
+                      style={inputStyle}
+                      value={systemForm.bankSortCode}
+                      onChange={(e) => setSystemForm({ ...systemForm, bankSortCode: e.target.value })}
+                      placeholder="XX-XX-XX"
+                    />
                   </div>
                 </div>
-
-                <div style={{ marginTop: '1.25rem', padding: '0.9rem', backgroundColor: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: '8px' }}>
-                  <p style={{ margin: 0, fontSize: '0.82rem', color: '#0369A1' }}>ℹ️ These values are stored in session only. To persist changes, update <code style={{ backgroundColor: '#DBEAFE', padding: '0.1rem 0.3rem', borderRadius: '3px' }}>app/config/company.ts</code> in the codebase.</p>
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <label style={labelStyle}>Account Number</label>
+                  <input
+                    style={inputStyle}
+                    value={systemForm.bankAccountNumber}
+                    onChange={(e) => setSystemForm({ ...systemForm, bankAccountNumber: e.target.value })}
+                    placeholder="8-digit account number"
+                  />
                 </div>
               </div>
             )}
 
             {/* Save Button */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid #F3F4F6' }}>
-              <button onClick={handleSave} style={{ padding: '0.7rem 1.75rem', backgroundColor: '#0A2239', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700, transition: 'background-color 0.15s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1E4E8C')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#0A2239')}>
+            <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                onClick={handleSave}
+                style={{
+                  padding: '0.75rem 2rem',
+                  backgroundColor: '#1F7A3D',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '0.95rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#166534'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1F7A3D'}
+              >
                 Save Settings
               </button>
             </div>

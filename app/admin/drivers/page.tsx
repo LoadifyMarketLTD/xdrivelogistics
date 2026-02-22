@@ -25,7 +25,8 @@ export default function DriversPage() {
 
   const loadCompanies = async () => {
     if (!isSupabaseConfigured) return;
-    const { data } = await supabase.from('companies').select('id, name').order('name');
+    const { data, error } = await supabase.from('companies').select('id, name').order('name');
+    if (error) { console.error('Failed to load companies:', error.message); return; }
     if (data) setCompanies(data as Company[]);
   };
 
@@ -43,6 +44,7 @@ export default function DriversPage() {
 
   const inputStyle = { width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '0.95rem', boxSizing: 'border-box' as const };
   const labelStyle = { display: 'block', fontSize: '0.9rem', fontWeight: '500' as const, color: '#374151', marginBottom: '0.5rem' };
+  const statusColor = (s: string) => s === 'active' ? '#1F7A3D' : '#ef4444';
 
   return (
     <ProtectedRoute>
@@ -53,15 +55,25 @@ export default function DriversPage() {
               <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937', margin: 0 }}>Drivers</h1>
               <p style={{ color: '#6b7280', margin: '0.5rem 0 0 0' }}>Manage drivers for your company</p>
             </div>
-            <button onClick={() => setShowModal(true)} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#1F7A3D', color: 'white', border: 'none', borderRadius: '8px', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer' }}>+ Add Driver</button>
+            <button onClick={() => setShowModal(true)} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#1F7A3D', color: 'white', border: 'none', borderRadius: '8px', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer' }}>
+              + Add Driver
+            </button>
           </div>
+
           {!isSupabaseConfigured && (
-            <div style={{ backgroundColor: '#fef3c7', border: '1px solid #f59e0b', borderRadius: '8px', padding: '1rem', marginBottom: '1.5rem', color: '#92400e' }}>⚠️ Supabase is not configured.</div>
+            <div style={{ backgroundColor: '#fef3c7', border: '1px solid #f59e0b', borderRadius: '8px', padding: '1rem', marginBottom: '1.5rem', color: '#92400e' }}>
+              ⚠️ Supabase is not configured. Database features are disabled.
+            </div>
           )}
+
           <div style={{ backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-            {loading ? <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>Loading...</div>
-            : drivers.length === 0 ? (
-              <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}><div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚚</div><p>No drivers yet.</p></div>
+            {loading ? (
+              <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>Loading...</div>
+            ) : drivers.length === 0 ? (
+              <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚚</div>
+                <p>No drivers yet. Add your first driver.</p>
+              </div>
             ) : (
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
@@ -77,7 +89,7 @@ export default function DriversPage() {
                       <td style={{ padding: '1rem', fontWeight: '600', color: '#1f2937' }}>{d.display_name}</td>
                       <td style={{ padding: '1rem', color: '#6b7280' }}>{d.email || '—'}</td>
                       <td style={{ padding: '1rem', color: '#6b7280' }}>{d.phone || '—'}</td>
-                      <td style={{ padding: '1rem' }}><span style={{ backgroundColor: d.status === 'active' ? '#d1fae5' : '#fee2e2', color: d.status === 'active' ? '#065f46' : '#991b1b', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600' }}>{d.status}</span></td>
+                      <td style={{ padding: '1rem' }}><span style={{ backgroundColor: d.status === 'active' ? '#d1fae5' : '#fee2e2', color: statusColor(d.status), padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600' }}>{d.status}</span></td>
                       <td style={{ padding: '1rem', color: '#6b7280' }}>{new Date(d.created_at).toLocaleDateString()}</td>
                     </tr>
                   ))}
@@ -86,6 +98,7 @@ export default function DriversPage() {
             )}
           </div>
         </div>
+
         {showModal && (
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
             <div style={{ backgroundColor: 'white', borderRadius: '12px', width: '90%', maxWidth: '500px' }}>
