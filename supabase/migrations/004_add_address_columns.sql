@@ -1,4 +1,8 @@
+-- ============================================================
 -- Ensure address columns exist on the companies table.
+-- Idempotent: safe to run on any database state.
+-- ============================================================
+
 DO $$
 BEGIN
   ALTER TABLE public.companies

@@ -308,6 +308,18 @@ CREATE POLICY "drivers_all_admin" ON public.drivers FOR ALL USING (public.is_com
 CREATE POLICY "vehicles_select_member" ON public.vehicles FOR SELECT USING (public.is_company_member(company_id));
 CREATE POLICY "vehicles_all_admin" ON public.vehicles FOR ALL USING (public.is_company_admin(company_id));
 
+-- Driver documents RLS
+CREATE POLICY "driver_docs_select_member" ON public.driver_documents FOR SELECT
+  USING (EXISTS (SELECT 1 FROM public.drivers d WHERE d.id = driver_id AND public.is_company_member(d.company_id)));
+CREATE POLICY "driver_docs_all_admin" ON public.driver_documents FOR ALL
+  USING (EXISTS (SELECT 1 FROM public.drivers d WHERE d.id = driver_id AND public.is_company_admin(d.company_id)));
+
+-- Vehicle documents RLS
+CREATE POLICY "vehicle_docs_select_member" ON public.vehicle_documents FOR SELECT
+  USING (EXISTS (SELECT 1 FROM public.vehicles v WHERE v.id = vehicle_id AND public.is_company_member(v.company_id)));
+CREATE POLICY "vehicle_docs_all_admin" ON public.vehicle_documents FOR ALL
+  USING (EXISTS (SELECT 1 FROM public.vehicles v WHERE v.id = vehicle_id AND public.is_company_admin(v.company_id)));
+
 -- Jobs RLS
 CREATE POLICY "jobs_all_member" ON public.jobs FOR ALL USING (public.is_company_member(company_id));
 

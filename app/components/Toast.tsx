@@ -1,45 +1,62 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+
+import { useEffect } from 'react';
 
 interface ToastProps {
   message: string;
   type?: 'success' | 'error' | 'info';
-  duration?: number;
   onClose: () => void;
+  duration?: number;
 }
 
-export function Toast({ message, type = 'info', duration = 3000, onClose }: ToastProps) {
+export default function Toast({ message, type = 'success', onClose, duration = 3000 }: ToastProps) {
   useEffect(() => {
-    const timer = setTimeout(onClose, duration);
-    return () => clearTimeout(timer);
-  }, [duration, onClose]);
+    const timer = setTimeout(() => {
+      onClose();
+    }, duration);
 
-  const bgColor = type === 'success' ? '#D1FAE5' : type === 'error' ? '#FEE2E2' : '#DBEAFE';
-  const textColor = type === 'success' ? '#065F46' : type === 'error' ? '#DC2626' : '#1E40AF';
-  const borderColor = type === 'success' ? '#6EE7B7' : type === 'error' ? '#FCA5A5' : '#93C5FD';
+    return () => clearTimeout(timer);
+  }, [onClose, duration]);
+
+  const backgroundColor = type === 'success' ? '#1E7A3E' : type === 'error' ? '#dc2626' : '#2563eb';
 
   return (
-    <div style={{
-      position: 'fixed', bottom: '1.5rem', right: '1.5rem', zIndex: 9999,
-      padding: '1rem 1.5rem', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-      backgroundColor: bgColor, color: textColor, border: `1px solid ${borderColor}`,
-      display: 'flex', alignItems: 'center', gap: '0.75rem', maxWidth: '400px',
-      animation: 'fadeInUp 0.3s ease'
-    }}>
-      <span style={{ flex: 1 }}>{message}</span>
-      <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: textColor, fontSize: '1.25rem', lineHeight: 1 }}>×</button>
+    <div
+      style={{
+        position: 'fixed',
+        bottom: '80px',
+        right: '20px',
+        backgroundColor,
+        color: 'white',
+        padding: '16px 24px',
+        borderRadius: '10px',
+        boxShadow: '0 14px 40px rgba(10,40,90,0.3)',
+        zIndex: 9999,
+        maxWidth: '320px',
+        animation: 'slideIn 0.3s ease-out',
+        fontWeight: 500,
+      }}
+      onClick={onClose}
+      role="alert"
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ fontSize: '18px' }}>
+          {type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}
+        </span>
+        <span>{message}</span>
+      </div>
+      <style jsx>{\`
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      \`}</style>
     </div>
   );
-}
-
-export function useToast() {
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-
-  const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
-    setToast({ message, type });
-  }, []);
-
-  const hideToast = useCallback(() => setToast(null), []);
-
-  return { toast, showToast, hideToast };
 }

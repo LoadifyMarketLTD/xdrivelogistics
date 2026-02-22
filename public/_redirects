@@ -1,3 +1,3 @@
-/admin/*  /admin/:splat  200
-/m/*      /m/:splat      200
-/*        /index.html    200
+# Netlify automatically handles www to apex domain redirects based on primary domain configuration
+# Primary domain is dannycourierltd.co.uk (configured in Netlify dashboard)
+# No custom redirect rules needed here

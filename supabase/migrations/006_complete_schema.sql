@@ -1,3 +1,4 @@
+-- ============================================================
 -- Danny Courier Ltd — COMPLETE SCHEMA (single idempotent file)
 -- ============================================================
 -- Paste the entire contents of this file into the Supabase

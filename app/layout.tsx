@@ -16,12 +16,29 @@ export const metadata: Metadata = {
     template: '%s | Danny Courier',
   },
   description: 'Danny Courier connects self-employed courier drivers with businesses across the UK and Europe. Find loads, manage deliveries, and grow your transport business. 24/7 reliable freight services.',
-  keywords: ['Danny Courier', 'courier jobs UK', 'self employed driver', 'transport platform UK', 'UK courier', 'express delivery', 'logistics Blackburn'],
+  keywords: [
+    'Danny Courier',
+    'courier jobs UK',
+    'self employed driver',
+    'haulage exchange UK',
+    'transport platform UK',
+    'owner driver jobs UK',
+    'courier driver app UK',
+    'freight loads UK',
+    'courier exchange',
+    'UK courier',
+    'express delivery',
+    'same day delivery',
+    'pallet transport',
+    'logistics Blackburn',
+  ],
   authors: [{ name: 'XDrive Logistics Ltd' }],
   creator: 'XDrive Logistics Ltd',
   publisher: 'XDrive Logistics Ltd',
   metadataBase: new URL('https://dannycourierltd.co.uk'),
-  icons: { apple: '/apple-touch-icon.png' },
+  icons: {
+    apple: '/apple-touch-icon.png',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_GB',
@@ -38,7 +55,13 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true, 'max-video-preview': -1, 'max-image-preview': 'large', 'max-snippet': -1 },
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 }
 
@@ -58,11 +81,19 @@ const jsonLd = {
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
       <body>
-        <Script id="org-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <Script
+          id="org-jsonld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <AuthProvider>
           {children}
         </AuthProvider>

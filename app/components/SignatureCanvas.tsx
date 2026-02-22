@@ -1,109 +1,182 @@
 'use client';
-import { useRef, useState, useEffect } from 'react';
+
+import { useState, useRef, useEffect } from 'react';
 
 interface SignatureCanvasProps {
-  onSave: (dataUrl: string) => void;
-  onClear?: () => void;
-  label?: string;
+  onSave: (signatureData: string, recipientName: string) => void;
+  onCancel?: () => void;
+  initialSignature?: string;
+  initialRecipientName?: string;
 }
 
-export function SignatureCanvas({ onSave, onClear, label = 'Recipient Signature' }: SignatureCanvasProps) {
+export default function SignatureCanvas({ 
+  onSave, 
+  onCancel,
+  initialSignature = '',
+  initialRecipientName = ''
+}: SignatureCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [hasSignature, setHasSignature] = useState(false);
-  const [recipientName, setRecipientName] = useState('');
+  const [recipientName, setRecipientName] = useState(initialRecipientName);
+  const [hasSignature, setHasSignature] = useState(!!initialSignature);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    ctx.strokeStyle = '#1a1a1a';
-    ctx.lineWidth = 2.5;
+
+    // Set canvas size
+    canvas.width = canvas.offsetWidth;
+    canvas.height = 200;
+
+    // Set drawing style
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-  }, []);
 
-  const getPos = (e: React.MouseEvent | React.TouchEvent) => {
-    const canvas = canvasRef.current!;
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    if ('touches' in e) {
-      return {
-        x: (e.touches[0].clientX - rect.left) * scaleX,
-        y: (e.touches[0].clientY - rect.top) * scaleY,
+    // Load initial signature if provided
+    if (initialSignature) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0);
       };
+      img.src = initialSignature;
     }
-    return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY,
-    };
-  };
+  }, [initialSignature]);
 
-  const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d')!;
-    const { x, y } = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(x, y);
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
     setIsDrawing(true);
     setHasSignature(true);
+
+    const rect = canvas.getBoundingClientRect();
+    const x = 'touches' in e 
+      ? e.touches[0].clientX - rect.left
+      : e.clientX - rect.left;
+    const y = 'touches' in e
+      ? e.touches[0].clientY - rect.top
+      : e.clientY - rect.top;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
   };
 
-  const draw = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d')!;
-    const { x, y } = getPos(e);
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = 'touches' in e
+      ? e.touches[0].clientX - rect.left
+      : e.clientX - rect.left;
+    const y = 'touches' in e
+      ? e.touches[0].clientY - rect.top
+      : e.clientY - rect.top;
+
     ctx.lineTo(x, y);
     ctx.stroke();
+
+    e.preventDefault();
   };
 
-  const stopDrawing = () => setIsDrawing(false);
+  const stopDrawing = () => {
+    setIsDrawing(false);
+  };
 
-  const clear = () => {
+  const clearSignature = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d')!;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     setHasSignature(false);
-    onClear?.();
   };
 
-  const save = () => {
+  const handleSave = () => {
     const canvas = canvasRef.current;
-    if (!canvas || !hasSignature) return;
-    onSave(canvas.toDataURL('image/png'));
+    if (!canvas) return;
+
+    if (!hasSignature) {
+      alert('Please provide a signature');
+      return;
+    }
+
+    if (!recipientName.trim()) {
+      alert('Please enter recipient name');
+      return;
+    }
+
+    const signatureData = canvas.toDataURL('image/png');
+    onSave(signatureData, recipientName.trim());
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-      <div style={{ marginBottom: '0.25rem' }}>
-        <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>
+    <div style={{
+      backgroundColor: 'white',
+      padding: '1rem',
+      borderRadius: '8px',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+    }}>
+      <h3 style={{
+        fontSize: '1rem',
+        fontWeight: '600',
+        color: '#1f2937',
+        marginBottom: '0.75rem'
+      }}>
+        Delivery Signature
+      </h3>
+
+      {/* Recipient Name Input */}
+      <div style={{ marginBottom: '1rem' }}>
+        <label style={{
+          display: 'block',
+          fontSize: '0.875rem',
+          fontWeight: '500',
+          color: '#374151',
+          marginBottom: '0.5rem'
+        }}>
           Recipient Name
         </label>
         <input
           type="text"
           value={recipientName}
           onChange={(e) => setRecipientName(e.target.value)}
-          placeholder="Full name of recipient"
-          style={{ width: '100%', padding: '0.6rem 0.8rem', border: '1.5px solid #D1D5DB', borderRadius: '7px', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box' }}
-          onFocus={(e) => (e.target.style.borderColor = '#1E4E8C')}
-          onBlur={(e) => (e.target.style.borderColor = '#D1D5DB')}
+          placeholder="Enter recipient name"
+          style={{
+            width: '100%',
+            padding: '0.75rem',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            fontSize: '1rem',
+            minHeight: '48px'
+          }}
         />
       </div>
 
-      <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>{label}</label>
-      <div style={{ border: '1.5px solid #D1D5DB', borderRadius: '8px', overflow: 'hidden', backgroundColor: 'white' }}>
+      {/* Canvas */}
+      <div style={{
+        border: '2px dashed #d1d5db',
+        borderRadius: '8px',
+        marginBottom: '1rem',
+        backgroundColor: '#f9fafb'
+      }}>
         <canvas
           ref={canvasRef}
-          width={600}
-          height={180}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
@@ -111,33 +184,82 @@ export function SignatureCanvas({ onSave, onClear, label = 'Recipient Signature'
           onTouchStart={startDrawing}
           onTouchMove={draw}
           onTouchEnd={stopDrawing}
-          style={{ display: 'block', width: '100%', touchAction: 'none', cursor: 'crosshair' }}
+          style={{
+            width: '100%',
+            height: '200px',
+            cursor: 'crosshair',
+            touchAction: 'none'
+          }}
         />
-        {!hasSignature && (
-          <div style={{ position: 'absolute', pointerEvents: 'none' }} />
-        )}
       </div>
-      {!hasSignature && (
-        <p style={{ fontSize: '0.78rem', color: '#9CA3AF', margin: 0, textAlign: 'center' }}>Draw signature above</p>
-      )}
 
-      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+      <p style={{
+        fontSize: '0.75rem',
+        color: '#6b7280',
+        textAlign: 'center',
+        marginBottom: '1rem'
+      }}>
+        Sign above with your finger or stylus
+      </p>
+
+      {/* Buttons */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: onCancel ? '1fr 1fr' : '1fr',
+        gap: '0.5rem'
+      }}>
         <button
-          type="button"
-          onClick={clear}
-          style={{ padding: '0.5rem 1.1rem', border: '1.5px solid #D1D5DB', borderRadius: '7px', background: 'white', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 500, color: '#374151' }}
+          onClick={clearSignature}
+          style={{
+            backgroundColor: '#f3f4f6',
+            color: '#374151',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '0.75rem',
+            fontSize: '1rem',
+            fontWeight: '600',
+            cursor: 'pointer',
+            minHeight: '48px'
+          }}
         >
           Clear
         </button>
         <button
-          type="button"
-          onClick={save}
-          disabled={!hasSignature}
-          style={{ padding: '0.5rem 1.25rem', backgroundColor: hasSignature ? '#1F7A3D' : '#D1D5DB', color: 'white', border: 'none', borderRadius: '7px', cursor: hasSignature ? 'pointer' : 'not-allowed', fontSize: '0.85rem', fontWeight: 700 }}
+          onClick={handleSave}
+          style={{
+            backgroundColor: '#10b981',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '0.75rem',
+            fontSize: '1rem',
+            fontWeight: '600',
+            cursor: 'pointer',
+            minHeight: '48px'
+          }}
         >
           Save Signature
         </button>
       </div>
+
+      {onCancel && (
+        <button
+          onClick={onCancel}
+          style={{
+            width: '100%',
+            backgroundColor: 'transparent',
+            color: '#6b7280',
+            border: 'none',
+            padding: '0.75rem',
+            fontSize: '0.9rem',
+            fontWeight: '500',
+            cursor: 'pointer',
+            marginTop: '0.5rem'
+          }}
+        >
+          Cancel
+        </button>
+      )}
     </div>
   );
 }
