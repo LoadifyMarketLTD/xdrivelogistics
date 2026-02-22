@@ -452,6 +452,7 @@ export default function GlobalAnalyticsPage() {
               { label: '🏢 Companies', desc: `${stats.totalCompanies} registered`, href: '/admin/companies' },
               { label: '📦 All Loads', desc: `${stats.totalJobs} jobs`, href: '/loads' },
               { label: '💰 All Quotes', desc: `${stats.totalBids} bids`, href: '/quotes' },
+              { label: '📋 Site Audit', desc: 'Full 15-section analysis', href: '/analytics/audit', highlight: true },
               { label: '🔍 Diagnostics', desc: 'System health', href: '/diagnostics' },
             ].map(a => (
               <a

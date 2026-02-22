@@ -18,6 +18,13 @@ export const NAV_ITEMS: NavItem[] = [
     section: 'main',
   },
   {
+    label: '📋 Site Audit',
+    path: '/analytics/audit',
+    icon: '📋',
+    allowedRoles: ['owner'],
+    section: 'main',
+  },
+  {
     label: '✅ Approvals',
     path: '/admin/approvals',
     icon: '✅',
