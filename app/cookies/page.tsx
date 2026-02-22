@@ -1,102 +1,40 @@
-import type { Metadata } from 'next'
-
-export const metadata: Metadata = {
-  title: 'Cookie Policy | XDrive Logistics LTD',
-  description: 'XDrive Logistics LTD Cookie Policy – how we use cookies on our website and how you can manage your preferences.',
-}
-
-const LAST_UPDATED = '21 February 2026'
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#C8A64D', marginBottom: '0.75rem' }}>
-        {title}
-      </h2>
-      <div style={{ margin: 0 }}>{children}</div>
-    </div>
-  )
-}
+'use client';
+import Link from 'next/link';
+import { COMPANY_CONFIG } from '../config/company';
 
 export default function CookiesPage() {
   return (
-    <main style={{ minHeight: '100vh', backgroundColor: '#0A2239', color: '#ffffff', padding: '6rem 24px 4rem' }}>
-      <div style={{ maxWidth: '860px', margin: '0 auto' }}>
-        <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: '#C8A64D', textDecoration: 'none', fontSize: '0.9rem', marginBottom: '2rem' }}>
-          ← Back to Home
-        </a>
-        <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 800, color: '#ffffff', marginBottom: '0.5rem' }}>
-          Cookie Policy
-        </h1>
-        <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '2.5rem', fontSize: '0.9rem' }}>
-          Last updated: {LAST_UPDATED}
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', lineHeight: '1.7', color: 'rgba(255,255,255,0.82)' }}>
-          <Section title="1. What Are Cookies?">
-            Cookies are small text files placed on your device when you visit a website. They help the website remember your preferences, understand how you use the site, and provide a better experience.
-          </Section>
-          <Section title="2. How We Use Cookies">
-            XDrive Logistics Ltd uses cookies for the following purposes:
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem', fontSize: '0.9rem' }}>
-              <thead>
-                <tr>
-                  {['Cookie Type', 'Purpose', 'Duration'].map((h) => (
-                    <th key={h} style={{ textAlign: 'left', padding: '0.75rem', backgroundColor: 'rgba(200,166,77,0.15)', color: '#C8A64D', borderBottom: '1px solid rgba(200,166,77,0.3)' }}>
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  ['Strictly Necessary', 'Authentication, session management, security', 'Session'],
-                  ['Functional', 'Remember your preferences and settings', 'Up to 1 year'],
-                  ['Analytics', 'Understand how visitors use the site', 'Up to 2 years'],
-                  ['Performance', 'Improve platform speed and reliability', 'Up to 1 year'],
-                ].map(([type, purpose, duration], i) => (
-                  <tr key={i}>
-                    {[type, purpose, duration].map((cell, j) => (
-                      <td key={j} style={{ padding: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.08)', verticalAlign: 'top' }}>
-                        {cell}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Section>
-          <Section title="3. Third-Party Cookies">
-            Some cookies are set by third-party services we use, including:
-            <ul style={{ marginTop: '0.5rem', paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <li><strong>Supabase</strong> – authentication and database services</li>
-              <li><strong>Google Analytics</strong> – anonymous usage analytics (if enabled)</li>
-            </ul>
-            These third parties have their own privacy and cookie policies, which we encourage you to review.
-          </Section>
-          <Section title="4. Managing Cookies">
-            You can control and manage cookies through your browser settings. Most browsers allow you to:
-            <ul style={{ marginTop: '0.5rem', paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <li>View cookies stored on your device</li>
-              <li>Delete specific or all cookies</li>
-              <li>Block cookies from specific or all websites</li>
-            </ul>
-            Please note that disabling strictly necessary cookies may affect your ability to log in and use core features.
-          </Section>
-          <Section title="5. Consent">
-            When you first visit our website, you will be asked to consent to the use of non-essential cookies. You can withdraw your consent at any time by adjusting your browser settings or contacting us.
-          </Section>
-          <Section title="6. Changes to This Policy">
-            We may update this Cookie Policy from time to time. Changes will be posted on this page with an updated &quot;Last updated&quot; date.
-          </Section>
-          <Section title="7. Contact Us">
-            If you have any questions about our use of cookies, please contact:<br /><br />
-            XDrive Logistics Ltd<br />
-            101 Cornelian Street, Blackburn, BB1 9QL<br />
-            Email: dannycourierltd@gmail.com<br />
-            Phone: 07423 272 138
-          </Section>
-        </div>
+    <div style={{ minHeight: '100vh', backgroundColor: '#F4F7FA', padding: '2rem 1rem' }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto', backgroundColor: 'white', borderRadius: '12px', padding: '2.5rem', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+        <Link href="/" style={{ color: '#1E4E8C', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-block', marginBottom: '1.5rem' }}>← Back to Home</Link>
+        <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#0A2239', marginBottom: '0.5rem' }}>Cookie Policy</h1>
+        <p style={{ color: '#6B7280', marginBottom: '2rem', fontSize: '0.9rem' }}>Last updated: January 2025</p>
+
+        <section style={{ marginBottom: '2rem' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0A2239', marginBottom: '1rem' }}>What Are Cookies?</h2>
+          <p style={{ color: '#374151', lineHeight: 1.7 }}>Cookies are small text files placed on your device when you visit our website. They help us provide you with a better experience by remembering your preferences and understanding how you use our site.</p>
+        </section>
+
+        <section style={{ marginBottom: '2rem' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0A2239', marginBottom: '1rem' }}>How We Use Cookies</h2>
+          <p style={{ color: '#374151', lineHeight: 1.7, marginBottom: '1rem' }}>We use cookies for the following purposes:</p>
+          <ul style={{ color: '#374151', lineHeight: 1.7, paddingLeft: '1.5rem' }}>
+            <li style={{ marginBottom: '0.5rem' }}><strong>Essential cookies:</strong> Required for the website to function properly, including authentication and session management.</li>
+            <li style={{ marginBottom: '0.5rem' }}><strong>Functional cookies:</strong> Remember your preferences and settings to improve your experience.</li>
+            <li style={{ marginBottom: '0.5rem' }}><strong>Analytics cookies:</strong> Help us understand how visitors interact with our website so we can improve it.</li>
+          </ul>
+        </section>
+
+        <section style={{ marginBottom: '2rem' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0A2239', marginBottom: '1rem' }}>Your Choices</h2>
+          <p style={{ color: '#374151', lineHeight: 1.7 }}>You can control and/or delete cookies as you wish. You can delete all cookies that are already on your computer and you can set most browsers to prevent them from being placed. However, if you do this, you may have to manually adjust some preferences every time you visit and some services and functionalities may not work.</p>
+        </section>
+
+        <section style={{ marginBottom: '2rem' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0A2239', marginBottom: '1rem' }}>Contact Us</h2>
+          <p style={{ color: '#374151', lineHeight: 1.7 }}>If you have questions about our use of cookies, please contact us at <a href={`mailto:${COMPANY_CONFIG.email}`} style={{ color: '#1E4E8C' }}>{COMPANY_CONFIG.email}</a>.</p>
+        </section>
       </div>
-    </main>
-  )
+    </div>
+  );
 }

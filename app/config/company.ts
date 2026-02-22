@@ -1,12 +1,8 @@
-// Company configuration for Danny Courier (trading name of XDrive Logistics Ltd)
-// MASTER SPEC - ONE SOURCE OF TRUTH
-
 export const COMPANY_CONFIG = {
   name: 'Danny Courier',
   legalName: 'XDrive Logistics Ltd',
   tagline: 'Professional Transport Services',
   companyNumber: '13171804',
-
   address: {
     street: '101 Cornelian Street',
     city: 'Blackburn',
@@ -14,46 +10,23 @@ export const COMPANY_CONFIG = {
     country: 'United Kingdom',
     full: '101 Cornelian Street, Blackburn, BB1 9QL, United Kingdom',
   },
-
   email: 'dannycourierltd@gmail.com',
   phone: '+447377694228',
   phoneDisplay: '07377 694 228',
-
   whatsapp: {
     number: '447377694228',
     defaultMessage: "Hello, I'd like to inquire about your transport services",
   },
-
   payment: {
-    bankTransfer: {
-      accountName: 'XDrive Logistics Ltd',
-      sortCode: '04-00-04',
-      accountNumber: '12345678',
-    },
-    paypal: {
-      email: 'dannycourierltd@gmail.com',
-    },
+    bankTransfer: { accountName: 'XDrive Logistics Ltd', sortCode: '04-00-04', accountNumber: '12345678' },
+    paypal: { email: 'dannycourierltd@gmail.com' },
     terms: ['Pay now', '14 days', '30 days'] as const,
     lateFeeNote: 'Late payments may incur administrative charges.',
     lateFeeAmount: 'A late payment charge of £25 per full week may apply after the due date.',
   },
-
-  vat: {
-    rates: [0, 5, 20] as const,
-    defaultRate: 20,
-  },
-
-  invoice: {
-    jobRefPrefix: 'DC',
-    invoicePrefix: 'INV',
-  },
-
-  social: {
-    facebook: '#',
-    instagram: '#',
-    tiktok: '#',
-    linkedin: '#',
-  },
+  vat: { rates: [0, 5, 20] as const, defaultRate: 20 },
+  invoice: { jobRefPrefix: 'DC', invoicePrefix: 'INV' },
+  social: { facebook: '#', instagram: '#', tiktok: '#', linkedin: '#' },
 };
 
 export const JOB_STATUS = {

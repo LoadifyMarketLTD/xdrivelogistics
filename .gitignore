@@ -1,39 +1,35 @@
-# Dependencies
-node_modules/
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
 
-# Build outputs
-dist/
-build/
-.next/
-*.tsbuildinfo
+# testing
+/coverage
 
-# Vite landing page integrated into Next.js public/
-public/index.html
-public/assets/
+# next.js
+/.next/
+/out/
 
-# Environment variables
-.env
-.env.local
+# production
+/build
+/dist
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
+# misc
 .DS_Store
-Thumbs.db
+*.pem
 
-# Logs
-*.log
+# debug
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Temporary files
-/tmp/
-*.tmp
+# local env files
+.env
+.env*.local
 
-# Screenshot binary blobs — never commit PNGs from audit/proof directories
-audit/
-docs/screenshots/**/*.png
-docs/proof/**/*.png
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+*.backup
