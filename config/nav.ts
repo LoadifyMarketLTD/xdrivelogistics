@@ -9,6 +9,56 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
+  // Owner-only items
+  {
+    label: '🌐 Global Analytics',
+    path: '/analytics',
+    icon: '🌐',
+    allowedRoles: ['owner'],
+    section: 'main',
+  },
+  {
+    label: '📋 Site Audit',
+    path: '/analytics/audit',
+    icon: '📋',
+    allowedRoles: ['owner'],
+    section: 'main',
+  },
+  {
+    label: '✅ Approvals',
+    path: '/admin/approvals',
+    icon: '✅',
+    allowedRoles: ['owner'],
+    section: 'main',
+  },
+  {
+    label: '👥 Users',
+    path: '/admin/users',
+    icon: '👥',
+    allowedRoles: ['owner'],
+    section: 'main',
+  },
+  {
+    label: '🏢 Companies',
+    path: '/admin/companies',
+    icon: '🏢',
+    allowedRoles: ['owner'],
+    section: 'main',
+  },
+  {
+    label: '📦 All Loads',
+    path: '/loads',
+    icon: '📦',
+    allowedRoles: ['owner'],
+    section: 'main',
+  },
+  {
+    label: '🔍 Diagnostics',
+    path: '/diagnostics',
+    icon: '🔍',
+    allowedRoles: ['owner'],
+    section: 'main',
+  },
   {
     label: 'Dashboard',
     path: '/dashboard',
