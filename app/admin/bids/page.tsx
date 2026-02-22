@@ -40,11 +40,13 @@ export default function BidsPage() {
             <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937', margin: 0 }}>Job Bids</h1>
             <p style={{ color: '#6b7280', margin: '0.5rem 0 0 0' }}>Review and manage incoming job bids</p>
           </div>
+
           {!isSupabaseConfigured && (
             <div style={{ backgroundColor: '#fef3c7', border: '1px solid #f59e0b', borderRadius: '8px', padding: '1rem', marginBottom: '1.5rem', color: '#92400e' }}>
               ⚠️ Supabase is not configured. Database features are disabled.
             </div>
           )}
+
           <div style={{ backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
             {loading ? (
               <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>Loading...</div>

@@ -1,54 +1,24 @@
 'use client';
-import { useEffect, useState, useRef } from 'react';
+
+import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useAuth } from '../../../components/AuthContext';
 import ProtectedRoute from '../../../components/ProtectedRoute';
 import InvoiceTemplate, { InvoiceData } from '../../../components/InvoiceTemplate';
-import { SignatureCanvas } from '../../../components/SignatureCanvas';
-import { PODPhotoUpload } from '../../../components/PODPhotoUpload';
 import { COMPANY_CONFIG } from '../../../config/company';
-import { supabase, isSupabaseConfigured } from '../../../../lib/supabaseClient';
-
-function today() {
-  return new Date().toISOString().slice(0, 10);
-}
-function addDays(dateStr: string, days: number) {
-  const d = new Date(dateStr);
-  d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
-}
-function calcVat(net: number, rate: number) {
-  return Math.round(net * rate) / 100;
-}
-function nextInvNum(prefix: string) {
-  return `${prefix}-${Date.now().toString().slice(-6)}`;
-}
-
-type Tab = 'form' | 'preview';
 
 export default function InvoiceDetailPage() {
-  const { logout } = useAuth();
   const router = useRouter();
   const params = useParams();
   const invoiceId = params?.id as string;
   const isNew = invoiceId === 'new';
 
-  const printRef = useRef<HTMLDivElement>(null);
-
-  const defaultDate = today();
-  const defaultDue = addDays(defaultDate, 14);
-
-  const [tab, setTab] = useState<Tab>('form');
-  const [saving, setSaving] = useState(false);
-  const [loadError, setLoadError] = useState('');
-  const [saveMsg, setSaveMsg] = useState('');
-
-  const [form, setForm] = useState<InvoiceData>({
-    invoiceNumber: nextInvNum(COMPANY_CONFIG.invoice.invoicePrefix),
-    jobRef: `${COMPANY_CONFIG.invoice.jobRefPrefix}-`,
-    date: defaultDate,
-    dueDate: defaultDue,
-    status: 'unpaid',
+  const [formData, setFormData] = useState<InvoiceData>({
+    id: '',
+    invoiceNumber: '',
+    jobRef: '',
+    date: new Date().toISOString().split('T')[0],
+    dueDate: '',
+    status: 'Pending',
     clientName: '',
     clientAddress: '',
     clientEmail: '',
@@ -57,297 +27,622 @@ export default function InvoiceDetailPage() {
     deliveryLocation: '',
     deliveryDateTime: '',
     deliveryRecipient: '',
-    serviceDescription: 'Courier / transport service',
+    serviceDescription: '',
     amount: 0,
     paymentTerms: '14 days',
-    vatRate: 20,
+    lateFee: COMPANY_CONFIG.payment.lateFeeNote,
+    vatRate: COMPANY_CONFIG.vat.defaultRate as 0 | 5 | 20,
     netAmount: 0,
     vatAmount: 0,
-    podPhotos: [],
-    signature: '',
-    recipientName: '',
   });
 
-  useEffect(() => {
-    if (isNew || !isSupabaseConfigured) return;
-    supabase.from('invoices').select('*').eq('id', invoiceId).single().then(({ data, error }) => {
-      if (error) { setLoadError(error.message); return; }
-      if (data) {
-        setForm({
-          id: data.id,
-          invoiceNumber: data.invoice_ref ?? '',
-          jobRef: data.job_ref ?? '',
-          date: data.invoice_date ?? defaultDate,
-          dueDate: data.due_date ?? defaultDue,
-          status: data.status ?? 'unpaid',
-          clientName: data.customer_name ?? '',
-          clientAddress: data.customer_address ?? '',
-          clientEmail: data.customer_email ?? '',
-          pickupLocation: data.pickup_location ?? '',
-          pickupDateTime: data.pickup_datetime ?? '',
-          deliveryLocation: data.delivery_location ?? '',
-          deliveryDateTime: data.delivery_datetime ?? '',
-          deliveryRecipient: data.delivery_recipient ?? '',
-          serviceDescription: data.service_description ?? '',
-          amount: data.gross_amount ?? 0,
-          paymentTerms: data.payment_terms ?? '14 days',
-          vatRate: data.vat_rate ?? 20,
-          netAmount: data.net_amount ?? 0,
-          vatAmount: data.vat_amount ?? 0,
-          podPhotos: data.pod_photos ?? [],
-          signature: data.signature ?? '',
-          recipientName: data.recipient_name ?? '',
-        });
-      }
-    });
-  }, [invoiceId, isNew]);
+  const [showPreview, setShowPreview] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
 
-  const set = (field: keyof InvoiceData, value: unknown) => {
-    setForm((prev) => {
-      const next = { ...prev, [field]: value };
-      if (field === 'netAmount' || field === 'vatRate') {
-        const net = field === 'netAmount' ? Number(value) : prev.netAmount;
-        const rate = field === 'vatRate' ? Number(value) : prev.vatRate;
-        next.vatAmount = calcVat(net, rate);
-        next.amount = net + next.vatAmount;
-      }
-      if (field === 'paymentTerms') {
-        const days = value === '14 days' ? 14 : value === '30 days' ? 30 : 0;
-        next.dueDate = addDays(next.date, days);
-      }
-      return next;
-    });
+  useEffect(() => {
+    if (!isNew) {
+      loadInvoice();
+    } else {
+      generateNewInvoiceData();
+    }
+  }, [invoiceId]);
+
+  useEffect(() => {
+    if (formData.date && formData.paymentTerms) {
+      const invoiceDate = new Date(formData.date);
+      const daysToAdd = formData.paymentTerms === '14 days' ? 14 : 30;
+      const dueDate = new Date(invoiceDate);
+      dueDate.setDate(dueDate.getDate() + daysToAdd);
+      setFormData((prev) => ({
+        ...prev,
+        dueDate: dueDate.toISOString().split('T')[0],
+      }));
+    }
+  }, [formData.date, formData.paymentTerms]);
+
+  // Calculate VAT breakdown whenever amount or VAT rate changes
+  useEffect(() => {
+    if (formData.amount > 0) {
+      const netAmount = formData.amount / (1 + formData.vatRate / 100);
+      const vatAmount = formData.amount - netAmount;
+      setFormData((prev) => ({
+        ...prev,
+        netAmount: Number(netAmount.toFixed(2)),
+        vatAmount: Number(vatAmount.toFixed(2)),
+      }));
+    }
+  }, [formData.amount, formData.vatRate]);
+
+  // Generate unique Job Reference using timestamp to prevent collisions
+  // Format: DC-YYMMDD-XXXX where XXXX is based on timestamp
+  // NOTE: In production, use a proper sequential counter from database
+  const generateJobRef = () => {
+    const now = new Date();
+    const yy = now.getFullYear().toString().slice(-2);
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    // Use last 4 digits of timestamp + random component for better uniqueness
+    const timePart = String(now.getTime()).slice(-3);
+    const randomPart = String(Math.floor(Math.random() * 10));
+    const xxxx = (timePart + randomPart).padStart(4, '0');
+    return `${COMPANY_CONFIG.invoice.jobRefPrefix}-${yy}${mm}${dd}-${xxxx}`;
   };
 
-  const handleSave = async () => {
-    setSaving(true); setSaveMsg('');
+  // Generate unique Invoice Number using timestamp
+  // Format: INV-YYYYMM-XXX
+  // NOTE: In production, use a proper sequential counter from database
+  const generateInvoiceNumber = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    // Use last 3 digits of timestamp for better distribution
+    const uniqueId = String(now.getTime()).slice(-3);
+    return `${COMPANY_CONFIG.invoice.invoicePrefix}-${year}${month}-${uniqueId}`;
+  };
+
+  const generateNewInvoiceData = () => {
+    const id = `invoice_${Date.now()}`;
+    const jobRef = generateJobRef();
+    const invoiceNumber = generateInvoiceNumber();
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 14);
+
+    setFormData((prev) => ({
+      ...prev,
+      id,
+      jobRef,
+      invoiceNumber,
+      dueDate: dueDate.toISOString().split('T')[0],
+    }));
+  };
+
+  const loadInvoice = () => {
     try {
-      if (!isSupabaseConfigured) { setSaveMsg('⚠️ Supabase not configured — changes not persisted.'); return; }
-      const row = {
-        invoice_ref: form.invoiceNumber,
-        job_ref: form.jobRef,
-        invoice_date: form.date,
-        due_date: form.dueDate,
-        status: form.status,
-        customer_name: form.clientName,
-        customer_address: form.clientAddress,
-        customer_email: form.clientEmail,
-        pickup_location: form.pickupLocation,
-        pickup_datetime: form.pickupDateTime,
-        delivery_location: form.deliveryLocation,
-        delivery_datetime: form.deliveryDateTime,
-        delivery_recipient: form.deliveryRecipient,
-        service_description: form.serviceDescription,
-        net_amount: form.netAmount,
-        vat_rate: form.vatRate,
-        vat_amount: form.vatAmount,
-        gross_amount: form.amount,
-        payment_terms: form.paymentTerms,
-        pod_photos: form.podPhotos,
-        signature: form.signature,
-        recipient_name: form.recipientName,
-      };
-      if (isNew) {
-        const { data, error } = await supabase.from('invoices').insert([row]).select().single();
-        if (error) throw error;
-        setSaveMsg('✓ Invoice created!');
-        setTimeout(() => router.replace(`/admin/invoices/${data.id}`), 800);
+      const stored = localStorage.getItem('dannycourier_invoices');
+      if (stored) {
+        const invoices: InvoiceData[] = JSON.parse(stored);
+        const invoice = invoices.find((inv) => inv.id === invoiceId);
+        if (invoice) {
+          setFormData(invoice);
+        } else {
+          router.push('/admin/invoices');
+        }
       } else {
-        const { error } = await supabase.from('invoices').update(row).eq('id', invoiceId);
-        if (error) throw error;
-        setSaveMsg('✓ Saved successfully!');
+        router.push('/admin/invoices');
       }
-    } catch (err: unknown) {
-      setSaveMsg(`Error: ${err instanceof Error ? err.message : 'Save failed'}`);
-    } finally {
-      setSaving(false);
+    } catch (error) {
+      console.error('Error loading invoice:', error);
+      router.push('/admin/invoices');
     }
   };
 
-  const handlePrint = () => {
-    const el = document.getElementById('invoice-template');
-    if (!el) return;
-    const win = window.open('', '_blank');
-    if (!win) return;
-    win.document.write(`<!DOCTYPE html><html><head><title>Invoice</title><style>body{margin:0;padding:0;font-family:Inter,system-ui,sans-serif}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body>${el.outerHTML}</body></html>`);
-    win.document.close();
-    win.focus();
-    setTimeout(() => { win.print(); }, 300);
+  const handleSave = () => {
+    try {
+      const stored = localStorage.getItem('dannycourier_invoices');
+      let invoices: InvoiceData[] = stored ? JSON.parse(stored) : [];
+
+      if (isNew) {
+        invoices.push(formData);
+      } else {
+        invoices = invoices.map((inv) => (inv.id === invoiceId ? formData : inv));
+      }
+
+      localStorage.setItem('dannycourier_invoices', JSON.stringify(invoices));
+      setSaveMessage('Invoice saved successfully!');
+      setTimeout(() => setSaveMessage(''), 3000);
+
+      if (isNew) {
+        setTimeout(() => {
+          router.push(`/admin/invoices/${formData.id}`);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Error saving invoice:', error);
+      setSaveMessage('Error saving invoice. Please try again.');
+      setTimeout(() => setSaveMessage(''), 3000);
+    }
   };
 
-  const handleWhatsApp = () => {
-    const gross = form.netAmount + form.vatAmount;
-    const msg = encodeURIComponent(
-      `*Invoice ${form.invoiceNumber}*\nClient: ${form.clientName}\nJob Ref: ${form.jobRef}\nDate: ${form.date}\nDue: ${form.dueDate}\nAmount: £${gross.toFixed(2)}\n\nPlease make payment to:\nAccount: ${COMPANY_CONFIG.payment.bankTransfer.accountName}\nSort: ${COMPANY_CONFIG.payment.bankTransfer.sortCode}\nAcc No: ${COMPANY_CONFIG.payment.bankTransfer.accountNumber}\n\nThank you — ${COMPANY_CONFIG.name}`
+  const handleWhatsAppShare = () => {
+    const message = encodeURIComponent(
+      `Invoice ${formData.invoiceNumber}\n` +
+      `Job Ref: ${formData.jobRef}\n` +
+      `Amount: £${formData.amount.toFixed(2)}\n` +
+      `Due Date: ${new Date(formData.dueDate).toLocaleDateString('en-GB')}\n\n` +
+      `Please make payment via:\n` +
+      `Bank Transfer: Sort Code ${COMPANY_CONFIG.payment.bankTransfer.sortCode}, Account ${COMPANY_CONFIG.payment.bankTransfer.accountNumber}\n` +
+      `PayPal: ${COMPANY_CONFIG.payment.paypal.email}`
     );
-    window.open(`https://wa.me/${COMPANY_CONFIG.whatsapp.number}?text=${msg}`, '_blank');
+    window.open(`https://wa.me/?text=${message}`, '_blank');
   };
 
-  const inputCls: React.CSSProperties = { width: '100%', padding: '0.6rem 0.8rem', border: '1.5px solid #E5E7EB', borderRadius: '7px', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box' };
-  const labelCls: React.CSSProperties = { display: 'block', marginBottom: '0.3rem', fontSize: '0.8rem', fontWeight: 600, color: '#374151' };
-  const sectionHdr: React.CSSProperties = { fontSize: '0.8rem', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '1.5rem 0 0.75rem' };
+  const handlePrint = () => {
+    window.print();
+  };
 
-  const gross = form.netAmount + form.vatAmount;
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '0.75rem',
+    border: '2px solid #e5e7eb',
+    borderRadius: '6px',
+    fontSize: '0.95rem',
+    outline: 'none',
+    transition: 'border-color 0.2s',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '0.875rem',
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: '0.5rem',
+  };
 
   return (
     <ProtectedRoute>
-      <div style={{ minHeight: '100vh', backgroundColor: '#F3F4F6' }}>
+      <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6' }}>
         {/* Header */}
-        <header style={{ backgroundColor: '#0A2239', color: 'white', padding: '0.9rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button onClick={() => router.push('/admin/invoices')} style={{ color: 'rgba(255,255,255,0.75)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}>← Invoices</button>
-            <h1 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>🧾 {isNew ? 'New Invoice' : `Invoice ${form.invoiceNumber}`}</h1>
+        <div
+          style={{
+            backgroundColor: '#1e293b',
+            color: 'white',
+            padding: '1.5rem 2rem',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          }}
+        >
+          <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '1rem',
+              }}
+            >
+              <div>
+                <h1 style={{ fontSize: '1.875rem', fontWeight: '700', margin: '0 0 0.25rem 0' }}>
+                  {isNew ? 'Create New Invoice' : 'Edit Invoice'}
+                </h1>
+                <p style={{ margin: 0, opacity: 0.8, fontSize: '0.95rem' }}>
+                  {isNew ? 'Fill in the details below' : `Invoice ${formData.invoiceNumber}`}
+                </p>
+              </div>
+              <button
+                onClick={() => router.push('/admin/invoices')}
+                style={{
+                  padding: '0.625rem 1.25rem',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  color: 'white',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '6px',
+                  fontSize: '0.95rem',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)')}
+              >
+                ← Back to Invoices
+              </button>
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <button onClick={handleWhatsApp} style={{ backgroundColor: '#25D366', color: 'white', border: 'none', borderRadius: '6px', padding: '0.45rem 0.9rem', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600 }}>WhatsApp</button>
-            <button onClick={handlePrint} style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: 'white', border: 'none', borderRadius: '6px', padding: '0.45rem 0.9rem', cursor: 'pointer', fontSize: '0.82rem' }}>Print</button>
-            <button onClick={handleSave} disabled={saving} style={{ backgroundColor: saving ? '#9CA3AF' : '#1F7A3D', color: 'white', border: 'none', borderRadius: '6px', padding: '0.45rem 0.9rem', cursor: saving ? 'not-allowed' : 'pointer', fontSize: '0.82rem', fontWeight: 700 }}>{saving ? 'Saving…' : 'Save'}</button>
-            <button onClick={logout} style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', borderRadius: '6px', padding: '0.45rem 0.8rem', cursor: 'pointer', fontSize: '0.82rem' }}>Logout</button>
-          </div>
-        </header>
-
-        {saveMsg && <div style={{ padding: '0.6rem 1.5rem', backgroundColor: saveMsg.startsWith('Error') ? '#FEF2F2' : '#F0FDF4', color: saveMsg.startsWith('Error') ? '#DC2626' : '#15803D', fontSize: '0.875rem', borderBottom: '1px solid #E5E7EB' }}>{saveMsg}</div>}
-        {loadError && <div style={{ padding: '0.6rem 1.5rem', backgroundColor: '#FEF2F2', color: '#DC2626', fontSize: '0.875rem' }}>Error loading: {loadError}</div>}
-
-        {/* Tabs */}
-        <div style={{ display: 'flex', gap: '0', borderBottom: '2px solid #E5E7EB', backgroundColor: 'white', paddingLeft: '1.5rem' }}>
-          {(['form', 'preview'] as Tab[]).map((t) => (
-            <button key={t} onClick={() => setTab(t)} style={{ padding: '0.75rem 1.25rem', border: 'none', borderBottom: tab === t ? '2px solid #0A2239' : '2px solid transparent', background: 'none', cursor: 'pointer', fontSize: '0.875rem', fontWeight: tab === t ? 700 : 500, color: tab === t ? '#0A2239' : '#6B7280', marginBottom: '-2px', textTransform: 'capitalize' }}>
-              {t === 'form' ? '✏️ Edit' : '👁 Preview'}
-            </button>
-          ))}
         </div>
 
-        <div style={{ maxWidth: '900px', margin: '1.5rem auto', padding: '0 1rem' }}>
-          {tab === 'form' ? (
-            <div style={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #E5E7EB', padding: '1.5rem' }}>
-              {/* Invoice Meta */}
-              <p style={sectionHdr}>Invoice Details</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
-                <div>
-                  <label style={labelCls}>Invoice Number</label>
-                  <input style={inputCls} value={form.invoiceNumber} onChange={(e) => set('invoiceNumber', e.target.value)} />
+        {/* Main Content */}
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: showPreview ? '1fr 1fr' : '1fr', gap: '2rem' }}>
+            {/* Form Section */}
+            <div>
+              {/* Action Buttons */}
+              <div
+                style={{
+                  backgroundColor: 'white',
+                  padding: '1.5rem',
+                  borderRadius: '12px',
+                  marginBottom: '1.5rem',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                }}
+              >
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={handleSave}
+                    style={{
+                      flex: 1,
+                      minWidth: '120px',
+                      padding: '0.75rem 1.5rem',
+                      backgroundColor: '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '0.95rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#059669')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#10b981')}
+                  >
+                    💾 Save Invoice
+                  </button>
+                  <button
+                    onClick={() => setShowPreview(!showPreview)}
+                    style={{
+                      flex: 1,
+                      minWidth: '120px',
+                      padding: '0.75rem 1.5rem',
+                      backgroundColor: '#3b82f6',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '0.95rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#2563eb')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#3b82f6')}
+                  >
+                    👁️ {showPreview ? 'Hide' : 'Show'} Preview
+                  </button>
+                  <button
+                    onClick={handlePrint}
+                    style={{
+                      padding: '0.75rem 1.25rem',
+                      backgroundColor: '#6b7280',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '0.95rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4b5563')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#6b7280')}
+                  >
+                    🖨️ Print
+                  </button>
+                  <button
+                    onClick={handleWhatsAppShare}
+                    style={{
+                      padding: '0.75rem 1.25rem',
+                      backgroundColor: '#25d366',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '0.95rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#20ba5a')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#25d366')}
+                  >
+                    📱 WhatsApp
+                  </button>
                 </div>
-                <div>
-                  <label style={labelCls}>Job Reference</label>
-                  <input style={inputCls} value={form.jobRef} onChange={(e) => set('jobRef', e.target.value)} />
-                </div>
-                <div>
-                  <label style={labelCls}>Invoice Date</label>
-                  <input type="date" style={inputCls} value={form.date} onChange={(e) => set('date', e.target.value)} />
-                </div>
-                <div>
-                  <label style={labelCls}>Due Date</label>
-                  <input type="date" style={inputCls} value={form.dueDate} onChange={(e) => set('dueDate', e.target.value)} />
-                </div>
-                <div>
-                  <label style={labelCls}>Payment Terms</label>
-                  <select style={inputCls} value={form.paymentTerms} onChange={(e) => set('paymentTerms', e.target.value)}>
-                    {COMPANY_CONFIG.payment.terms.map((t) => <option key={t} value={t}>{t}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label style={labelCls}>Status</label>
-                  <select style={inputCls} value={form.status ?? 'unpaid'} onChange={(e) => set('status', e.target.value)}>
-                    {['unpaid', 'paid', 'overdue', 'draft'].map((s) => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
+                {saveMessage && (
+                  <div
+                    style={{
+                      marginTop: '1rem',
+                      padding: '0.75rem',
+                      backgroundColor: saveMessage.includes('Error') ? '#fee2e2' : '#d1fae5',
+                      color: saveMessage.includes('Error') ? '#991b1b' : '#065f46',
+                      borderRadius: '6px',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {saveMessage}
+                  </div>
+                )}
               </div>
 
-              {/* Client */}
-              <p style={sectionHdr}>Client Information</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
-                <div>
-                  <label style={labelCls}>Client Name *</label>
-                  <input style={inputCls} value={form.clientName} onChange={(e) => set('clientName', e.target.value)} placeholder="Company or person name" />
+              {/* Invoice Details Form */}
+              <div
+                style={{
+                  backgroundColor: 'white',
+                  padding: '1.5rem',
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                }}
+              >
+                <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1f2937', marginBottom: '1.5rem' }}>
+                  Invoice Details
+                </h2>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+                  <div>
+                    <label style={labelStyle}>Invoice Number</label>
+                    <input
+                      type="text"
+                      value={formData.invoiceNumber}
+                      readOnly
+                      style={{ ...inputStyle, backgroundColor: '#f9fafb', cursor: 'not-allowed' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Job Reference</label>
+                    <input
+                      type="text"
+                      value={formData.jobRef}
+                      readOnly
+                      style={{ ...inputStyle, backgroundColor: '#f9fafb', cursor: 'not-allowed' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Date</label>
+                    <input
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#3b82f6')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Payment Terms</label>
+                    <select
+                      value={formData.paymentTerms}
+                      onChange={(e) => setFormData({ ...formData, paymentTerms: e.target.value as 'Pay now' | '14 days' | '30 days' })}
+                      style={inputStyle}
+                    >
+                      <option value="Pay now">Pay now</option>
+                      <option value="14 days">14 days</option>
+                      <option value="30 days">30 days</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Due Date</label>
+                    <input
+                      type="date"
+                      value={formData.dueDate}
+                      readOnly
+                      style={{ ...inputStyle, backgroundColor: '#f9fafb', cursor: 'not-allowed' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Status</label>
+                    <select
+                      value={formData.status}
+                      onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                      style={inputStyle}
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Paid">Paid</option>
+                      <option value="Overdue">Overdue</option>
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label style={labelCls}>Client Email</label>
-                  <input type="email" style={inputCls} value={form.clientEmail ?? ''} onChange={(e) => set('clientEmail', e.target.value)} placeholder="email@example.com" />
+
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#1f2937', marginTop: '1.5rem', marginBottom: '1rem' }}>
+                  Client Details
+                </h3>
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                  <div>
+                    <label style={labelStyle}>Client Name</label>
+                    <input
+                      type="text"
+                      value={formData.clientName}
+                      onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
+                      placeholder="Client Name"
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#3b82f6')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Client Address</label>
+                    <textarea
+                      value={formData.clientAddress}
+                      onChange={(e) => setFormData({ ...formData, clientAddress: e.target.value })}
+                      placeholder="Full address"
+                      rows={3}
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#3b82f6')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Client Email</label>
+                    <input
+                      type="email"
+                      value={formData.clientEmail}
+                      onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
+                      placeholder="client@example.com"
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#3b82f6')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </div>
                 </div>
-                <div style={{ gridColumn: 'span 2' }}>
-                  <label style={labelCls}>Client Address</label>
-                  <textarea style={{ ...inputCls, minHeight: '70px', resize: 'vertical' }} value={form.clientAddress ?? ''} onChange={(e) => set('clientAddress', e.target.value)} placeholder="Street, City, Postcode" />
+
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#1f2937', marginTop: '1.5rem', marginBottom: '1rem' }}>
+                  Pickup Details
+                </h3>
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                  <div>
+                    <label style={labelStyle}>Pickup Location</label>
+                    <input
+                      type="text"
+                      value={formData.pickupLocation}
+                      onChange={(e) => setFormData({ ...formData, pickupLocation: e.target.value })}
+                      placeholder="Pickup address"
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#3b82f6')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Pickup Date & Time</label>
+                    <input
+                      type="datetime-local"
+                      value={formData.pickupDateTime}
+                      onChange={(e) => setFormData({ ...formData, pickupDateTime: e.target.value })}
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#3b82f6')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </div>
+                </div>
+
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#1f2937', marginTop: '1.5rem', marginBottom: '1rem' }}>
+                  Delivery Details
+                </h3>
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                  <div>
+                    <label style={labelStyle}>Delivery Location</label>
+                    <input
+                      type="text"
+                      value={formData.deliveryLocation}
+                      onChange={(e) => setFormData({ ...formData, deliveryLocation: e.target.value })}
+                      placeholder="Delivery address"
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#3b82f6')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Delivery Date & Time</label>
+                    <input
+                      type="datetime-local"
+                      value={formData.deliveryDateTime}
+                      onChange={(e) => setFormData({ ...formData, deliveryDateTime: e.target.value })}
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#3b82f6')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Delivery Recipient</label>
+                    <input
+                      type="text"
+                      value={formData.deliveryRecipient}
+                      onChange={(e) => setFormData({ ...formData, deliveryRecipient: e.target.value })}
+                      placeholder="Recipient name"
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#3b82f6')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </div>
+                </div>
+
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#1f2937', marginTop: '1.5rem', marginBottom: '1rem' }}>
+                  Service & Payment
+                </h3>
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                  <div>
+                    <label style={labelStyle}>Service Description</label>
+                    <textarea
+                      value={formData.serviceDescription}
+                      onChange={(e) => setFormData({ ...formData, serviceDescription: e.target.value })}
+                      placeholder="Description of courier service provided"
+                      rows={3}
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#3b82f6')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                    <div>
+                      <label style={labelStyle}>VAT Rate (%)</label>
+                      <select
+                        value={formData.vatRate}
+                        onChange={(e) => setFormData({ ...formData, vatRate: parseInt(e.target.value) as 0 | 5 | 20 })}
+                        style={inputStyle}
+                      >
+                        <option value="0">0%</option>
+                        <option value="5">5%</option>
+                        <option value="20">20%</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Total Amount (£)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={formData.amount}
+                        onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
+                        placeholder="0.00"
+                        style={inputStyle}
+                        onFocus={(e) => (e.currentTarget.style.borderColor = '#3b82f6')}
+                        onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      />
+                    </div>
+                  </div>
+                  <div style={{ backgroundColor: '#f9fafb', padding: '1rem', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', fontSize: '0.95rem' }}>
+                      <div>
+                        <span style={{ color: '#6b7280', fontWeight: '500' }}>Net Amount:</span>
+                        <span style={{ fontWeight: '600', color: '#1f2937', marginLeft: '0.5rem' }}>
+                          £{formData.netAmount.toFixed(2)}
+                        </span>
+                      </div>
+                      <div>
+                        <span style={{ color: '#6b7280', fontWeight: '500' }}>VAT ({formData.vatRate}%):</span>
+                        <span style={{ fontWeight: '600', color: '#1f2937', marginLeft: '0.5rem' }}>
+                          £{formData.vatAmount.toFixed(2)}
+                        </span>
+                      </div>
+                      <div>
+                        <span style={{ color: '#6b7280', fontWeight: '500' }}>Total:</span>
+                        <span style={{ fontWeight: '700', color: '#10b981', marginLeft: '0.5rem' }}>
+                          £{formData.amount.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              {/* Job */}
-              <p style={sectionHdr}>Job Details</p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div>
-                  <label style={labelCls}>Collection Address</label>
-                  <input style={inputCls} value={form.pickupLocation ?? ''} onChange={(e) => set('pickupLocation', e.target.value)} />
-                </div>
-                <div>
-                  <label style={labelCls}>Collection Date/Time</label>
-                  <input style={inputCls} value={form.pickupDateTime ?? ''} onChange={(e) => set('pickupDateTime', e.target.value)} placeholder="e.g. 12 Jan 2025 09:00" />
-                </div>
-                <div>
-                  <label style={labelCls}>Delivery Address</label>
-                  <input style={inputCls} value={form.deliveryLocation ?? ''} onChange={(e) => set('deliveryLocation', e.target.value)} />
-                </div>
-                <div>
-                  <label style={labelCls}>Delivery Date/Time</label>
-                  <input style={inputCls} value={form.deliveryDateTime ?? ''} onChange={(e) => set('deliveryDateTime', e.target.value)} placeholder="e.g. 12 Jan 2025 14:00" />
-                </div>
-                <div>
-                  <label style={labelCls}>Recipient Name</label>
-                  <input style={inputCls} value={form.deliveryRecipient ?? ''} onChange={(e) => set('deliveryRecipient', e.target.value)} />
-                </div>
-                <div style={{ gridColumn: 'span 2' }}>
-                  <label style={labelCls}>Service Description</label>
-                  <input style={inputCls} value={form.serviceDescription} onChange={(e) => set('serviceDescription', e.target.value)} />
-                </div>
-              </div>
-
-              {/* Pricing */}
-              <p style={sectionHdr}>Pricing</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
-                <div>
-                  <label style={labelCls}>Net Amount (£)</label>
-                  <input type="number" step="0.01" min="0" style={inputCls} value={form.netAmount || ''} onChange={(e) => set('netAmount', parseFloat(e.target.value) || 0)} />
-                </div>
-                <div>
-                  <label style={labelCls}>VAT Rate</label>
-                  <select style={inputCls} value={form.vatRate} onChange={(e) => set('vatRate', parseInt(e.target.value) as 0 | 5 | 20)}>
-                    {COMPANY_CONFIG.vat.rates.map((r) => <option key={r} value={r}>{r}%</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label style={labelCls}>VAT Amount (£)</label>
-                  <input type="number" step="0.01" readOnly style={{ ...inputCls, backgroundColor: '#F9FAFB', color: '#6B7280' }} value={form.vatAmount.toFixed(2)} />
-                </div>
-              </div>
-              <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#0A2239', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.875rem' }}>Total Due</span>
-                <span style={{ color: 'white', fontWeight: 800, fontSize: '1.4rem' }}>£{gross.toFixed(2)}</span>
-              </div>
-
-              {/* POD */}
-              <p style={sectionHdr}>Proof of Delivery</p>
-              <PODPhotoUpload
-                jobId={invoiceId === 'new' ? 'new' : invoiceId}
-                existingPhotos={form.podPhotos ?? []}
-                onUploadComplete={(url) => set('podPhotos', [...(form.podPhotos ?? []), url])}
-              />
-
-              {/* Signature */}
-              <p style={sectionHdr}>Delivery Signature</p>
-              {form.signature ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <img src={form.signature} alt="Saved signature" style={{ maxHeight: '70px', border: '1px solid #E5E7EB', borderRadius: '4px', padding: '0.25rem', backgroundColor: 'white' }} />
-                  <button type="button" onClick={() => { set('signature', ''); set('recipientName', ''); }} style={{ padding: '0.4rem 0.8rem', border: '1.5px solid #E5E7EB', borderRadius: '6px', background: 'white', cursor: 'pointer', fontSize: '0.82rem', color: '#DC2626' }}>Remove</button>
-                  {form.recipientName && <span style={{ fontSize: '0.875rem', color: '#374151' }}>Signed by: <strong>{form.recipientName}</strong></span>}
-                </div>
-              ) : (
-                <SignatureCanvas onSave={(url) => set('signature', url)} onClear={() => set('signature', '')} />
-              )}
             </div>
-          ) : (
-            <div ref={printRef}>
-              <InvoiceTemplate invoice={form} />
-            </div>
-          )}
+
+            {/* Preview Section */}
+            {showPreview && (
+              <div>
+                <div
+                  style={{
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div style={{ padding: '1.5rem', borderBottom: '2px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1f2937', margin: 0 }}>
+                      Invoice Preview
+                    </h2>
+                  </div>
+                  <div style={{ padding: '1rem', maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
+                    <InvoiceTemplate invoice={formData} showPreview={true} />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </ProtectedRoute>

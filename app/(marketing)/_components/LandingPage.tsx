@@ -1,4 +1,5 @@
 'use client';
+
 import { Navbar } from './sections/Navbar';
 import { Hero } from './sections/Hero';
 import { KPIStats } from './sections/KPIStats';
@@ -12,17 +13,33 @@ import { Footer } from './sections/Footer';
 
 export function LandingPage() {
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-primary-navy-dark)', overflow: 'hidden' }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        backgroundColor: 'var(--color-primary-navy-dark)',
+        overflow: 'hidden',
+      }}
+    >
       <Navbar />
-      <div id="home"><Hero /></div>
+      <div id="home">
+        <Hero />
+      </div>
       <KPIStats />
-      <div id="for-drivers"><ForDrivers /></div>
-      <div id="for-companies"><ForCompanies /></div>
-      <div id="how-it-works"><HowItWorks /></div>
+      <div id="for-drivers">
+        <ForDrivers />
+      </div>
+      <div id="for-companies">
+        <ForCompanies />
+      </div>
+      <div id="how-it-works">
+        <HowItWorks />
+      </div>
       <Benefits />
       <Testimonials />
       <FAQ />
-      <div id="contact"><Footer /></div>
+      <div id="contact">
+        <Footer />
+      </div>
     </div>
   );
 }
