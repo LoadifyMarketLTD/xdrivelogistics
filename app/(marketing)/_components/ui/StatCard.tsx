@@ -1,38 +1,9 @@
-interface StatCardProps {
-  value: string
-  label: string
-  icon?: string
-}
-
-export default function StatCard({ value, label, icon }: StatCardProps) {
+interface StatCardProps { value: string; label: string; }
+export function StatCard({ value, label }: StatCardProps) {
   return (
-    <div style={{
-      background: 'var(--surface)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--r-lg)',
-      padding: '1.5rem',
-      boxShadow: 'var(--shadow-sm)',
-      textAlign: 'center',
-    }}>
-      {icon && (
-        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
-          {icon}
-        </div>
-      )}
-      <div style={{
-        fontSize: '2rem',
-        fontWeight: '700',
-        color: 'var(--brand)',
-        marginBottom: '0.25rem',
-      }}>
-        {value}
-      </div>
-      <div style={{
-        fontSize: '0.875rem',
-        color: 'var(--muted)',
-      }}>
-        {label}
-      </div>
+    <div style={{ backgroundColor: "var(--glass-bg)", border: "1px solid var(--glass-border)", borderRadius: "var(--radius-lg)", padding: "1.5rem", textAlign: "center", backdropFilter: "blur(10px)" }}>
+      <div style={{ fontSize: "clamp(2rem, 4vw, 2.5rem)", fontWeight: "var(--font-weight-bold)", color: "var(--color-gold-primary)", marginBottom: "0.5rem" }}>{value}</div>
+      <div style={{ fontSize: "0.95rem", color: "var(--color-text-white-transparent)", fontWeight: "var(--font-weight-medium)" }}>{label}</div>
     </div>
-  )
+  );
 }

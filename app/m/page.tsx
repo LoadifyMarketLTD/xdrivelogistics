@@ -1,198 +1,47 @@
-'use client'
+'use client';
 
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/lib/AuthContext'
-import { brandColors } from '@/lib/brandColors'
-import { useEffect } from 'react'
+import ProtectedRoute from '../components/ProtectedRoute';
+import { useAuth } from '../components/AuthContext';
 
-export default function MobileChooserPage() {
-  const router = useRouter()
-  const { profile, loading } = useAuth()
+export default function MobilePage() {
+  const { user, logout } = useAuth();
 
-  // Auto-route based on role if available
-  useEffect(() => {
-    if (loading) return
-    
-    if (profile?.role) {
-      // If role is 'driver', auto-route to driver app
-      if (profile.role === 'driver') {
-        router.push('/m/driver')
-        return
-      }
-      
-      // For other roles (admin, dispatcher, viewer), auto-route to fleet app
-      if (['admin', 'dispatcher', 'viewer'].includes(profile.role)) {
-        router.push('/m/fleet')
-        return
-      }
-    }
-  }, [profile, loading, router])
-
-  const handleFleetClick = () => {
-    router.push('/m/fleet')
-  }
-
-  const handleDriverClick = () => {
-    router.push('/m/driver')
-  }
+  const tiles = [
+    { id: 'active', label: 'Active Jobs', icon: '🚚', color: '#1F7A3D' },
+    { id: 'pickup', label: 'Pickup', icon: '📦', color: '#f59e0b' },
+    { id: 'delivery', label: 'Delivery', icon: '✅', color: '#2F6FB3' },
+    { id: 'history', label: 'History', icon: '📋', color: '#0A2239' },
+  ];
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: `linear-gradient(135deg, ${brandColors.primary.navy} 0%, ${brandColors.primary.navy} 50%, ${brandColors.background.light} 50%, ${brandColors.background.light} 100%)`,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px',
-    }}>
-      {/* Logo */}
-      <div style={{
-        fontSize: '28px',
-        fontWeight: '700',
-        color: brandColors.primary.gold,
-        marginBottom: '12px',
-        textAlign: 'center',
-        letterSpacing: '0.5px',
-      }}>
-        XDrive Logistics
+    <ProtectedRoute>
+      <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6', padding: 0 }}>
+        <header style={{ backgroundColor: '#0A2239', color: 'white', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+          <div>
+            <h1 style={{ fontSize: '1.25rem', fontWeight: '700', margin: 0 }}>Mobile Ops</h1>
+            <p style={{ fontSize: '0.85rem', margin: '0.25rem 0 0 0', opacity: 0.9 }}>{user?.email}</p>
+          </div>
+          <button onClick={logout} style={{ backgroundColor: 'rgba(255,255,255,0.2)', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.9rem', fontWeight: '600', cursor: 'pointer' }}>Logout</button>
+        </header>
+        <div style={{ padding: '1rem', maxWidth: '600px', margin: '0 auto' }}>
+          <div style={{ backgroundColor: 'white', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+            <p style={{ margin: 0, fontSize: '1rem', color: '#374151', textAlign: 'center' }}>Welcome! Select an option below to get started.</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+            {tiles.map((tile) => (
+              <button key={tile.id} onClick={() => window.location.href = '/m/jobs'}
+                style={{ backgroundColor: 'white', border: 'none', borderRadius: '12px', padding: '2rem 1rem', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', transition: 'all 0.2s', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', minHeight: '150px', position: 'relative' }}
+                onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.95)'; }}
+                onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+              >
+                <div style={{ fontSize: '3rem', lineHeight: 1 }}>{tile.icon}</div>
+                <div style={{ fontSize: '1.1rem', fontWeight: '600', color: '#1f2937', textAlign: 'center' }}>{tile.label}</div>
+                <div style={{ position: 'absolute', bottom: '0.5rem', width: '60%', height: '3px', backgroundColor: tile.color, borderRadius: '2px' }} />
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
-      
-      <div style={{
-        fontSize: '14px',
-        color: brandColors.text.light,
-        marginBottom: '48px',
-        textAlign: 'center',
-      }}>
-        Choose your experience
-      </div>
-
-      {/* Chooser Cards */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px',
-        width: '100%',
-        maxWidth: '400px',
-      }}>
-        {/* Fleet App Card */}
-        <button
-          onClick={handleFleetClick}
-          style={{
-            background: brandColors.background.white,
-            border: `2px solid ${brandColors.border.light}`,
-            borderRadius: '12px',
-            padding: '32px 24px',
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-4px)'
-            e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.15)'
-            e.currentTarget.style.borderColor = brandColors.primary.gold
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)'
-            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)'
-            e.currentTarget.style.borderColor = brandColors.border.light
-          }}
-        >
-          <div style={{
-            fontSize: '48px',
-            marginBottom: '16px',
-            textAlign: 'center',
-          }}>
-            🏢
-          </div>
-          <div style={{
-            fontSize: '24px',
-            fontWeight: '700',
-            color: brandColors.primary.navy,
-            marginBottom: '8px',
-            textAlign: 'center',
-          }}>
-            Fleet App
-          </div>
-          <div style={{
-            fontSize: '14px',
-            color: brandColors.text.secondary,
-            textAlign: 'center',
-            lineHeight: '1.5',
-          }}>
-            For team members, dispatchers, and office staff
-          </div>
-        </button>
-
-        {/* Driver App Card */}
-        <button
-          onClick={handleDriverClick}
-          style={{
-            background: brandColors.background.white,
-            border: `2px solid ${brandColors.border.light}`,
-            borderRadius: '12px',
-            padding: '32px 24px',
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-4px)'
-            e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.15)'
-            e.currentTarget.style.borderColor = brandColors.primary.gold
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)'
-            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)'
-            e.currentTarget.style.borderColor = brandColors.border.light
-          }}
-        >
-          <div style={{
-            fontSize: '48px',
-            marginBottom: '16px',
-            textAlign: 'center',
-          }}>
-            🚛
-          </div>
-          <div style={{
-            fontSize: '24px',
-            fontWeight: '700',
-            color: brandColors.primary.navy,
-            marginBottom: '8px',
-            textAlign: 'center',
-          }}>
-            Driver App
-          </div>
-          <div style={{
-            fontSize: '14px',
-            color: brandColors.text.secondary,
-            textAlign: 'center',
-            lineHeight: '1.5',
-          }}>
-            For drivers on the road
-          </div>
-        </button>
-      </div>
-
-      {/* Desktop Link */}
-      <div style={{
-        marginTop: '48px',
-        textAlign: 'center',
-      }}>
-        <button
-          onClick={() => router.push('/dashboard')}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: brandColors.text.light,
-            fontSize: '13px',
-            textDecoration: 'underline',
-            cursor: 'pointer',
-          }}
-        >
-          Use desktop version instead
-        </button>
-      </div>
-    </div>
-  )
+    </ProtectedRoute>
+  );
 }

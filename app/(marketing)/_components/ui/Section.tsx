@@ -1,27 +1,11 @@
-import { ReactNode } from 'react'
-
-interface SectionProps {
-  children: ReactNode
-  className?: string
-  id?: string
-}
-
-export default function Section({ children, className = '', id }: SectionProps) {
+import { ReactNode } from "react";
+interface SectionProps { children: ReactNode; className?: string; id?: string; backgroundColor?: string; }
+export function Section({ children, className = "", id, backgroundColor }: SectionProps) {
   return (
-    <section id={id} className={className} style={{
-      width: '100%',
-      paddingTop: '4rem',
-      paddingBottom: '4rem',
-    }}>
-      <div style={{
-        maxWidth: '1280px',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        paddingLeft: '1.5rem',
-        paddingRight: '1.5rem',
-      }}>
-        {children}
+    <section id={id} style={{ backgroundColor: backgroundColor || "transparent", width: "100%" }}>
+      <div className="container" style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 24px" }}>
+        <div className={className}>{children}</div>
       </div>
     </section>
-  )
+  );
 }

@@ -1,68 +1,45 @@
-import { ReactNode } from 'react'
+import { ReactNode, CSSProperties } from 'react';
 
 interface PrimaryButtonProps {
-  children: ReactNode
-  href?: string
-  onClick?: () => void
-  variant?: 'primary' | 'secondary'
-  size?: 'sm' | 'md' | 'lg'
+  children: ReactNode;
+  onClick?: () => void;
+  href?: string;
+  variant?: 'primary' | 'secondary';
+  size?: 'md' | 'lg';
+  style?: CSSProperties;
 }
 
-export default function PrimaryButton({ 
-  children, 
-  href, 
-  onClick, 
-  variant = 'primary',
-  size = 'md'
-}: PrimaryButtonProps) {
-  const baseStyle = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '0.5rem',
-    borderRadius: 'var(--r-md)',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'all 0.15s ease',
-    textDecoration: 'none',
-    border: 'none',
-  }
-
-  const sizeStyles = {
-    sm: { padding: '0.5rem 1rem', fontSize: '0.875rem' },
-    md: { padding: '0.75rem 1.5rem', fontSize: '1rem' },
-    lg: { padding: '1rem 2rem', fontSize: '1.125rem' },
-  }
-
-  const variantStyles = {
-    primary: {
-      background: 'var(--brand)',
-      color: '#fff',
-    },
-    secondary: {
-      background: 'var(--surface)',
-      color: 'var(--text)',
-      border: '1px solid var(--border)',
-    },
-  }
-
-  const style = {
-    ...baseStyle,
-    ...sizeStyles[size],
-    ...variantStyles[variant],
-  }
-
+export function PrimaryButton({ children, onClick, href, variant = 'primary', size = 'md', style }: PrimaryButtonProps) {
+  const baseStyles: CSSProperties = {
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+    padding: size === 'lg' ? '1rem 2rem' : '0.875rem 1.75rem',
+    fontSize: size === 'lg' ? '1.1rem' : '1rem',
+    fontWeight: 600,
+    borderRadius: '10px', border: 'none', cursor: 'pointer',
+    transition: 'all 0.3s ease', textDecoration: 'none', ...style,
+  };
+  const variantStyles: CSSProperties = variant === 'primary'
+    ? { backgroundColor: '#D4AF37', color: '#0A2239' }
+    : { backgroundColor: 'transparent', color: '#FFFFFF', border: '2px solid rgba(255,255,255,0.4)' };
+  const cs = { ...baseStyles, ...variantStyles };
+  const handleHover = (e: React.MouseEvent<HTMLElement>) => {
+    if (variant === 'primary') {
+      e.currentTarget.style.backgroundColor = '#b8962e';
+      e.currentTarget.style.transform = 'translateY(-2px)';
+    } else {
+      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+    }
+  };
+  const handleLeave = (e: React.MouseEvent<HTMLElement>) => {
+    if (variant === 'primary') {
+      e.currentTarget.style.backgroundColor = '#D4AF37';
+      e.currentTarget.style.transform = 'translateY(0)';
+    } else {
+      e.currentTarget.style.backgroundColor = 'transparent';
+    }
+  };
   if (href) {
-    return (
-      <a href={href} style={style}>
-        {children}
-      </a>
-    )
+    return <a href={href} style={cs} onMouseEnter={handleHover} onMouseLeave={handleLeave}>{children}</a>;
   }
-
-  return (
-    <button onClick={onClick} style={style}>
-      {children}
-    </button>
-  )
+  return <button onClick={onClick} style={cs} onMouseEnter={handleHover} onMouseLeave={handleLeave}>{children}</button>;
 }

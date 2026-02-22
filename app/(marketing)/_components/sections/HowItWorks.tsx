@@ -1,158 +1,156 @@
-import Section from '../ui/Section'
+'use client';
 
-export default function HowItWorks() {
-  const driverSteps = [
-    {
-      number: '01',
-      title: 'Create Account',
-      description: 'Register for free and complete your profile with the required documents.',
-    },
-    {
-      number: '02',
-      title: 'Find Loads',
-      description: 'Search for available loads on your route and apply instantly.',
-    },
-    {
-      number: '03',
-      title: 'Confirm and Deliver',
-      description: 'Receive confirmation, pick up the goods and deliver to destination.',
-    },
-    {
-      number: '04',
-      title: 'Receive Payment',
-      description: 'Funds arrive in your account within 24–48 hours after delivery.',
-    },
-  ]
+import { Section } from '../ui/Section';
 
-  const companySteps = [
-    {
-      number: '01',
-      title: 'Register Your Company',
-      description: 'Create a business account and add your company details.',
-    },
-    {
-      number: '02',
-      title: 'Post a Load',
-      description: 'Add transport details and your available budget.',
-    },
-    {
-      number: '03',
-      title: 'Choose a Driver',
-      description: 'Receive bids and select the right driver.',
-    },
-    {
-      number: '04',
-      title: 'Track Delivery',
-      description: 'Real-time tracking and destination confirmation.',
-    },
-  ]
+const STEPS = [
+  {
+    number: '01',
+    title: 'Contact Us',
+    description: 'Reach out via WhatsApp, phone, or email with your requirements',
+    icon: '📞',
+  },
+  {
+    number: '02',
+    title: 'Get Quote',
+    description: 'Receive a competitive quote tailored to your specific needs',
+    icon: '💰',
+  },
+  {
+    number: '03',
+    title: 'Book Service',
+    description: 'Confirm your booking and schedule pickup time',
+    icon: '📅',
+  },
+  {
+    number: '04',
+    title: 'Track Delivery',
+    description: 'Monitor your shipment in real-time until safe delivery',
+    icon: '📍',
+  },
+];
 
-  const StepCard = ({ number, title, description }: { number: string; title: string; description: string }) => (
-    <div style={{
-      background: 'var(--surface)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--r-lg)',
-      padding: '1.5rem',
-      boxShadow: 'var(--shadow-sm)',
-    }}>
-      <div style={{
-        fontSize: '2rem',
-        fontWeight: '700',
-        color: 'var(--brand)',
-        marginBottom: '0.75rem',
-        opacity: '0.5',
-      }}>
-        {number}
-      </div>
-      <h4 style={{
-        fontSize: '1.125rem',
-        fontWeight: '600',
-        color: 'var(--text)',
-        marginBottom: '0.5rem',
-      }}>
-        {title}
-      </h4>
-      <p style={{
-        fontSize: '0.9375rem',
-        color: 'var(--muted)',
-        lineHeight: '1.6',
-        margin: 0,
-      }}>
-        {description}
-      </p>
-    </div>
-  )
-
+export function HowItWorks() {
   return (
-    <Section id="how-it-works">
-      <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-        <h2 style={{
-          fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-          fontWeight: '700',
-          color: 'var(--text)',
-          marginBottom: '0.75rem',
-        }}>
-          How It Works
-        </h2>
-        <p style={{
-          fontSize: '1.125rem',
-          color: 'var(--muted)',
-          maxWidth: '600px',
-          margin: '0 auto',
-        }}>
-          Simple and Efficient
-        </p>
-      </div>
-
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr',
-        gap: '3rem',
-      }}>
-        {/* For Drivers */}
-        <div>
-          <h3 style={{
-            fontSize: '1.5rem',
-            fontWeight: '700',
-            color: 'var(--text)',
-            marginBottom: '1.5rem',
-            textAlign: 'center',
-          }}>
-            For Drivers
-          </h3>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '1.5rem',
-          }}>
-            {driverSteps.map((step) => (
-              <StepCard key={step.number} {...step} />
-            ))}
-          </div>
+    <Section backgroundColor="var(--color-primary-navy)">
+      <div style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+        {/* Section Header */}
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h2
+            style={{
+              fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+              fontWeight: 'var(--font-weight-bold)',
+              color: 'var(--color-text-white)',
+              marginBottom: '1rem',
+            }}
+          >
+            How It Works
+          </h2>
+          <p
+            style={{
+              fontSize: '1.1rem',
+              color: 'var(--color-text-white-transparent)',
+              maxWidth: '600px',
+              margin: '0 auto',
+            }}
+          >
+            Simple, fast, and reliable. Get your shipment moving in four easy steps.
+          </p>
         </div>
 
-        {/* For Companies */}
-        <div>
-          <h3 style={{
-            fontSize: '1.5rem',
-            fontWeight: '700',
-            color: 'var(--text)',
-            marginBottom: '1.5rem',
-            textAlign: 'center',
-          }}>
-            For Companies
-          </h3>
-          <div style={{
+        {/* Steps Grid */}
+        <div
+          style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '1.5rem',
-          }}>
-            {companySteps.map((step) => (
-              <StepCard key={step.number} {...step} />
-            ))}
-          </div>
+            gap: '2rem',
+          }}
+        >
+          {STEPS.map((step, index) => (
+            <div
+              key={step.number}
+              style={{
+                backgroundColor: 'var(--glass-bg)',
+                border: '1px solid var(--glass-border)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '2rem',
+                position: 'relative',
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              {/* Step Number Badge */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '-1rem',
+                  right: '1.5rem',
+                  backgroundColor: 'var(--color-gold-primary)',
+                  color: 'var(--color-primary-navy-dark)',
+                  width: '3rem',
+                  height: '3rem',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.25rem',
+                  fontWeight: 'var(--font-weight-bold)',
+                }}
+              >
+                {step.number}
+              </div>
+
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+                {step.icon}
+              </div>
+
+              <h3
+                style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 'var(--font-weight-semibold)',
+                  color: 'var(--color-text-white)',
+                  marginBottom: '0.75rem',
+                }}
+              >
+                {step.title}
+              </h3>
+
+              <p
+                style={{
+                  fontSize: '0.95rem',
+                  color: 'var(--color-text-white-transparent)',
+                  lineHeight: '1.5',
+                }}
+              >
+                {step.description}
+              </p>
+
+              {/* Connection Line (except last item) */}
+              {index < STEPS.length - 1 && (
+                <div
+                  className="connection-line"
+                  style={{
+                    position: 'absolute',
+                    right: '-1rem',
+                    top: '50%',
+                    width: '2rem',
+                    height: '2px',
+                    backgroundColor: 'var(--color-gold-primary)',
+                    opacity: 0.3,
+                  }}
+                />
+              )}
+            </div>
+          ))}
         </div>
       </div>
+
+      {/* Hide connection lines on mobile */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .connection-line {
+            display: none !important;
+          }
+        }
+      `}</style>
     </Section>
-  )
+  );
 }

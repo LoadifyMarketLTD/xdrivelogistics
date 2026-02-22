@@ -1,157 +1,129 @@
-import Section from '../ui/Section'
+'use client';
 
-export default function Benefits() {
-  const benefits = [
-    {
-      icon: '✅',
-      title: 'Full Verification',
-      description: 'All drivers go through a rigorous verification process for documents and history.',
-    },
-    {
-      icon: '⚡',
-      title: 'Instant Matching',
-      description: 'Smart algorithm connecting drivers with the right loads in seconds.',
-    },
-    {
-      icon: '💬',
-      title: '24/7 Support',
-      description: 'Our team is available around the clock for any issue or question.',
-    },
-    {
-      icon: '📈',
-      title: 'Grow Your Revenue',
-      description: 'Drivers earn more through access to more loads and optimised routes.',
-    },
-    {
-      icon: '🔒',
-      title: 'Secure Payments',
-      description: 'Secure payment system with guarantee for both parties.',
-    },
-    {
-      icon: '⭐',
-      title: 'Rating System',
-      description: 'Full transparency through authentic reviews and ratings from real users.',
-    },
-  ]
+import { Section } from '../ui/Section';
 
+const BENEFITS = [
+  {
+    icon: '⏰',
+    title: '24/7 Availability',
+    description: 'Round-the-clock service for urgent deliveries',
+  },
+  {
+    icon: '✅',
+    title: 'Fully Insured',
+    description: 'Complete coverage for peace of mind',
+  },
+  {
+    icon: '👨‍✈️',
+    title: 'Professional Drivers',
+    description: 'Experienced and vetted transport professionals',
+  },
+  {
+    icon: '💬',
+    title: 'Real-Time Updates',
+    description: 'Stay informed throughout the delivery process',
+  },
+  {
+    icon: '💳',
+    title: 'Flexible Payment',
+    description: 'Multiple payment options to suit your needs',
+  },
+  {
+    icon: '🌟',
+    title: 'Competitive Rates',
+    description: 'Quality service at fair, transparent pricing',
+  },
+];
+
+export function Benefits() {
   return (
-    <Section id="benefits">
-      <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-        <h2 style={{
-          fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-          fontWeight: '700',
-          color: 'var(--text)',
-          marginBottom: '0.75rem',
-        }}>
-          Why XDrive?
-        </h2>
-        <p style={{
-          fontSize: '1.125rem',
-          color: 'var(--muted)',
-          maxWidth: '600px',
-          margin: '0 auto',
-        }}>
-          Benefits That Make a Difference
-        </p>
-      </div>
-
-      {/* Top Stats */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '1.5rem',
-        marginBottom: '3rem',
-      }}>
-        <div style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--r-lg)',
-          padding: '2rem',
-          textAlign: 'center',
-          boxShadow: 'var(--shadow-sm)',
-        }}>
-          <div style={{
-            fontSize: '3rem',
-            fontWeight: '700',
-            color: 'var(--brand)',
-            marginBottom: '0.5rem',
-          }}>
-            99%
-          </div>
-          <div style={{
-            fontSize: '0.875rem',
-            color: 'var(--muted)',
-          }}>
-            On-Time Deliveries
-          </div>
-        </div>
-        <div style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--r-lg)',
-          padding: '2rem',
-          textAlign: 'center',
-          boxShadow: 'var(--shadow-sm)',
-        }}>
-          <div style={{
-            fontSize: '3rem',
-            fontWeight: '700',
-            color: 'var(--brand)',
-            marginBottom: '0.5rem',
-          }}>
-            4.8
-          </div>
-          <div style={{
-            fontSize: '0.875rem',
-            color: 'var(--muted)',
-          }}>
-            Average Rating
-          </div>
-        </div>
-      </div>
-
-      {/* Benefits Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-        gap: '1.5rem',
-      }}>
-        {benefits.map((benefit, idx) => (
-          <div
-            key={idx}
+    <Section>
+      <div style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+        {/* Section Header */}
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h2
             style={{
-              background: 'var(--surface)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--r-lg)',
-              padding: '1.5rem',
-              boxShadow: 'var(--shadow-sm)',
+              fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+              fontWeight: 'var(--font-weight-bold)',
+              color: 'var(--color-text-white)',
+              marginBottom: '1rem',
             }}
           >
-            <div style={{
-              fontSize: '2rem',
-              marginBottom: '0.75rem',
-            }}>
-              {benefit.icon}
+            Why Choose Danny Courier
+          </h2>
+          <p
+            style={{
+              fontSize: '1.1rem',
+              color: 'var(--color-text-white-transparent)',
+              maxWidth: '600px',
+              margin: '0 auto',
+            }}
+          >
+            Trusted by businesses across the UK and Europe for reliable transport solutions
+          </p>
+        </div>
+
+        {/* Benefits Grid */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '2rem',
+          }}
+        >
+          {BENEFITS.map((benefit) => (
+            <div
+              key={benefit.title}
+              style={{
+                backgroundColor: 'var(--glass-bg)',
+                border: '1px solid var(--glass-border)',
+                borderRadius: '20px',
+                padding: '2rem',
+                backdropFilter: 'blur(10px)',
+                transition: 'transform 0.3s ease, border-color 0.3s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.borderColor = 'var(--color-gold-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.borderColor = 'var(--glass-border)';
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '3rem',
+                  marginBottom: '1rem',
+                }}
+              >
+                {benefit.icon}
+              </div>
+
+              <h3
+                style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 'var(--font-weight-semibold)',
+                  color: 'var(--color-text-white)',
+                  marginBottom: '0.75rem',
+                }}
+              >
+                {benefit.title}
+              </h3>
+
+              <p
+                style={{
+                  fontSize: '0.95rem',
+                  color: 'var(--color-text-white-transparent)',
+                  lineHeight: '1.5',
+                }}
+              >
+                {benefit.description}
+              </p>
             </div>
-            <h3 style={{
-              fontSize: '1.125rem',
-              fontWeight: '600',
-              color: 'var(--text)',
-              marginBottom: '0.5rem',
-            }}>
-              {benefit.title}
-            </h3>
-            <p style={{
-              fontSize: '0.9375rem',
-              color: 'var(--muted)',
-              lineHeight: '1.6',
-              margin: 0,
-            }}>
-              {benefit.description}
-            </p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </Section>
-  )
+  );
 }

@@ -5,8 +5,7 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  // Ignore build artifacts, auto-generated files, and third-party UI components
-  globalIgnores(['.next', 'next-env.d.ts']),
+  globalIgnores(['dist', '.next']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -17,19 +16,6 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
-    },
-    rules: {
-      // Allow `any` types in this mixed JS/TS codebase (warn instead of error)
-      '@typescript-eslint/no-explicit-any': 'warn',
-      // Allow unused vars prefixed with _ (common convention for intentional ignores)
-      '@typescript-eslint/no-unused-vars': [
-        'warn',
-        {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-          caughtErrorsIgnorePattern: '^_',
-        },
-      ],
     },
   },
 ])
