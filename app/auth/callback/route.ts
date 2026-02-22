@@ -13,13 +13,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', url.origin))
   }
 
-  const supabase = await createClient()
-  const { error } = await supabase.auth.exchangeCodeForSession(code)
+  try {
+    const supabase = await createClient()
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
 
-  if (error) {
-    console.error('exchangeCodeForSession error:', error)
+    if (error) {
+      console.error('exchangeCodeForSession error:', error)
+      return NextResponse.redirect(new URL('/login', url.origin))
+    }
+
+    return NextResponse.redirect(new URL(next, url.origin))
+  } catch (error) {
+    console.error('Auth callback error:', error)
     return NextResponse.redirect(new URL('/login', url.origin))
   }
-
-  return NextResponse.redirect(new URL(next, url.origin))
 }
