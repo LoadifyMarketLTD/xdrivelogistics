@@ -2,7 +2,7 @@
 
 A modern logistics and courier exchange platform built with React, TypeScript, and Supabase.
 
-This is a hybrid application that uses **Vite** for the landing page and **Next.js** for the portal application.
+This application uses **Next.js** (App Router) for both the marketing landing page and the portal.
 
 ---
 
