@@ -7,22 +7,22 @@ import Panel from '@/components/portal/Panel'
 import StatCard from '@/components/portal/StatCard'
 import ResponsiveContainer from '@/components/layout/ResponsiveContainer'
 import ResponsiveGrid from '@/components/layout/ResponsiveGrid'
-import dynamic from 'next/dynamic'
+import dynamicImport from 'next/dynamic'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic'
 
 // Dynamically import recharts to avoid SSR issues
-const BarChart = dynamic(() => import('recharts').then(m => m.BarChart), { ssr: false })
-const Bar = dynamic(() => import('recharts').then(m => m.Bar), { ssr: false })
-const LineChart = dynamic(() => import('recharts').then(m => m.LineChart), { ssr: false })
-const Line = dynamic(() => import('recharts').then(m => m.Line), { ssr: false })
-const XAxis = dynamic(() => import('recharts').then(m => m.XAxis), { ssr: false })
-const YAxis = dynamic(() => import('recharts').then(m => m.YAxis), { ssr: false })
-const CartesianGrid = dynamic(() => import('recharts').then(m => m.CartesianGrid), { ssr: false })
-const Tooltip = dynamic(() => import('recharts').then(m => m.Tooltip), { ssr: false })
-const Legend = dynamic(() => import('recharts').then(m => m.Legend), { ssr: false })
-const RechartResponsiveContainer = dynamic(() => import('recharts').then(m => m.ResponsiveContainer), { ssr: false })
+const BarChart = dynamicImport(() => import('recharts').then(m => m.BarChart), { ssr: false })
+const Bar = dynamicImport(() => import('recharts').then(m => m.Bar), { ssr: false })
+const LineChart = dynamicImport(() => import('recharts').then(m => m.LineChart), { ssr: false })
+const Line = dynamicImport(() => import('recharts').then(m => m.Line), { ssr: false })
+const XAxis = dynamicImport(() => import('recharts').then(m => m.XAxis), { ssr: false })
+const YAxis = dynamicImport(() => import('recharts').then(m => m.YAxis), { ssr: false })
+const CartesianGrid = dynamicImport(() => import('recharts').then(m => m.CartesianGrid), { ssr: false })
+const Tooltip = dynamicImport(() => import('recharts').then(m => m.Tooltip), { ssr: false })
+const Legend = dynamicImport(() => import('recharts').then(m => m.Legend), { ssr: false })
+const RechartResponsiveContainer = dynamicImport(() => import('recharts').then(m => m.ResponsiveContainer), { ssr: false })
 
 interface JobRow {
   id: string
