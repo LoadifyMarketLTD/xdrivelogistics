@@ -13,8 +13,6 @@ export default function DriversPage() {
   const [formData, setFormData] = useState({ display_name: '', phone: '', email: '', company_id: '' });
   const [error, setError] = useState('');
 
-  useEffect(() => { loadDrivers(); loadCompanies(); }, []);
-
   const loadDrivers = async () => {
     setLoading(true);
     if (!isSupabaseConfigured) { setLoading(false); return; }
@@ -29,6 +27,9 @@ export default function DriversPage() {
     if (error) { console.error('Failed to load companies:', error.message); return; }
     if (data) setCompanies(data as Company[]);
   };
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { loadDrivers(); loadCompanies(); }, []);
 
   const handleCreate = async () => {
     if (!formData.display_name.trim()) { setError('Driver name is required'); return; }

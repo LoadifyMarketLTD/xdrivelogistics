@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import ProtectedRoute from '../../../components/ProtectedRoute';
-import { useAuth } from '../../../components/AuthContext';
 import PODPhotoUpload from '../../../components/PODPhotoUpload';
 import SignatureCanvas from '../../../components/SignatureCanvas';
 import DelayUpdate from '../../../components/DelayUpdate';
@@ -58,7 +57,6 @@ interface Job {
 }
 
 export default function JobDetailPage() {
-  const { user } = useAuth();
   const router = useRouter();
   const params = useParams();
   const jobId = params.id as string;

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import ProtectedRoute from '../../../components/ProtectedRoute';
-import { COMPANY_CONFIG, JOB_STATUS } from '../../../config/company';
+import { JOB_STATUS } from '../../../config/company';
 
 interface Job {
   id: string;
@@ -66,10 +66,6 @@ export default function JobDetailPage() {
   const [saveMessage, setSaveMessage] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  useEffect(() => {
-    loadJob();
-  }, [jobId]);
-
   const loadJob = () => {
     try {
       const stored = localStorage.getItem('danny_jobs');
@@ -90,6 +86,11 @@ export default function JobDetailPage() {
       setSaveMessage('Error loading job');
     }
   };
+
+  useEffect(() => {
+    loadJob();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jobId]);
 
   const handleEdit = () => {
     setEditMode(true);
@@ -113,22 +114,23 @@ export default function JobDetailPage() {
         const statusChanged = oldJob && oldJob.status !== formData.status;
         
         // Update status history if status changed
+        let updatedFormData = { ...formData };
         if (statusChanged) {
-          const statusHistory = formData.statusHistory || [];
-          statusHistory.push({
-            status: formData.status,
-            timestamp: new Date().toISOString()
-          });
-          formData.statusHistory = statusHistory;
+          const statusHistory = [
+            ...(formData.statusHistory || []),
+            { status: formData.status, timestamp: new Date().toISOString() },
+          ];
+          updatedFormData = { ...updatedFormData, statusHistory };
         }
         
         // Update timestamp
-        formData.updatedAt = new Date().toISOString();
+        updatedFormData = { ...updatedFormData, updatedAt: new Date().toISOString() };
         
-        jobs = jobs.map((j) => (j.id === jobId ? formData : j));
+        jobs = jobs.map((j) => (j.id === jobId ? updatedFormData : j));
         localStorage.setItem('danny_jobs', JSON.stringify(jobs));
         
-        setJob(formData);
+        setJob(updatedFormData);
+        setFormData(updatedFormData);
         setEditMode(false);
         setSaveMessage('Job saved successfully!');
         setTimeout(() => setSaveMessage(''), 3000);

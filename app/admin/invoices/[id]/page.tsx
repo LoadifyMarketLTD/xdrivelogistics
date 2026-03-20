@@ -39,40 +39,6 @@ export default function InvoiceDetailPage() {
   const [showPreview, setShowPreview] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
 
-  useEffect(() => {
-    if (!isNew) {
-      loadInvoice();
-    } else {
-      generateNewInvoiceData();
-    }
-  }, [invoiceId]);
-
-  useEffect(() => {
-    if (formData.date && formData.paymentTerms) {
-      const invoiceDate = new Date(formData.date);
-      const daysToAdd = formData.paymentTerms === '14 days' ? 14 : 30;
-      const dueDate = new Date(invoiceDate);
-      dueDate.setDate(dueDate.getDate() + daysToAdd);
-      setFormData((prev) => ({
-        ...prev,
-        dueDate: dueDate.toISOString().split('T')[0],
-      }));
-    }
-  }, [formData.date, formData.paymentTerms]);
-
-  // Calculate VAT breakdown whenever amount or VAT rate changes
-  useEffect(() => {
-    if (formData.amount > 0) {
-      const netAmount = formData.amount / (1 + formData.vatRate / 100);
-      const vatAmount = formData.amount - netAmount;
-      setFormData((prev) => ({
-        ...prev,
-        netAmount: Number(netAmount.toFixed(2)),
-        vatAmount: Number(vatAmount.toFixed(2)),
-      }));
-    }
-  }, [formData.amount, formData.vatRate]);
-
   // Generate unique Job Reference using timestamp to prevent collisions
   // Format: DC-YYMMDD-XXXX where XXXX is based on timestamp
   // NOTE: In production, use a proper sequential counter from database
@@ -135,6 +101,41 @@ export default function InvoiceDetailPage() {
       router.push('/admin/invoices');
     }
   };
+
+  useEffect(() => {
+    if (!isNew) {
+      loadInvoice();
+    } else {
+      generateNewInvoiceData();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [invoiceId]);
+
+  useEffect(() => {
+    if (formData.date && formData.paymentTerms) {
+      const invoiceDate = new Date(formData.date);
+      const daysToAdd = formData.paymentTerms === '14 days' ? 14 : 30;
+      const dueDate = new Date(invoiceDate);
+      dueDate.setDate(dueDate.getDate() + daysToAdd);
+      setFormData((prev) => ({
+        ...prev,
+        dueDate: dueDate.toISOString().split('T')[0],
+      }));
+    }
+  }, [formData.date, formData.paymentTerms]);
+
+  // Calculate VAT breakdown whenever amount or VAT rate changes
+  useEffect(() => {
+    if (formData.amount > 0) {
+      const netAmount = formData.amount / (1 + formData.vatRate / 100);
+      const vatAmount = formData.amount - netAmount;
+      setFormData((prev) => ({
+        ...prev,
+        netAmount: Number(netAmount.toFixed(2)),
+        vatAmount: Number(vatAmount.toFixed(2)),
+      }));
+    }
+  }, [formData.amount, formData.vatRate]);
 
   const handleSave = () => {
     try {
@@ -429,7 +430,7 @@ export default function InvoiceDetailPage() {
                     <label style={labelStyle}>Status</label>
                     <select
                       value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                      onChange={(e) => setFormData({ ...formData, status: e.target.value as InvoiceData['status'] })}
                       style={inputStyle}
                     >
                       <option value="Pending">Pending</option>

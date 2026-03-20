@@ -11,10 +11,6 @@ export default function InvoicesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Paid' | 'Pending' | 'Overdue'>('All');
 
-  useEffect(() => {
-    loadInvoices();
-  }, []);
-
   const loadInvoices = () => {
     try {
       const stored = localStorage.getItem('dannycourier_invoices');
@@ -38,6 +34,11 @@ export default function InvoicesPage() {
     const due = new Date(dueDate);
     return today > due ? 'Overdue' : 'Pending';
   };
+
+  useEffect(() => {
+    loadInvoices();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filteredInvoices = invoices.filter((invoice) => {
     const matchesSearch =
@@ -148,7 +149,7 @@ export default function InvoicesPage() {
                 {/* Status Filter */}
                 <select
                   value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as any)}
+                  onChange={(e) => setStatusFilter(e.target.value as 'All' | 'Paid' | 'Pending' | 'Overdue')}
                   style={{
                     padding: '0.75rem 1rem',
                     border: '2px solid #e5e7eb',

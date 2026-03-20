@@ -8,13 +8,15 @@ import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 export default function AdminPage() {
   const { user, logout } = useAuth();
   const [activeSection, setActiveSection] = useState('dashboard');
-  const [stats, setStats] = useState({ activeJobs: '—', pendingQuotes: '—', activeDrivers: '—', completedToday: '—' });
+  const [stats, setStats] = useState(() => ({
+    activeJobs: isSupabaseConfigured ? '—' : '0',
+    pendingQuotes: isSupabaseConfigured ? '—' : '0',
+    activeDrivers: isSupabaseConfigured ? '—' : '0',
+    completedToday: isSupabaseConfigured ? '—' : '0',
+  }));
 
   useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setStats({ activeJobs: '0', pendingQuotes: '0', activeDrivers: '0', completedToday: '0' });
-      return;
-    }
+    if (!isSupabaseConfigured) return;
     // Use start-of-UTC-day so "today" is consistent with the timestamps stored by Supabase
     const todayUtc = new Date().toISOString().slice(0, 10);
     Promise.all([
