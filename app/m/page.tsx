@@ -1,12 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { useAuth } from '../components/AuthContext';
 
 export default function MobilePage() {
   const { user, logout } = useAuth();
-  const router = useRouter();
 
   const tiles = [
     { id: 'active', label: 'Active Jobs', icon: '🚚', color: '#1F7A3D' },
@@ -15,8 +13,8 @@ export default function MobilePage() {
     { id: 'history', label: 'History', icon: '📋', color: '#0A2239' },
   ];
 
-  const handleTileClick = () => {
-    router.push('/m/jobs');
+  const handleTileClick = (tileId: string) => {
+    window.location.href = '/m/jobs';
   };
 
   return (
@@ -105,7 +103,7 @@ export default function MobilePage() {
             {tiles.map((tile) => (
               <button
                 key={tile.id}
-                onClick={() => handleTileClick()}
+                onClick={() => handleTileClick(tile.id)}
                 style={{
                   backgroundColor: 'white',
                   border: 'none',

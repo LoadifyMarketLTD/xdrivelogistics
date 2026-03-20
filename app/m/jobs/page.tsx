@@ -56,7 +56,7 @@ const mockJobs: Job[] = [
 ];
 
 export default function JobsPage() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'pickup' | 'delivery' | 'completed'>('all');
 
@@ -172,7 +172,7 @@ export default function JobsPage() {
             {filters.map((filter) => (
               <button
                 key={filter.id}
-                onClick={() => setActiveFilter(filter.id as 'all' | 'active' | 'pickup' | 'delivery' | 'completed')}
+                onClick={() => setActiveFilter(filter.id as any)}
                 style={{
                   backgroundColor: activeFilter === filter.id 
                     ? 'rgba(255, 255, 255, 0.3)' 

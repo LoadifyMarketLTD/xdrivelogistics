@@ -27,22 +27,8 @@ const LEGACY_CREDENTIALS = [
 ];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    // For legacy (non-Supabase) mode, initialize user from localStorage immediately
-    // to avoid synchronous setState in useEffect
-    if (isSupabaseConfigured || typeof window === 'undefined') return null;
-    const storedUser = localStorage.getItem('danny_user');
-    if (!storedUser) return null;
-    try {
-      const parsed = JSON.parse(storedUser);
-      return { id: parsed.email, email: parsed.email, role: parsed.role };
-    } catch {
-      localStorage.removeItem('danny_user');
-      return null;
-    }
-  });
-  // When Supabase is configured, start in loading state; otherwise already loaded
-  const [isLoading, setIsLoading] = useState(isSupabaseConfigured);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -73,8 +59,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       return () => subscription.unsubscribe();
+    } else {
+      // Legacy localStorage auth
+      const storedUser = localStorage.getItem('danny_user');
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          // In legacy mode, use email as ID (no real UUID available without Supabase)
+          setUser({ id: parsed.email, email: parsed.email, role: parsed.role });
+        } catch (error) {
+          console.error('Failed to parse stored user:', error);
+          localStorage.removeItem('danny_user');
+        }
+      }
+      setIsLoading(false);
     }
-    // Legacy localStorage auth: user already initialized via lazy useState above
   }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {

@@ -48,8 +48,8 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           router.push('/admin');
         }, 1000);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to login');
+    } catch (err: any) {
+      setError(err.message || 'Failed to login');
     } finally {
       setLoading(false);
     }
@@ -96,8 +96,8 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           setIsRegisterMode(false);
         }, 3000);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to register');
+    } catch (err: any) {
+      setError(err.message || 'Failed to register');
     } finally {
       setLoading(false);
     }
